@@ -502,6 +502,10 @@ tr:hover td { background: rgba(239,68,68,.03); }
   color: var(--text3); margin-bottom: 14px;
   display: flex; align-items: center; justify-content: space-between;
 }
+/* DOC CARDS */
+.doc-card { position: relative; }
+#docs-dynamic-area .grid { margin-bottom: 0; }
+
 .kanban-card {
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--radius2); padding: 14px;
@@ -935,11 +939,11 @@ body.is-admin .admin-only-block { display: block; }
         <i class="fas fa-search" style="color:var(--text3)"></i>
         <input type="text" placeholder="Buscar…">
       </div>
-      <div class="btn-icon notif-btn" data-tooltip="Notificações" onclick="showToast('Sistema de notificações em breve.','info')">
+      <div class="btn-icon notif-btn" data-tooltip="Notificações" onclick="openNotificacoes()">
         <i class="fas fa-bell"></i>
         <span class="notif-dot"></span>
       </div>
-      <div class="btn-icon" data-tooltip="Configurações" onclick="showToast('Configurações em breve.','info')">
+      <div class="btn-icon" data-tooltip="Configurações" onclick="openConfiguracoes()">
         <i class="fas fa-cog"></i>
       </div>
       <span id="topbar-role-badge" class="role-badge admin" style="margin-right:4px"><i class="fas fa-shield-alt"></i> Admin</span><div class="btn-icon" data-tooltip="Tema" onclick="toggleTheme()">
@@ -1420,10 +1424,12 @@ body.is-admin .admin-only-block { display: block; }
       </div>
 
       <div class="inner-panel" id="ag-cal">
-        <div class="card" style="text-align:center;padding:60px">
-          <i class="fas fa-calendar-alt" style="font-size:48px;color:var(--teal);margin-bottom:16px;opacity:.5"></i>
-          <div style="font-size:16px;color:var(--text2)">Visualização de calendário em desenvolvimento</div>
-          <div style="font-size:13px;color:var(--text3);margin-top:8px">Integração com Google Calendar em breve</div>
+        <div class="card" style="padding:24px">
+          <div id="mini-calendar-container">
+            <div style="text-align:center;padding:24px;color:var(--text3)">
+              <i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Carregando calendário…
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1611,42 +1617,63 @@ body.is-admin .admin-only-block { display: block; }
     ══════════════════════════════ -->
     <div class="page" id="page-documentos">
       <div class="section-title">Documentos</div>
-      <div class="section-sub">Repositório central de arquivos, formulários e materiais da liga.</div>
-      <div style="display:flex;gap:12px;margin-bottom:20px">
-        <div class="search-box" style="flex:1"><i class="fas fa-search" style="color:var(--text3)"></i><input type="text" placeholder="Buscar documento…"></div>
+      <div class="section-sub">Repositório central de arquivos, formulários e materiais da liga — armazenados no Google Drive.</div>
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
+        <div class="search-box" style="flex:1;min-width:200px">
+          <i class="fas fa-search" style="color:var(--text3)"></i>
+          <input id="doc-search-input" type="text" placeholder="Buscar documento…" oninput="filtrarDocumentos(this.value)">
+        </div>
+        <select id="doc-filter-cat" class="form-select" style="width:auto;padding:8px 12px" onchange="filtrarDocumentos(document.getElementById('doc-search-input').value)">
+          <option value="">Todas as categorias</option>
+          <option>Ata</option><option>Financeiro</option><option>Regulamento</option>
+          <option>Marketing</option><option>Pesquisa</option><option>Extensão</option>
+          <option>Ensino</option><option>Imagem</option><option>Geral</option>
+        </select>
         <button class="btn btn-primary admin-only" onclick="uploadDocumento()"><i class="fas fa-upload"></i> Enviar arquivo</button>
       </div>
-      <div class="grid grid-4">
-        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-          <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px"></i>
+      <!-- Cards dinâmicos da API + fixos abaixo -->
+      <div id="docs-dynamic-area" style="margin-bottom:12px"></div>
+      <div class="grid grid-4" id="docs-static-grid">
+        <div class="doc-card card" data-nome="Estatuto 2025" data-cat="Regulamento" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <span class="badge teal" style="font-size:9px;position:absolute;top:8px;right:8px">Regulamento</span>
+          <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px;margin-top:8px"></i>
           <div style="font-size:13px;font-weight:600">Estatuto 2025</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 2.1 MB</div>
         </div>
-        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-          <i class="fas fa-file-excel" style="font-size:36px;color:var(--sage);margin-bottom:12px"></i>
+        <div class="doc-card card" data-nome="Planilha Financeira 2026" data-cat="Financeiro" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <span class="badge gold" style="font-size:9px;position:absolute;top:8px;right:8px">Financeiro</span>
+          <i class="fas fa-file-excel" style="font-size:36px;color:var(--sage);margin-bottom:12px;margin-top:8px"></i>
           <div style="font-size:13px;font-weight:600">Planilha Financeira 2026</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">XLSX • 540 KB</div>
         </div>
-        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-          <i class="fas fa-file-word" style="font-size:36px;color:var(--sky);margin-bottom:12px"></i>
+        <div class="doc-card card" data-nome="Ata Abril 2026" data-cat="Ata" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <span class="badge lav" style="font-size:9px;position:absolute;top:8px;right:8px">Ata</span>
+          <i class="fas fa-file-word" style="font-size:36px;color:var(--sky);margin-bottom:12px;margin-top:8px"></i>
           <div style="font-size:13px;font-weight:600">Ata Abril 2026</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">DOCX • 180 KB</div>
         </div>
-        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-          <i class="fas fa-file-image" style="font-size:36px;color:var(--lavender);margin-bottom:12px"></i>
+        <div class="doc-card card" data-nome="Manual de Marca" data-cat="Marketing" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <span class="badge lav" style="font-size:9px;position:absolute;top:8px;right:8px">Marketing</span>
+          <i class="fas fa-file-image" style="font-size:36px;color:var(--lavender);margin-bottom:12px;margin-top:8px"></i>
           <div style="font-size:13px;font-weight:600">Manual de Marca</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 8.4 MB</div>
         </div>
-        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-          <i class="fas fa-file-alt" style="font-size:36px;color:var(--gold);margin-bottom:12px"></i>
+        <div class="doc-card card" data-nome="Regimento Interno" data-cat="Regulamento" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <span class="badge teal" style="font-size:9px;position:absolute;top:8px;right:8px">Regulamento</span>
+          <i class="fas fa-file-alt" style="font-size:36px;color:var(--gold);margin-bottom:12px;margin-top:8px"></i>
           <div style="font-size:13px;font-weight:600">Regimento Interno</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 1.3 MB</div>
         </div>
-        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
-          <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px"></i>
+        <div class="doc-card card" data-nome="Rel. Semestral 2025.2" data-cat="Geral" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <span class="badge sage" style="font-size:9px;position:absolute;top:8px;right:8px">Geral</span>
+          <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px;margin-top:8px"></i>
           <div style="font-size:13px;font-weight:600">Rel. Semestral 2025.2</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 3.7 MB</div>
         </div>
+      </div>
+      <div id="docs-empty-msg" style="display:none;text-align:center;padding:32px;color:var(--text3)">
+        <i class="fas fa-folder-open" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>
+        Nenhum documento encontrado para este filtro.
       </div>
     </div>
 
@@ -1686,23 +1713,26 @@ body.is-admin .admin-only-block { display: block; }
       <div class="modal-title">Reunião Ordinária #04 — Abril 2026</div>
       <button class="modal-close" onclick="closeModal('modal-ver-ata')">✕</button>
     </div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px"><i class="fas fa-calendar"></i> 08 Abr 2026 &nbsp;|&nbsp; <i class="fas fa-clock"></i> 18h00 &nbsp;|&nbsp; <i class="fas fa-users"></i> 22 presentes</div>
+    <div class="ata-meta-info" style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      <i class="fas fa-calendar"></i> 08 Abr 2026 &nbsp;|&nbsp; <i class="fas fa-clock"></i> 18h00 &nbsp;|&nbsp; <i class="fas fa-users"></i> 22 presentes
+    </div>
     <div style="font-weight:600;margin-bottom:8px">Pauta</div>
-    <ul style="padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8">
+    <ul class="ata-pauta-content" style="padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8">
       <li>Relatório de atividades — Março 2026</li>
       <li>Planejamento Simulacro de Emergência — Maio</li>
       <li>Atualização financeira — Tesouraria</li>
       <li>Abertura de vagas para novos membros</li>
     </ul>
     <div style="font-weight:600;margin:14px 0 8px">Deliberações</div>
-    <ul style="padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8">
+    <ul class="ata-delib-content" style="padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8">
       <li>Aprovado: Realizar simulacro em 10/05 no pátio da faculdade</li>
       <li>Aprovado: Abrir 10 vagas para processo seletivo 2026.2</li>
       <li>Postergado: Discussão sobre novo regimento para próxima reunião</li>
     </ul>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="showToast('Download integrado ao Google Drive em breve.','info')"><i class="fas fa-download"></i> Baixar PDF</button>
-      <button class="btn btn-primary admin-only" onclick="showToast('Edição de ata em breve.','info')"><i class="fas fa-edit"></i> Editar</button>
+      <button class="btn btn-outline btn-download-ata" onclick="showToast('Arquivo não vinculado ao Drive ainda.','info')"><i class="fas fa-download"></i> Baixar PDF</button>
+      <button class="btn btn-outline btn-edit-ata admin-only" onclick="showToast('Clique em Editar na lista de atas.','info')"><i class="fas fa-edit"></i> Editar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-ver-ata')">Fechar</button>
     </div>
   </div>
 </div>
@@ -1909,7 +1939,253 @@ body.is-admin .admin-only-block { display: block; }
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-doc')">Fechar</button>
-      <button class="btn btn-primary"><i class="fas fa-download"></i> Baixar PDF</button>
+      <button class="btn btn-primary" onclick="showToast('Vincule o link do Drive ao arquivo Estatuto 2025 para habilitar o download.','info')"><i class="fas fa-download"></i> Baixar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Upload de Documento/Imagem para o Google Drive -->
+<div class="modal-overlay" id="modal-upload-doc">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-cloud-upload-alt" style="color:var(--teal);margin-right:8px"></i>Enviar arquivo para o Google Drive</div>
+      <button class="modal-close" onclick="closeModal('modal-upload-doc')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Arquivo <span style="color:var(--coral)">*</span></label>
+      <input id="upload-file-input" class="form-input" type="file"
+        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.svg,.zip,.txt"
+        style="padding:8px;cursor:pointer">
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Formatos aceitos: PDF, Word, Excel, PowerPoint, Imagens, ZIP. Máximo: 20 MB.</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nome para exibição</label>
+        <input id="upload-file-name" class="form-input" type="text" placeholder="Ex: Ata Abril 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <select id="upload-category" class="form-select">
+          <option value="Geral">Geral</option>
+          <option value="Ata">Ata</option>
+          <option value="Financeiro">Financeiro</option>
+          <option value="Regulamento">Regulamento</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Pesquisa">Pesquisa</option>
+          <option value="Extensão">Extensão</option>
+          <option value="Ensino">Ensino</option>
+          <option value="Imagem">Imagem</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição (opcional)</label>
+      <input id="upload-desc" class="form-input" type="text" placeholder="Breve descrição do arquivo">
+    </div>
+    <!-- Barra de progresso -->
+    <div id="upload-progress-bar" style="display:none;margin:12px 0">
+      <div class="progress-bar" style="height:8px;border-radius:4px;background:var(--bg3)">
+        <div class="progress-fill" style="width:0%;transition:width .4s ease;border-radius:4px"></div>
+      </div>
+      <div id="upload-status-msg" style="font-size:12px;color:var(--text3);margin-top:6px;text-align:center"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-upload-doc')">Cancelar</button>
+      <button id="btn-upload-exec" class="btn btn-primary" onclick="executarUpload()">
+        <i class="fas fa-upload"></i> Enviar para o Drive
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Membro -->
+<div class="modal-overlay" id="modal-edit-membro">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-user-edit" style="color:var(--teal);margin-right:8px"></i>Editar Membro</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-membro')">✕</button>
+    </div>
+    <input type="hidden" id="edit-membro-id">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nome completo</label><input id="edit-membro-nome" class="form-input" type="text" placeholder="Nome do membro"></div>
+      <div class="form-group"><label class="form-label">Matrícula</label><input id="edit-membro-mat" class="form-input" type="text" placeholder="Ex: 2023001"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Período</label>
+        <select id="edit-membro-periodo" class="form-select">
+          <option value="1">1º</option><option value="2">2º</option><option value="3">3º</option>
+          <option value="4">4º</option><option value="5">5º</option><option value="6">6º</option>
+          <option value="7">7º</option><option value="8">8º</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Setor</label>
+        <select id="edit-membro-setor" class="form-select">
+          <option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option>
+          <option>Extensão</option><option>Ensino</option><option>Secretaria</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Cargo</label>
+        <select id="edit-membro-cargo" class="form-select">
+          <option>Membro</option><option>Coordenador(a)</option><option>Diretor(a)</option>
+          <option>Presidente</option><option>Vice-Presidente</option><option>Tesoureiro(a)</option><option>Secretário(a)</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select id="edit-membro-status" class="form-select">
+          <option value="Ativo">Ativo</option>
+          <option value="Afastado">Afastado</option>
+          <option value="Desligado">Desligado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-membro')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoMembro()"><i class="fas fa-save"></i> Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Evento -->
+<div class="modal-overlay" id="modal-edit-evento">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-calendar-edit" style="color:var(--teal);margin-right:8px"></i>Editar Evento</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-evento')">✕</button>
+    </div>
+    <input type="hidden" id="edit-evento-id">
+    <div class="form-group"><label class="form-label">Título</label><input id="edit-evento-titulo" class="form-input" type="text"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo</label>
+        <select id="edit-evento-tipo" class="form-select">
+          <option>Palestra</option><option>Workshop</option><option>Reunião</option>
+          <option>Jornada</option><option>Ação de extensão</option><option>Congresso</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Data</label><input id="edit-evento-data" class="form-input" type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Horário início</label><input id="edit-evento-horainicio" class="form-input" type="time"></div>
+      <div class="form-group"><label class="form-label">Horário fim</label><input id="edit-evento-horafim" class="form-input" type="time"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Local</label><input id="edit-evento-local" class="form-input" type="text"></div>
+      <div class="form-group"><label class="form-label">Responsável</label><input id="edit-evento-resp" class="form-input" type="text"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea id="edit-evento-desc" class="form-textarea"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-evento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoEvento()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Projeto de Pesquisa -->
+<div class="modal-overlay" id="modal-edit-projeto">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-flask" style="color:var(--teal);margin-right:8px"></i>Editar Projeto</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-projeto')">✕</button>
+    </div>
+    <input type="hidden" id="edit-proj-id">
+    <div class="form-group"><label class="form-label">Título</label><input id="edit-proj-titulo" class="form-input" type="text"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Status</label>
+        <select id="edit-proj-status" class="form-select">
+          <option>Planejamento</option><option>Aguardando CEP</option><option>Coleta de dados</option>
+          <option>Análise</option><option>Escrita</option><option>Publicado</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">CAAE</label><input id="edit-proj-caae" class="form-input" type="text" placeholder="Nº CAAE"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Pesquisadores</label><input id="edit-proj-pesq" class="form-input" type="number" min="0"></div>
+      <div class="form-group"><label class="form-label">Progresso (%)</label><input id="edit-proj-prog" class="form-input" type="number" min="0" max="100"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea id="edit-proj-desc" class="form-textarea"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-projeto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoProjeto()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Ata -->
+<div class="modal-overlay" id="modal-edit-ata">
+  <div class="modal" style="width:600px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-file-alt" style="color:var(--teal);margin-right:8px"></i>Editar Ata</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-ata')">✕</button>
+    </div>
+    <input type="hidden" id="edit-ata-id">
+    <div class="form-row">
+      <div class="form-group" style="flex:2"><label class="form-label">Título</label><input id="edit-ata-titulo" class="form-input" type="text"></div>
+      <div class="form-group"><label class="form-label">Data</label><input id="edit-ata-data" class="form-input" type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Presentes</label><input id="edit-ata-presentes" class="form-input" type="number" min="0"></div>
+      <div class="form-group"><label class="form-label">Duração</label><input id="edit-ata-duracao" class="form-input" type="text" placeholder="Ex: 1h30min"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select id="edit-ata-status" class="form-select">
+          <option value="Aprovada">Aprovada</option>
+          <option value="Pendente assinatura">Pendente assinatura</option>
+          <option value="Rascunho">Rascunho</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Pauta (uma linha por item)</label><textarea id="edit-ata-pauta" class="form-textarea" placeholder="Item 1&#10;Item 2&#10;Item 3"></textarea></div>
+    <div class="form-group"><label class="form-label">Deliberações (uma linha por item)</label><textarea id="edit-ata-delib" class="form-textarea" placeholder="Decisão 1&#10;Decisão 2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-ata')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoAta()"><i class="fas fa-save"></i> Salvar ata</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Notificações -->
+<div class="modal-overlay" id="modal-notificacoes">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-bell" style="color:var(--teal);margin-right:8px"></i>Notificações</div>
+      <button class="modal-close" onclick="closeModal('modal-notificacoes')">✕</button>
+    </div>
+    <div id="notif-list" style="max-height:360px;overflow-y:auto">
+      <div style="text-align:center;padding:24px;color:var(--text3)"><i class="fas fa-spinner fa-spin"></i></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('modal-notificacoes')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Configurações -->
+<div class="modal-overlay" id="modal-configuracoes">
+  <div class="modal" style="width:500px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-cog" style="color:var(--teal);margin-right:8px"></i>Configurações</div>
+      <button class="modal-close" onclick="closeModal('modal-configuracoes')">✕</button>
+    </div>
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px">Geral</div>
+    <div class="form-group">
+      <label class="form-label">Nome da organização</label>
+      <input id="cfg-nome-org" class="form-input" type="text" placeholder="Ex: LAPA — Liga de Primeiros Auxilios" value="LAPA — Liga de Primeiros Auxilios">
+    </div>
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:18px 0 12px">Integração Google</div>
+    <div class="form-group">
+      <label class="form-label">URL do Google Apps Script (API)</label>
+      <input id="cfg-api-url" class="form-input" type="text" placeholder="https://script.google.com/macros/s/…/exec">
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Cole a URL de implantação do seu Apps Script para conectar à planilha.</div>
+    </div>
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:18px 0 12px">Aparência</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-outline" onclick="toggleTheme();closeModal('modal-configuracoes')">
+        <i class="fas fa-adjust"></i> Alternar tema claro/escuro
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-configuracoes')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarConfiguracoes()"><i class="fas fa-save"></i> Salvar</button>
     </div>
   </div>
 </div>
@@ -2120,6 +2396,7 @@ function showPage(id) {
     ensino:     loadEnsino,
     ouvidoria:  loadOuvidoria,
     marketing:  loadMarketing,
+    documentos: loadDocumentos,
   };
   if (loaders[id]) loaders[id]();
 }
@@ -2142,7 +2419,9 @@ function openModal(id) {
   // Modais de edição/criação exigem admin
   const adminModals = ['modal-add-membro','modal-nova-ata','modal-lancamento',
     'modal-novo-evento','modal-novo-projeto','modal-novo-curso',
-    'modal-nova-acao','modal-nova-corr','modal-new-task'];
+    'modal-nova-acao','modal-nova-corr','modal-new-task',
+    'modal-upload-doc','modal-edit-membro','modal-edit-evento',
+    'modal-edit-projeto','modal-edit-ata','modal-configuracoes'];
   if (adminModals.includes(id) && !isAdmin()) {
     showToast('Apenas administradores podem adicionar ou editar dados.', 'warning');
     return;
@@ -2549,8 +2828,9 @@ function renderSecMembros(data) {
 // ══════════════════════════════════════════════════════════════
 
 async function loadSecretaria() {
-  loadMembros(); // Recarrega tabela de membros (usada nas sub-abas)
+  loadMembros();
   loadAtas();
+  loadCorrespondencias();
 }
 
 async function loadAtas() {
@@ -2588,12 +2868,36 @@ async function loadAtas() {
   }
 }
 
-function verAta(id, titulo) {
-  document.querySelector('#modal-ver-ata .modal-title').textContent = titulo || 'Ata';
+async function verAta(id, titulo) {
+  const modalTitle = document.querySelector('#modal-ver-ata .modal-title');
+  if (modalTitle) modalTitle.textContent = titulo || 'Ata';
+
+  // Tenta buscar conteúdo real da ata
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Atas' });
+    const ata  = data?.find(a => String(a.ID) === String(id));
+    if (ata) {
+      const pautaEl = document.querySelector('#modal-ver-ata .ata-pauta-content');
+      const delibEl = document.querySelector('#modal-ver-ata .ata-delib-content');
+      const metaEl  = document.querySelector('#modal-ver-ata .ata-meta-info');
+      if (metaEl) metaEl.innerHTML = `<i class="fas fa-calendar"></i> ${formatDate(ata.Data)} &nbsp;|&nbsp; <i class="fas fa-clock"></i> ${ata.Duracao || '—'} &nbsp;|&nbsp; <i class="fas fa-users"></i> ${ata.Presentes || '—'} presentes`;
+      if (pautaEl && ata.Pauta) pautaEl.innerHTML = ata.Pauta.split('\n').map(l => `<li>${esc(l)}</li>`).join('');
+      if (delibEl && ata.Deliberacoes) delibEl.innerHTML = ata.Deliberacoes.split('\n').map(l => `<li>${esc(l)}</li>`).join('');
+      // Botão download com URL real do Drive se existir
+      const dlBtn = document.querySelector('#modal-ver-ata .btn-download-ata');
+      if (dlBtn && ata.DriveUrl) {
+        dlBtn.onclick = () => window.open(ata.DriveUrl, '_blank');
+      }
+      // Botão editar na ata visualizada
+      const editBtnVer = document.querySelector('#modal-ver-ata .btn-edit-ata');
+      if (editBtnVer) editBtnVer.onclick = () => { closeModal('modal-ver-ata'); editAta(id); };
+    }
+  } catch(e) { /* Mostra dados estáticos se API falhar */ }
+
   openModal('modal-ver-ata');
 }
 
-function editAta(id) { showToast('Edição de ata em breve.', 'info'); }
+// editAta implementado acima
 
 // ══════════════════════════════════════════════════════════════
 //  LOADER — TESOURARIA
@@ -2698,12 +3002,163 @@ async function loadAgenda() {
           </div>
         </div>`;
       }).join('');
+
+    // Atualiza também o mini-calendário com os dados carregados
+    renderCalendar(_calYear, _calMonth, data);
+
   } catch(e) {
     setEmptyMsg('agenda-list-container', 'fa-exclamation-circle', 'Erro ao carregar agenda.');
   }
 }
 
-function editEvento(id) { showToast('Edição de evento em breve.', 'info'); }
+async function editEvento(id) {
+  if (!requireAdmin('editar eventos')) return;
+  showToast('Buscando dados do evento…', 'info');
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Eventos' });
+    const ev   = data?.find(e => String(e.ID) === String(id));
+    if (!ev) { showToast('Evento não encontrado.', 'error'); return; }
+    const modal = document.getElementById('modal-edit-evento');
+    document.getElementById('edit-evento-id').value        = ev.ID;
+    document.getElementById('edit-evento-titulo').value    = ev.Titulo    || '';
+    document.getElementById('edit-evento-data').value      = ev.Data      || '';
+    document.getElementById('edit-evento-horainicio').value= ev.HoraInicio|| '';
+    document.getElementById('edit-evento-horafim').value   = ev.HoraFim   || '';
+    document.getElementById('edit-evento-local').value     = ev.Local     || '';
+    document.getElementById('edit-evento-resp').value      = ev.Responsavel|| '';
+    document.getElementById('edit-evento-desc').value      = ev.Descricao || '';
+    const tipSel = document.getElementById('edit-evento-tipo');
+    if (tipSel) [...tipSel.options].forEach(o => { o.selected = o.value === ev.Tipo; });
+    openModal('modal-edit-evento');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+}
+
+async function salvarEdicaoEvento() {
+  if (!requireAdmin('editar eventos')) return;
+  const modal = document.getElementById('modal-edit-evento');
+  const id    = document.getElementById('edit-evento-id').value;
+  const row   = {
+    Titulo:     document.getElementById('edit-evento-titulo').value.trim(),
+    Tipo:       document.getElementById('edit-evento-tipo').value,
+    Data:       document.getElementById('edit-evento-data').value,
+    HoraInicio: document.getElementById('edit-evento-horainicio').value,
+    HoraFim:    document.getElementById('edit-evento-horafim').value,
+    Local:      document.getElementById('edit-evento-local').value.trim(),
+    Responsavel:document.getElementById('edit-evento-resp').value.trim(),
+    Descricao:  document.getElementById('edit-evento-desc').value.trim(),
+  };
+  if (!row.Titulo) { showToast('Informe o título do evento.', 'warning'); return; }
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+  try {
+    await apiPost({ action: 'update', sheet: 'Eventos', id, row });
+    closeModal('modal-edit-evento');
+    showToast('Evento atualizado!', 'success');
+    loadAgenda();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Salvar';
+  }
+}
+
+async function editProjeto(id) {
+  if (!requireAdmin('editar projetos')) return;
+  showToast('Buscando dados do projeto…', 'info');
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Pesquisas' });
+    const p    = data?.find(x => String(x.ID) === String(id));
+    if (!p) { showToast('Projeto não encontrado.', 'error'); return; }
+    const modal = document.getElementById('modal-edit-projeto');
+    document.getElementById('edit-proj-id').value      = p.ID;
+    document.getElementById('edit-proj-titulo').value  = p.Titulo      || '';
+    document.getElementById('edit-proj-caae').value    = p.CAAE        || '';
+    document.getElementById('edit-proj-pesq').value    = p.Pesquisadores|| '';
+    document.getElementById('edit-proj-prog').value    = p.Progresso   || '0';
+    document.getElementById('edit-proj-desc').value    = p.Descricao   || '';
+    const stSel  = document.getElementById('edit-proj-status');
+    if (stSel)  [...stSel.options].forEach(o => { o.selected = o.value === p.Status; });
+    openModal('modal-edit-projeto');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+}
+
+async function salvarEdicaoProjeto() {
+  if (!requireAdmin('editar projetos')) return;
+  const modal = document.getElementById('modal-edit-projeto');
+  const id    = document.getElementById('edit-proj-id').value;
+  const row   = {
+    Titulo:       document.getElementById('edit-proj-titulo').value.trim(),
+    Status:       document.getElementById('edit-proj-status').value,
+    CAAE:         document.getElementById('edit-proj-caae').value.trim(),
+    Pesquisadores:document.getElementById('edit-proj-pesq').value,
+    Progresso:    document.getElementById('edit-proj-prog').value,
+    Descricao:    document.getElementById('edit-proj-desc').value.trim(),
+  };
+  if (!row.Titulo) { showToast('Informe o título.', 'warning'); return; }
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+  try {
+    await apiPost({ action: 'update', sheet: 'Pesquisas', id, row });
+    closeModal('modal-edit-projeto');
+    showToast('Projeto atualizado!', 'success');
+    loadPesquisa();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Salvar';
+  }
+}
+
+async function editAta(id) {
+  if (!requireAdmin('editar atas')) return;
+  showToast('Buscando dados da ata…', 'info');
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Atas' });
+    const ata  = data?.find(a => String(a.ID) === String(id));
+    if (!ata) { showToast('Ata não encontrada.', 'error'); return; }
+    document.getElementById('edit-ata-id').value      = ata.ID;
+    document.getElementById('edit-ata-titulo').value  = ata.Titulo    || '';
+    document.getElementById('edit-ata-data').value    = ata.Data      || '';
+    document.getElementById('edit-ata-presentes').value = ata.Presentes|| '';
+    document.getElementById('edit-ata-duracao').value = ata.Duracao   || '';
+    document.getElementById('edit-ata-pauta').value   = ata.Pauta     || '';
+    document.getElementById('edit-ata-delib').value   = ata.Deliberacoes|| '';
+    const stSel = document.getElementById('edit-ata-status');
+    if (stSel) [...stSel.options].forEach(o => { o.selected = o.value === ata.Status; });
+    openModal('modal-edit-ata');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+}
+
+async function salvarEdicaoAta() {
+  if (!requireAdmin('editar atas')) return;
+  const modal = document.getElementById('modal-edit-ata');
+  const id    = document.getElementById('edit-ata-id').value;
+  const row   = {
+    Titulo:       document.getElementById('edit-ata-titulo').value.trim(),
+    Data:         document.getElementById('edit-ata-data').value,
+    Presentes:    document.getElementById('edit-ata-presentes').value,
+    Duracao:      document.getElementById('edit-ata-duracao').value.trim(),
+    Pauta:        document.getElementById('edit-ata-pauta').value.trim(),
+    Deliberacoes: document.getElementById('edit-ata-delib').value.trim(),
+    Status:       document.getElementById('edit-ata-status').value,
+  };
+  if (!row.Titulo) { showToast('Informe o título.', 'warning'); return; }
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+  try {
+    await apiPost({ action: 'update', sheet: 'Atas', id, row });
+    closeModal('modal-edit-ata');
+    showToast('Ata atualizada!', 'success');
+    loadAtas();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Salvar';
+  }
+}
 
 async function deleteEvento(id, nome) {
   if (!requireAdmin('excluir eventos')) return;
@@ -2762,7 +3217,7 @@ async function loadPesquisa() {
   }
 }
 
-function editProjeto(id) { showToast('Edição de projeto em breve.', 'info'); }
+// editProjeto e editAta implementados acima
 
 // ══════════════════════════════════════════════════════════════
 //  LOADER — EXTENSÃO
@@ -2913,7 +3368,72 @@ async function loadMarketing() {
 
 function editMembro(id) {
   if (!requireAdmin('editar membros')) return;
-  showToast('Modal de edição de membro em breve.', 'info');
+  // Busca dados do membro na tabela já carregada
+  const rows = document.querySelectorAll('#members-table tr');
+  let dadosMembro = null;
+  rows.forEach(row => {
+    const btn = row.querySelector(`[onclick*="${id}"]`);
+    if (btn) {
+      const cells = row.querySelectorAll('td');
+      dadosMembro = {
+        ID:          id,
+        Nome:        cells[0]?.querySelector('div:last-child')?.textContent?.trim() || cells[0]?.textContent?.trim() || '',
+        Matricula:   cells[1]?.textContent?.trim() || '',
+        Periodo:     (cells[2]?.textContent?.trim() || '').replace('º',''),
+        Setor:       cells[3]?.textContent?.trim() || '',
+        Cargo:       cells[4]?.textContent?.trim() || '',
+        Status:      cells[6]?.textContent?.trim() || '',
+      };
+    }
+  });
+
+  const modal = document.getElementById('modal-edit-membro');
+  if (!modal) { showToast('Modal de edição não encontrado.', 'error'); return; }
+
+  if (dadosMembro) {
+    document.getElementById('edit-membro-id').value       = dadosMembro.ID;
+    document.getElementById('edit-membro-nome').value     = dadosMembro.Nome;
+    document.getElementById('edit-membro-mat').value      = dadosMembro.Matricula;
+    const perSel = document.getElementById('edit-membro-periodo');
+    if (perSel) [...perSel.options].forEach(o => { o.selected = o.value === dadosMembro.Periodo || o.text.startsWith(dadosMembro.Periodo); });
+    const setSel = document.getElementById('edit-membro-setor');
+    if (setSel) [...setSel.options].forEach(o => { o.selected = o.value === dadosMembro.Setor; });
+    const carSel = document.getElementById('edit-membro-cargo');
+    if (carSel) [...carSel.options].forEach(o => { o.selected = o.value === dadosMembro.Cargo; });
+    const stSel  = document.getElementById('edit-membro-status');
+    if (stSel)  [...stSel.options].forEach(o => { o.selected = o.value === dadosMembro.Status; });
+  }
+  openModal('modal-edit-membro');
+}
+
+async function salvarEdicaoMembro() {
+  if (!requireAdmin('editar membros')) return;
+  const modal = document.getElementById('modal-edit-membro');
+  const id    = document.getElementById('edit-membro-id').value;
+  const row   = {
+    Nome:      document.getElementById('edit-membro-nome').value.trim(),
+    Matricula: document.getElementById('edit-membro-mat').value.trim(),
+    Periodo:   document.getElementById('edit-membro-periodo').value,
+    Setor:     document.getElementById('edit-membro-setor').value,
+    Cargo:     document.getElementById('edit-membro-cargo').value,
+    Status:    document.getElementById('edit-membro-status').value,
+  };
+  if (!row.Nome) { showToast('Informe o nome completo.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+
+  try {
+    await apiPost({ action: 'update', sheet: 'Membros', id, row });
+    closeModal('modal-edit-membro');
+    showToast('Membro atualizado com sucesso!', 'success');
+    loadMembros();
+  } catch(e) {
+    showToast('Erro ao atualizar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Salvar alterações';
+  }
 }
 
 async function deleteMembro(id, nome) {
@@ -3031,6 +3551,42 @@ async function salvarLancamento() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando…';
 
   try {
+    // Upload do comprovante para o Drive (se fornecido)
+    const fileInput = modal.querySelector('input[type="file"]');
+    if (fileInput?.files?.length) {
+      const file = fileInput.files[0];
+      if (file.size <= 10 * 1024 * 1024) {
+        const base64 = await new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload  = () => resolve(r.result.split(',')[1]);
+          r.onerror = reject;
+          r.readAsDataURL(file);
+        });
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando comprovante…';
+        const upResp = await fetch(API_URL, {
+          method:  'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action:     'uploadFile',
+            fileName:   `Comprovante_${row.Descricao.substring(0,30)}_${row.Data}`,
+            mimeType:   file.type || 'application/octet-stream',
+            data:       base64,
+            categoria:  'Financeiro',
+            descricao:  `Comprovante: ${row.Descricao}`,
+            tamanho:    (file.size / 1024).toFixed(1) + ' KB',
+            dataUpload: row.Data,
+          })
+        });
+        const upResult = await upResp.json();
+        if (upResult.success && upResult.url) {
+          row.ComprovanteUrl = upResult.url;
+        }
+      } else {
+        showToast('Comprovante muito grande (máx. 10 MB). Lançamento registrado sem comprovante.', 'warning');
+      }
+    }
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
     await apiPost({ action: 'insert', sheet: 'Financeiro', row });
     closeModal('modal-lancamento');
     showToast(`Lançamento de R$ ${parseFloat(row.Valor).toFixed(2)} registrado!`, 'success');
@@ -3312,9 +3868,47 @@ async function salvarOuvidoria() {
 //  BOTÕES DE RELATÓRIOS (exportar)
 // ══════════════════════════════════════════════════════════════
 
-function exportarRelatorio(tipo) {
+async function exportarRelatorio(tipo) {
   if (!requireAdmin('exportar relatórios')) return;
-  showToast(`Exportação de ${tipo} em breve. Funcionalidade sendo desenvolvida.`, 'info');
+
+  const sheetMap = {
+    'Membros':           'Membros',
+    'Financeiro':        'Financeiro',
+    'Eventos':           'Eventos',
+    'Pesquisa':          'Pesquisas',
+    'Extensão':          'Extensao',
+    'Indicadores gerais':'Membros',
+  };
+
+  const sheet = Object.entries(sheetMap).find(([k]) => tipo.toLowerCase().includes(k.toLowerCase()))?.[1] || 'Membros';
+  showToast(`Gerando relatório de ${tipo}…`, 'info');
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet });
+    if (!data || data.length === 0) {
+      showToast('Nenhum dado disponível para exportar.', 'warning');
+      return;
+    }
+
+    const headers = Object.keys(data[0]);
+    const csvRows = [
+      headers.join(';'),
+      ...data.map(row => headers.map(h => `"${String(row[h] ?? '').replace(/"/g,'""')}"`).join(';'))
+    ];
+    const csvContent = '\uFEFF' + csvRows.join('\r\n'); // BOM para Excel PT-BR
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `LAPA_${sheet}_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Relatório de ${tipo} exportado com sucesso!`, 'success');
+  } catch(e) {
+    showToast('Erro ao exportar: ' + e.message, 'error');
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3323,7 +3917,254 @@ function exportarRelatorio(tipo) {
 
 function uploadDocumento() {
   if (!requireAdmin('enviar documentos')) return;
-  showToast('Upload de documentos integrado ao Google Drive em breve.', 'info');
+  openModal('modal-upload-doc');
+  // Limpa campos e barra de progresso
+  const fi = document.getElementById('upload-file-input');
+  const ni = document.getElementById('upload-file-name');
+  const di = document.getElementById('upload-desc');
+  const pb = document.getElementById('upload-progress-bar');
+  const sm = document.getElementById('upload-status-msg');
+  if (fi) fi.value = '';
+  if (ni) ni.value = '';
+  if (di) di.value = '';
+  if (pb) pb.style.display = 'none';
+  if (sm) sm.textContent = '';
+  const btn = document.getElementById('btn-upload-exec');
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload"></i> Enviar para o Drive'; }
+  bindUploadFileInput();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  UPLOAD REAL — GOOGLE DRIVE VIA APPS SCRIPT
+// ══════════════════════════════════════════════════════════════
+
+async function executarUpload() {
+  if (!requireAdmin('enviar documentos')) return;
+  const fileInput = document.getElementById('upload-file-input');
+  const nameInput = document.getElementById('upload-file-name');
+  const catSelect = document.getElementById('upload-category');
+  const descInput = document.getElementById('upload-desc');
+  const btn       = document.getElementById('btn-upload-exec');
+  const progress  = document.getElementById('upload-progress-bar');
+  const status    = document.getElementById('upload-status-msg');
+
+  if (!fileInput.files.length) {
+    showToast('Selecione um arquivo para enviar.', 'warning');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const MAX_MB = 20;
+  if (file.size > MAX_MB * 1024 * 1024) {
+    showToast(`Arquivo muito grande. Limite: ${MAX_MB} MB.`, 'error');
+    return;
+  }
+
+  const nomeExibicao = nameInput.value.trim() || file.name;
+  const categoria    = catSelect.value;
+  const descricao    = descInput.value.trim();
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando…';
+  progress.style.display = 'block';
+  progress.querySelector('.progress-fill').style.width = '0%';
+  status.textContent = 'Lendo arquivo…';
+
+  try {
+    // Converte para Base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    progress.querySelector('.progress-fill').style.width = '40%';
+    status.textContent = 'Enviando para o Google Drive…';
+
+    const payload = {
+      action:     'uploadFile',
+      fileName:   nomeExibicao,
+      mimeType:   file.type || 'application/octet-stream',
+      data:       base64,
+      categoria,
+      descricao,
+      tamanho:    (file.size / 1024).toFixed(1) + ' KB',
+      dataUpload: new Date().toISOString().split('T')[0],
+    };
+
+    const resp = await fetch(API_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify(payload),
+    });
+    const result = await resp.json();
+
+    progress.querySelector('.progress-fill').style.width = '100%';
+
+    if (!result.success) throw new Error(result.error || 'Erro no servidor');
+
+    status.textContent = '✓ Arquivo enviado com sucesso!';
+    showToast(`"${nomeExibicao}" salvo no Google Drive!`, 'success');
+
+    // Adiciona card dinâmico à grade de documentos
+    adicionarCardDocumento({
+      nome:      nomeExibicao,
+      categoria,
+      descricao,
+      tamanho:   (file.size / 1024).toFixed(1) + ' KB',
+      url:       result.url || null,
+      mimeType:  file.type,
+      data:      new Date().toISOString().split('T')[0],
+    });
+
+    setTimeout(() => closeModal('modal-upload-doc'), 1200);
+
+  } catch(e) {
+    progress.querySelector('.progress-fill').style.cssText = 'width:100%;background:var(--coral)';
+    status.textContent = 'Falha: ' + e.message;
+    showToast('Erro no upload: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-upload"></i> Tentar novamente';
+  }
+}
+
+function adicionarCardDocumento({ nome, categoria, descricao, tamanho, url, mimeType, data }) {
+  const area = document.getElementById('docs-dynamic-area');
+  if (!area) return;
+
+  // Garante que existe uma grid na área dinâmica
+  let grid = area.querySelector('.grid');
+  if (!grid) {
+    grid = document.createElement('div');
+    grid.className = 'grid grid-4';
+    grid.style.marginBottom = '12px';
+    area.appendChild(grid);
+  }
+
+  const iconeMap = {
+    'application/pdf':   { icon: 'fa-file-pdf',   cor: 'var(--coral)'   },
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { icon: 'fa-file-excel', cor: 'var(--sage)' },
+    'application/vnd.ms-excel': { icon: 'fa-file-excel', cor: 'var(--sage)' },
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { icon: 'fa-file-word', cor: 'var(--sky)' },
+    'application/msword': { icon: 'fa-file-word', cor: 'var(--sky)' },
+    'image/jpeg': { icon: 'fa-file-image', cor: 'var(--lavender)' },
+    'image/png':  { icon: 'fa-file-image', cor: 'var(--lavender)' },
+    'image/gif':  { icon: 'fa-file-image', cor: 'var(--lavender)' },
+    'image/svg+xml': { icon: 'fa-file-image', cor: 'var(--lavender)' },
+    'default':    { icon: 'fa-file-alt',   cor: 'var(--gold)'     },
+  };
+  const tipo = iconeMap[mimeType] || iconeMap['default'];
+
+  const badgeMap = { Ata:'lav', Financeiro:'gold', Regulamento:'teal', Marketing:'lav',
+                     Pesquisa:'teal', 'Extensão':'sage', Ensino:'sage', Imagem:'lav', Geral:'sage' };
+  const badgeCls = badgeMap[categoria] || 'teal';
+
+  const card = document.createElement('div');
+  card.className = 'doc-card card';
+  card.setAttribute('data-nome', nome.toLowerCase());
+  card.setAttribute('data-cat', categoria);
+  card.style.cssText = 'text-align:center;cursor:pointer;transition:all .2s;position:relative';
+  card.onmouseover = () => card.style.transform = 'translateY(-4px)';
+  card.onmouseout  = () => card.style.transform = '';
+  card.innerHTML = `
+    <span class="badge ${badgeCls}" style="font-size:9px;position:absolute;top:8px;right:8px">${esc(categoria)}</span>
+    <i class="fas ${tipo.icon}" style="font-size:36px;color:${tipo.cor};margin-bottom:12px;margin-top:8px"></i>
+    <div style="font-size:13px;font-weight:600">${esc(nome)}</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px">${tamanho} • ${data}</div>
+    ${descricao ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;font-style:italic">${esc(descricao)}</div>` : ''}
+  `;
+  card.onclick = () => {
+    if (url) window.open(url, '_blank');
+    else showToast(`"${nome}" ainda não possui link vinculado no Drive.`, 'info');
+  };
+  grid.prepend(card);
+}
+
+// ── Carrega documentos salvos via API (sheet: Documentos) ──
+async function loadDocumentos() {
+  const area = document.getElementById('docs-dynamic-area');
+  if (!area) return;
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Documentos' });
+    if (!data || data.length === 0) { area.innerHTML = ''; return; }
+
+    // Limpa área dinâmica antes de recarregar (evita duplicatas)
+    area.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'grid grid-4';
+    grid.style.marginBottom = '12px';
+    area.appendChild(grid);
+
+    data
+      .sort((a, b) => new Date(b.dataUpload || b.Data || 0) - new Date(a.dataUpload || a.Data || 0))
+      .forEach(doc => {
+        adicionarCardDocumento({
+          nome:      doc.fileName || doc.Nome || 'Arquivo',
+          categoria: doc.categoria || doc.Categoria || 'Geral',
+          descricao: doc.descricao || doc.Descricao || '',
+          tamanho:   doc.tamanho   || doc.Tamanho   || '—',
+          url:       doc.url       || doc.Url       || null,
+          mimeType:  doc.mimeType  || 'default',
+          data:      formatDate(doc.dataUpload || doc.Data),
+        });
+      });
+  } catch(e) {
+    console.warn('loadDocumentos:', e);
+  }
+}
+
+// ── Filtragem de documentos por texto e categoria ──
+function filtrarDocumentos(termo) {
+  const cat = (document.getElementById('doc-filter-cat')?.value || '').toLowerCase();
+  const val = (termo || '').toLowerCase().trim();
+
+  let total = 0;
+
+  // Filtrar cards estáticos
+  document.querySelectorAll('#docs-static-grid .doc-card').forEach(card => {
+    const nome  = (card.getAttribute('data-nome') || card.textContent).toLowerCase();
+    const cCard = (card.getAttribute('data-cat') || '').toLowerCase();
+    const nomeOk = !val || nome.includes(val);
+    const catOk  = !cat || cCard === cat;
+    const vis = nomeOk && catOk;
+    card.style.display = vis ? '' : 'none';
+    if (vis) total++;
+  });
+
+  // Filtrar cards dinâmicos
+  document.querySelectorAll('#docs-dynamic-area .doc-card').forEach(card => {
+    const nome  = (card.getAttribute('data-nome') || card.textContent).toLowerCase();
+    const cCard = (card.getAttribute('data-cat') || '').toLowerCase();
+    const nomeOk = !val || nome.includes(val);
+    const catOk  = !cat || cCard === cat;
+    const vis = nomeOk && catOk;
+    card.style.display = vis ? '' : 'none';
+    if (vis) total++;
+  });
+
+  const emptyMsg = document.getElementById('docs-empty-msg');
+  if (emptyMsg) emptyMsg.style.display = total === 0 ? 'block' : 'none';
+}
+
+// ── Listener do input de arquivo de upload (bind inline no modal) ──
+function bindUploadFileInput() {
+  const fi = document.getElementById('upload-file-input');
+  const ni = document.getElementById('upload-file-name');
+  const pb = document.getElementById('upload-progress-bar');
+  const sm = document.getElementById('upload-status-msg');
+  if (!fi || fi._bound) return;
+  fi._bound = true;
+  fi.addEventListener('change', () => {
+    if (fi.files.length && ni && !ni.value) {
+      ni.value = fi.files[0].name.replace(/\.[^.]+$/, '');
+    }
+    if (pb) pb.style.display = 'none';
+    if (sm) sm.textContent = '';
+    const btn = document.getElementById('btn-upload-exec');
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload"></i> Enviar para o Drive'; }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3375,23 +4216,21 @@ function bindModalButtons() {
     nb.addEventListener('click', uploadDocumento);
   }
 
-  // Documentos — cards clicáveis
-  document.querySelectorAll('#page-documentos .card[style*="cursor:pointer"], #page-documentos .card').forEach(card => {
-    if (!card.hasAttribute('onclick')) {
-      card.style.cursor = 'pointer';
-      card.addEventListener('click', () => {
-        const nome = card.querySelector('div:nth-child(2)')?.textContent || 'arquivo';
-        showToast(`Acesso ao "${nome.trim()}" integrado ao Google Drive em breve.`, 'info');
-      });
-    }
+  // Documentos — cards estáticos clicáveis (sem URL Drive ainda)
+  document.querySelectorAll('#docs-static-grid .doc-card').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => {
+      const nome = card.getAttribute('data-nome') || card.querySelector('div:nth-child(3)')?.textContent || 'arquivo';
+      showToast(`"${nome.trim()}" — link do Drive não configurado ainda. Use o botão Enviar arquivo para fazer upload.`, 'info');
+    });
   });
 
-  // Agenda edit buttons (static ones)
+  // Agenda edit buttons (static ones) — estes abrem modal-edit-evento vazio para novo evento
   document.querySelectorAll('#ag-lista .btn-outline.btn-sm').forEach(btn => {
     if (!btn.getAttribute('onclick')) {
       btn.addEventListener('click', () => {
         if (!requireAdmin('editar eventos')) return;
-        showToast('Edição de evento em breve.', 'info');
+        openModal('modal-novo-evento');
       });
     }
   });
@@ -3401,20 +4240,295 @@ function bindModalButtons() {
     card.addEventListener('click', () => openModal('modal-ver-ata'));
   });
 
-  // Estatuto & Regimento — cards
-  document.querySelectorAll('#sec-estatuto .card').forEach(card => {
+  // Estatuto & Regimento — cards: abre modal-doc para o Estatuto, exibe info para os outros
+  document.querySelectorAll('#sec-estatuto .card').forEach((card, idx) => {
     if (!card.getAttribute('onclick')) {
       card.addEventListener('click', () => {
-        const nome = card.querySelector('div[style*="font-weight"]')?.textContent || 'documento';
-        showToast(`Acesso ao "${nome.trim()}" via Google Drive em breve.`, 'info');
+        if (idx === 0) {
+          openModal('modal-doc');
+        } else {
+          const nome = card.querySelector('div[style*="font-weight"]')?.textContent || 'documento';
+          showToast(`Para acessar "${nome.trim()}", faça o upload via "Enviar arquivo" na aba Documentos.`, 'info');
+        }
       });
     }
   });
 }
 
 // ══════════════════════════════════════════════════════════════
-//  KANBAN IDs — adiciona IDs às colunas para referência
+//  LOADER — CORRESPONDÊNCIAS
 // ══════════════════════════════════════════════════════════════
+
+async function loadCorrespondencias() {
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Correspondencias' });
+    if (!data || data.length === 0) return;
+
+    const recebidas = data.filter(c => c.Direcao === 'Recebida');
+    const enviadas  = data.filter(c => c.Direcao === 'Enviada');
+
+    const recEl = document.querySelector('#sec-correspondencia .card:first-child');
+    const envEl = document.querySelector('#sec-correspondencia .card:last-child');
+
+    if (recEl && recebidas.length) {
+      const header = recEl.querySelector('.card-header');
+      recEl.querySelectorAll('.ata-card').forEach(el => el.remove());
+      recebidas.slice(0, 5).forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'ata-card';
+        card.innerHTML = `
+          <div class="ata-title">${esc(c.Assunto)}</div>
+          <div class="ata-meta">
+            <span>${esc(c.Remetente || c.Destinatario || '—')}</span>
+            <span>${formatDate(c.Data)}</span>
+            <span class="badge ${statusBadge(c.Status)}">${esc(c.Status)}</span>
+          </div>`;
+        recEl.appendChild(card);
+      });
+      // Atualiza badge de novas
+      const badge = recEl.querySelector('.nav-badge, .badge');
+      if (badge && badge.classList.contains('teal')) badge.textContent = recebidas.length + ' total';
+    }
+
+    if (envEl && enviadas.length) {
+      envEl.querySelectorAll('.ata-card').forEach(el => el.remove());
+      enviadas.slice(0, 5).forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'ata-card';
+        card.innerHTML = `
+          <div class="ata-title">${esc(c.Assunto)}</div>
+          <div class="ata-meta">
+            <span>Para: ${esc(c.Destinatario || '—')}</span>
+            <span>${formatDate(c.Data)}</span>
+            <span class="badge ${statusBadge(c.Status)}">${esc(c.Status)}</span>
+          </div>`;
+        envEl.appendChild(card);
+      });
+    }
+  } catch(e) { console.warn('loadCorrespondencias:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CALENDÁRIO MINI — GERADO A PARTIR DOS EVENTOS DA API
+// ══════════════════════════════════════════════════════════════
+
+let _calEventos = [];
+let _calYear    = new Date().getFullYear();
+let _calMonth   = new Date().getMonth();
+
+async function renderCalendar(year, month, eventos) {
+  if (eventos !== undefined) _calEventos = eventos;
+  _calYear  = year  ?? _calYear;
+  _calMonth = month ?? _calMonth;
+
+  const container = document.getElementById('mini-calendar-container');
+  if (!container) return;
+
+  const hoje     = new Date();
+  const primeiro = new Date(_calYear, _calMonth, 1);
+  const ultimo   = new Date(_calYear, _calMonth + 1, 0);
+  const diaSemana= primeiro.getDay(); // 0=Dom
+  const meses    = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  // Mapa: "YYYY-MM-DD" → array de eventos
+  const eventosPorDia = {};
+  (_calEventos || []).forEach(ev => {
+    if (ev.Data) {
+      const key = ev.Data.substring(0, 10);
+      if (!eventosPorDia[key]) eventosPorDia[key] = [];
+      eventosPorDia[key].push(ev);
+    }
+  });
+
+  // Cabeçalho
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <button class="btn btn-outline btn-sm" onclick="renderCalendar(${_calMonth===0?_calYear-1:_calYear},${_calMonth===0?11:_calMonth-1})">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">
+        ${meses[_calMonth]} ${_calYear}
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="renderCalendar(${_calMonth===11?_calYear+1:_calYear},${_calMonth===11?0:_calMonth+1})">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-bottom:8px">
+      ${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d =>
+        `<div style="font-size:11px;font-weight:600;color:var(--text3);padding:4px">${d}</div>`
+      ).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+  `;
+
+  // Células vazias antes do dia 1
+  for (let i = 0; i < diaSemana; i++) {
+    html += `<div style="min-height:44px"></div>`;
+  }
+
+  // Dias do mês
+  for (let dia = 1; dia <= ultimo.getDate(); dia++) {
+    const dateStr = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+    const evsDia  = eventosPorDia[dateStr] || [];
+    const isHoje  = dia === hoje.getDate() && _calMonth === hoje.getMonth() && _calYear === hoje.getFullYear();
+    const temEv   = evsDia.length > 0;
+
+    const cellStyle = isHoje
+      ? 'background:var(--teal);color:var(--bg);border-radius:8px;font-weight:700'
+      : temEv
+        ? 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:var(--teal);font-weight:600'
+        : 'border-radius:8px';
+
+    const tooltip = temEv
+      ? evsDia.map(e => e.Titulo).join(', ').substring(0, 60)
+      : '';
+
+    html += `
+      <div style="min-height:44px;padding:6px 4px;text-align:center;cursor:${temEv?'pointer':'default'};${cellStyle};transition:.15s"
+           title="${esc(tooltip)}"
+           onclick="${temEv ? `mostrarEventosDia('${dateStr}')` : ''}">
+        <div style="font-size:13px">${dia}</div>
+        ${temEv ? `<div style="font-size:9px;margin-top:2px;overflow:hidden;white-space:nowrap;max-width:36px">● ${evsDia.length}</div>` : ''}
+      </div>`;
+  }
+
+  html += `</div>`;
+
+  // Legenda
+  if (_calEventos && _calEventos.length > 0) {
+    const proxEvs = (_calEventos)
+      .filter(e => e.Data && new Date(e.Data + 'T00:00:00') >= new Date(hoje.toDateString()))
+      .sort((a,b) => new Date(a.Data) - new Date(b.Data))
+      .slice(0, 3);
+    if (proxEvs.length) {
+      html += `<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Próximos eventos</div>`;
+      proxEvs.forEach(ev => {
+        const cor = setorCor(ev.Tipo);
+        html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:8px;background:${cor.bg};border:1px solid ${cor.bd};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${cor.fg};font-size:12px;font-weight:700">
+            ${new Date(ev.Data+'T00:00:00').getDate()}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ev.Titulo)}</div>
+            <div style="font-size:11px;color:var(--text3)">${formatDate(ev.Data)} ${ev.HoraInicio ? '• ' + ev.HoraInicio : ''}</div>
+          </div>
+          <span class="badge ${cor.badge}">${esc(ev.Tipo)}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+function mostrarEventosDia(dateStr) {
+  const evs = _calEventos.filter(e => (e.Data || '').substring(0,10) === dateStr);
+  if (!evs.length) return;
+  const msgs = evs.map(e => `• ${e.Titulo} (${e.HoraInicio || '—'})`).join('\n');
+  alert(`Eventos em ${formatDate(dateStr)}:\n\n${msgs}`);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CONFIGURAÇÕES — MODAL DE PREFERÊNCIAS
+// ══════════════════════════════════════════════════════════════
+
+function openConfiguracoes() {
+  openModal('modal-configuracoes');
+}
+
+function salvarConfiguracoes() {
+  const nomeOrg  = document.getElementById('cfg-nome-org')?.value.trim();
+  const apiUrlCfg= document.getElementById('cfg-api-url')?.value.trim();
+
+  if (nomeOrg) {
+    document.querySelector('.logo-title').textContent = nomeOrg;
+  }
+  if (apiUrlCfg) {
+    // Atualiza API_URL em tempo de execução (persiste apenas na sessão)
+    window.API_URL = apiUrlCfg;
+    // eslint-disable-next-line no-global-assign
+    try { eval('API_URL = apiUrlCfg'); } catch(e) { /* non-strict fallback */ }
+    localStorage.setItem('lapa-api-url', apiUrlCfg);
+  }
+  closeModal('modal-configuracoes');
+  showToast('Configurações salvas com sucesso!', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NOTIFICAÇÕES — PAINEL SIMPLES
+// ══════════════════════════════════════════════════════════════
+
+function openNotificacoes() {
+  openModal('modal-notificacoes');
+  carregarNotificacoes();
+}
+
+async function carregarNotificacoes() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:18px;color:var(--text3)"><i class="fas fa-spinner fa-spin"></i></div>';
+
+  const notifs = [];
+
+  try {
+    // Membros ativos
+    const membros = await apiGet({ action: 'getAll', sheet: 'Membros' });
+    if (membros) {
+      const ativos = membros.filter(m => m.Status === 'Ativo').length;
+      notifs.push({ icon: 'fa-users', cor: 'var(--teal)',    msg: `${ativos} membros ativos cadastrados.`,      data: 'Agora' });
+    }
+
+    // Atas pendentes de assinatura
+    const atas = await apiGet({ action: 'getAll', sheet: 'Atas' });
+    if (atas) {
+      const pend = atas.filter(a => a.Status === 'Pendente assinatura').length;
+      if (pend > 0) notifs.push({ icon: 'fa-file-alt', cor: 'var(--gold)', msg: `${pend} ata(s) pendente(s) de assinatura.`, data: 'Verificar' });
+    }
+
+    // Financeiro: últimos lançamentos
+    const fin = await apiGet({ action: 'getAll', sheet: 'Financeiro' });
+    if (fin && fin.length) {
+      const ult = fin[fin.length - 1];
+      notifs.push({ icon: 'fa-receipt', cor: 'var(--sage)', msg: `Último lançamento: ${ult.Descricao} (R$ ${ult.Valor})`, data: formatDate(ult.Data) });
+    }
+
+    // Próximos eventos
+    const hoje = new Date();
+    const evs  = await apiGet({ action: 'getAll', sheet: 'Eventos' });
+    if (evs) {
+      const prox = evs.filter(e => e.Data && new Date(e.Data+'T00:00:00') >= hoje)
+                      .sort((a,b) => new Date(a.Data) - new Date(b.Data))[0];
+      if (prox) notifs.push({ icon: 'fa-calendar', cor: 'var(--lavender)', msg: `Próximo evento: ${prox.Titulo} em ${formatDate(prox.Data)}`, data: prox.HoraInicio || '' });
+    }
+  } catch(e) { /* ignora erros parciais */ }
+
+  if (notifs.length === 0) {
+    notifs.push({ icon: 'fa-check-circle', cor: 'var(--sage)', msg: 'Tudo em ordem. Nenhuma notificação pendente.', data: 'Agora' });
+  }
+
+  list.innerHTML = notifs.map(n => `
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="fas ${n.icon}" style="color:${n.cor};font-size:14px"></i>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13px;line-height:1.5">${n.msg}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${n.data}</div>
+      </div>
+    </div>`).join('');
+
+  // Limpa o dot de notificação após visualizar
+  document.querySelector('.notif-dot')?.remove();
+}
+
+// Restaura API_URL salva em localStorage (se o admin a alterou)
+(function restoreSettings() {
+  const savedUrl = localStorage.getItem('lapa-api-url');
+  if (savedUrl) { try { API_URL = savedUrl; } catch(e) {} }
+})();
 
 function setupKanbanIds() {
   const cols = document.querySelectorAll('.kanban-col');
