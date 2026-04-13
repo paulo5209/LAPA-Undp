@@ -1634,42 +1634,109 @@ body.is-admin .admin-only-block { display: block; }
       <!-- Cards dinâmicos da API + fixos abaixo -->
       <div id="docs-dynamic-area" style="margin-bottom:12px"></div>
       <div class="grid grid-4" id="docs-static-grid">
-        <div class="doc-card card" data-nome="Estatuto 2025" data-cat="Regulamento" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+
+        <!-- Estatuto 2025 -->
+        <div class="doc-card card" data-nome="Estatuto 2025" data-cat="Regulamento" data-drive-url="" data-tamanho="PDF • 2.1 MB"
+          style="text-align:center;cursor:pointer;transition:all .2s;position:relative"
+          onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''"
+          onclick="abrirDocStatic(this)">
           <span class="badge teal" style="font-size:9px;position:absolute;top:8px;right:8px">Regulamento</span>
+          <button class="btn-edit-static admin-only" onclick="event.stopPropagation();editarDocStatic(this.closest('.doc-card'))"
+            title="Editar / vincular link Drive"
+            style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:all .2s">
+            <i class="fas fa-edit"></i>
+          </button>
           <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px;margin-top:8px"></i>
-          <div style="font-size:13px;font-weight:600">Estatuto 2025</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 2.1 MB</div>
+          <div class="doc-static-nome" style="font-size:13px;font-weight:600">Estatuto 2025</div>
+          <div class="doc-static-tamanho" style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 2.1 MB</div>
+          <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
-        <div class="doc-card card" data-nome="Planilha Financeira 2026" data-cat="Financeiro" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+
+        <!-- Planilha Financeira 2026 -->
+        <div class="doc-card card" data-nome="Planilha Financeira 2026" data-cat="Financeiro" data-drive-url="" data-tamanho="XLSX • 540 KB"
+          style="text-align:center;cursor:pointer;transition:all .2s;position:relative"
+          onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''"
+          onclick="abrirDocStatic(this)">
           <span class="badge gold" style="font-size:9px;position:absolute;top:8px;right:8px">Financeiro</span>
+          <button class="btn-edit-static admin-only" onclick="event.stopPropagation();editarDocStatic(this.closest('.doc-card'))"
+            title="Editar / vincular link Drive"
+            style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:all .2s">
+            <i class="fas fa-edit"></i>
+          </button>
           <i class="fas fa-file-excel" style="font-size:36px;color:var(--sage);margin-bottom:12px;margin-top:8px"></i>
-          <div style="font-size:13px;font-weight:600">Planilha Financeira 2026</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">XLSX • 540 KB</div>
+          <div class="doc-static-nome" style="font-size:13px;font-weight:600">Planilha Financeira 2026</div>
+          <div class="doc-static-tamanho" style="font-size:11px;color:var(--text3);margin-top:4px">XLSX • 540 KB</div>
+          <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
-        <div class="doc-card card" data-nome="Ata Abril 2026" data-cat="Ata" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+
+        <!-- Ata Abril 2026 -->
+        <div class="doc-card card" data-nome="Ata Abril 2026" data-cat="Ata" data-drive-url="" data-tamanho="DOCX • 180 KB"
+          style="text-align:center;cursor:pointer;transition:all .2s;position:relative"
+          onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''"
+          onclick="abrirDocStatic(this)">
           <span class="badge lav" style="font-size:9px;position:absolute;top:8px;right:8px">Ata</span>
+          <button class="btn-edit-static admin-only" onclick="event.stopPropagation();editarDocStatic(this.closest('.doc-card'))"
+            title="Editar / vincular link Drive"
+            style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:all .2s">
+            <i class="fas fa-edit"></i>
+          </button>
           <i class="fas fa-file-word" style="font-size:36px;color:var(--sky);margin-bottom:12px;margin-top:8px"></i>
-          <div style="font-size:13px;font-weight:600">Ata Abril 2026</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">DOCX • 180 KB</div>
+          <div class="doc-static-nome" style="font-size:13px;font-weight:600">Ata Abril 2026</div>
+          <div class="doc-static-tamanho" style="font-size:11px;color:var(--text3);margin-top:4px">DOCX • 180 KB</div>
+          <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
-        <div class="doc-card card" data-nome="Manual de Marca" data-cat="Marketing" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+
+        <!-- Manual de Marca -->
+        <div class="doc-card card" data-nome="Manual de Marca" data-cat="Marketing" data-drive-url="" data-tamanho="PDF • 8.4 MB"
+          style="text-align:center;cursor:pointer;transition:all .2s;position:relative"
+          onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''"
+          onclick="abrirDocStatic(this)">
           <span class="badge lav" style="font-size:9px;position:absolute;top:8px;right:8px">Marketing</span>
+          <button class="btn-edit-static admin-only" onclick="event.stopPropagation();editarDocStatic(this.closest('.doc-card'))"
+            title="Editar / vincular link Drive"
+            style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:all .2s">
+            <i class="fas fa-edit"></i>
+          </button>
           <i class="fas fa-file-image" style="font-size:36px;color:var(--lavender);margin-bottom:12px;margin-top:8px"></i>
-          <div style="font-size:13px;font-weight:600">Manual de Marca</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 8.4 MB</div>
+          <div class="doc-static-nome" style="font-size:13px;font-weight:600">Manual de Marca</div>
+          <div class="doc-static-tamanho" style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 8.4 MB</div>
+          <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
-        <div class="doc-card card" data-nome="Regimento Interno" data-cat="Regulamento" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+
+        <!-- Regimento Interno -->
+        <div class="doc-card card" data-nome="Regimento Interno" data-cat="Regulamento" data-drive-url="" data-tamanho="PDF • 1.3 MB"
+          style="text-align:center;cursor:pointer;transition:all .2s;position:relative"
+          onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''"
+          onclick="abrirDocStatic(this)">
           <span class="badge teal" style="font-size:9px;position:absolute;top:8px;right:8px">Regulamento</span>
+          <button class="btn-edit-static admin-only" onclick="event.stopPropagation();editarDocStatic(this.closest('.doc-card'))"
+            title="Editar / vincular link Drive"
+            style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:all .2s">
+            <i class="fas fa-edit"></i>
+          </button>
           <i class="fas fa-file-alt" style="font-size:36px;color:var(--gold);margin-bottom:12px;margin-top:8px"></i>
-          <div style="font-size:13px;font-weight:600">Regimento Interno</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 1.3 MB</div>
+          <div class="doc-static-nome" style="font-size:13px;font-weight:600">Regimento Interno</div>
+          <div class="doc-static-tamanho" style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 1.3 MB</div>
+          <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
-        <div class="doc-card card" data-nome="Rel. Semestral 2025.2" data-cat="Geral" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+
+        <!-- Rel. Semestral 2025.2 -->
+        <div class="doc-card card" data-nome="Rel. Semestral 2025.2" data-cat="Geral" data-drive-url="" data-tamanho="PDF • 3.7 MB"
+          style="text-align:center;cursor:pointer;transition:all .2s;position:relative"
+          onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''"
+          onclick="abrirDocStatic(this)">
           <span class="badge sage" style="font-size:9px;position:absolute;top:8px;right:8px">Geral</span>
+          <button class="btn-edit-static admin-only" onclick="event.stopPropagation();editarDocStatic(this.closest('.doc-card'))"
+            title="Editar / vincular link Drive"
+            style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.35);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:all .2s">
+            <i class="fas fa-edit"></i>
+          </button>
           <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px;margin-top:8px"></i>
-          <div style="font-size:13px;font-weight:600">Rel. Semestral 2025.2</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 3.7 MB</div>
+          <div class="doc-static-nome" style="font-size:13px;font-weight:600">Rel. Semestral 2025.2</div>
+          <div class="doc-static-tamanho" style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 3.7 MB</div>
+          <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
+
       </div>
       <div id="docs-empty-msg" style="display:none;text-align:center;padding:32px;color:var(--text3)">
         <i class="fas fa-folder-open" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>
@@ -2143,6 +2210,63 @@ body.is-admin .admin-only-block { display: block; }
   </div>
 </div>
 
+<!-- MODAL: Editar Documento Estático -->
+<div class="modal-overlay" id="modal-edit-doc-static">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-folder-open" style="color:var(--teal);margin-right:8px"></i>Editar Documento</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-doc-static')">✕</button>
+    </div>
+
+    <!-- Referência interna ao card sendo editado (não visível ao usuário) -->
+    <input type="hidden" id="edit-doc-static-idx">
+
+    <div class="form-group">
+      <label class="form-label">Nome do documento</label>
+      <input id="edit-doc-static-nome" class="form-input" type="text" placeholder="Ex: Estatuto 2025">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <select id="edit-doc-static-cat" class="form-select">
+          <option>Ata</option><option>Financeiro</option><option>Regulamento</option>
+          <option>Marketing</option><option>Pesquisa</option><option>Extensão</option>
+          <option>Ensino</option><option>Imagem</option><option>Geral</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tamanho / Tipo</label>
+        <input id="edit-doc-static-tamanho" class="form-input" type="text" placeholder="Ex: PDF • 2.1 MB">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        <i class="fab fa-google-drive" style="color:#4285F4;margin-right:6px"></i>
+        Link do Google Drive
+      </label>
+      <input id="edit-doc-static-url" class="form-input" type="url"
+        placeholder="https://drive.google.com/file/d/…/view">
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5">
+        Cole o link de visualização do arquivo no Google Drive. O card ficará clicável e abrirá o documento diretamente.
+      </div>
+    </div>
+
+    <!-- Preview do link se já preenchido -->
+    <div id="edit-doc-static-preview" style="display:none;margin-top:4px;padding:10px 14px;background:var(--bg3);border:1px solid rgba(34,197,94,.25);border-radius:var(--radius2);font-size:12px;color:var(--sage)">
+      <i class="fas fa-check-circle"></i> <span id="edit-doc-static-preview-text"></span>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-doc-static')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarDocStatic()">
+        <i class="fas fa-save"></i> Salvar alterações
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Notificações -->
 <div class="modal-overlay" id="modal-notificacoes">
   <div class="modal" style="width:480px">
@@ -2421,7 +2545,8 @@ function openModal(id) {
     'modal-novo-evento','modal-novo-projeto','modal-novo-curso',
     'modal-nova-acao','modal-nova-corr','modal-new-task',
     'modal-upload-doc','modal-edit-membro','modal-edit-evento',
-    'modal-edit-projeto','modal-edit-ata','modal-configuracoes'];
+    'modal-edit-projeto','modal-edit-ata','modal-configuracoes',
+    'modal-edit-doc-static'];
   if (adminModals.includes(id) && !isAdmin()) {
     showToast('Apenas administradores podem adicionar ou editar dados.', 'warning');
     return;
@@ -4537,12 +4662,337 @@ function setupKanbanIds() {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  DOCUMENTOS ESTÁTICOS — Edição de nome, categoria e link Drive
+// ══════════════════════════════════════════════════════════════
+
+/** Referência ao card estático sendo editado */
+let _editDocCard = null;
+
+/**
+ * Abre o modal de edição de um card estático.
+ * @param {HTMLElement} card - O elemento .doc-card a editar
+ */
+function editarDocStatic(card) {
+  if (!requireAdmin('editar documentos')) return;
+  _editDocCard = card;
+
+  const nome    = card.getAttribute('data-nome') || '';
+  const cat     = card.getAttribute('data-cat')  || 'Geral';
+  const url     = card.getAttribute('data-drive-url') || '';
+  const tamanho = card.getAttribute('data-tamanho') || '';
+
+  document.getElementById('edit-doc-static-nome').value    = nome;
+  document.getElementById('edit-doc-static-tamanho').value = tamanho;
+  document.getElementById('edit-doc-static-url').value     = url;
+
+  const catSel = document.getElementById('edit-doc-static-cat');
+  for (let opt of catSel.options) {
+    if (opt.value === cat || opt.text === cat) { catSel.value = opt.value; break; }
+  }
+
+  // Preview do link atual
+  _atualizarPreviewDocStatic(url);
+
+  // Atualiza preview ao digitar
+  document.getElementById('edit-doc-static-url').oninput = function() {
+    _atualizarPreviewDocStatic(this.value.trim());
+  };
+
+  openModal('modal-edit-doc-static');
+}
+
+function _atualizarPreviewDocStatic(url) {
+  const prev = document.getElementById('edit-doc-static-preview');
+  const txt  = document.getElementById('edit-doc-static-preview-text');
+  if (!prev || !txt) return;
+  if (url && url.startsWith('http')) {
+    prev.style.display = 'block';
+    txt.textContent = 'Link válido — o card abrirá o Drive ao ser clicado.';
+  } else {
+    prev.style.display = 'none';
+  }
+}
+
+/**
+ * Salva as alterações do card estático (persiste em localStorage).
+ */
+function salvarDocStatic() {
+  const card = _editDocCard;
+  if (!card) return;
+
+  const nome    = document.getElementById('edit-doc-static-nome').value.trim();
+  const cat     = document.getElementById('edit-doc-static-cat').value;
+  const url     = document.getElementById('edit-doc-static-url').value.trim();
+  const tamanho = document.getElementById('edit-doc-static-tamanho').value.trim();
+
+  if (!nome) { showToast('Informe o nome do documento.', 'warning'); return; }
+
+  // Atualiza atributos de dados
+  card.setAttribute('data-nome',      nome.toLowerCase());
+  card.setAttribute('data-cat',       cat);
+  card.setAttribute('data-drive-url', url);
+  card.setAttribute('data-tamanho',   tamanho);
+
+  // Atualiza textos visíveis no card
+  const nomeEl = card.querySelector('.doc-static-nome');
+  if (nomeEl) nomeEl.textContent = nome;
+
+  const tamEl = card.querySelector('.doc-static-tamanho');
+  if (tamEl) tamEl.textContent = tamanho;
+
+  // Indicador de link
+  const linkInd = card.querySelector('.doc-link-indicator');
+  if (linkInd) linkInd.style.display = url ? 'block' : 'none';
+
+  // Atualiza badge de categoria
+  const badgeMap = { Ata:'lav', Financeiro:'gold', Regulamento:'teal', Marketing:'lav',
+                     Pesquisa:'teal', 'Extensão':'sage', Ensino:'sage', Imagem:'lav', Geral:'sage' };
+  const badge = card.querySelector('.badge');
+  if (badge) {
+    badge.className = 'badge ' + (badgeMap[cat] || 'teal');
+    badge.textContent = cat;
+    badge.style.cssText = 'font-size:9px;position:absolute;top:8px;right:8px';
+  }
+
+  // Persiste no localStorage para sobreviver a recarregamentos
+  _persistirDocsStatic();
+
+  closeModal('modal-edit-doc-static');
+  showToast(`"${nome}" atualizado com sucesso!`, 'success');
+}
+
+/**
+ * Abre o link do Drive ao clicar no card estático.
+ */
+function abrirDocStatic(card) {
+  const url = card.getAttribute('data-drive-url') || '';
+  if (url && url.startsWith('http')) {
+    window.open(url, '_blank', 'noopener');
+  } else {
+    const nome = card.querySelector('.doc-static-nome')?.textContent || 'Este documento';
+    if (isAdmin()) {
+      showToast(`"${nome}" não possui link do Drive. Clique em ✏️ para vincular.`, 'info');
+    } else {
+      showToast(`"${nome}" ainda não está disponível para download.`, 'info');
+    }
+  }
+}
+
+// ── Persistência dos cards estáticos via localStorage ──────────
+
+const _STATIC_DOCS_KEY = 'lapa-static-docs';
+
+function _persistirDocsStatic() {
+  const cards = document.querySelectorAll('#docs-static-grid .doc-card');
+  const estado = [];
+  cards.forEach(card => {
+    const nome = card.querySelector('.doc-static-nome')?.textContent || '';
+    estado.push({
+      nome,
+      cat:     card.getAttribute('data-cat')       || '',
+      url:     card.getAttribute('data-drive-url') || '',
+      tamanho: card.getAttribute('data-tamanho')   || '',
+    });
+  });
+  try { localStorage.setItem(_STATIC_DOCS_KEY, JSON.stringify(estado)); } catch(e) {}
+}
+
+function _restaurarDocsStatic() {
+  try {
+    const raw = localStorage.getItem(_STATIC_DOCS_KEY);
+    if (!raw) return;
+    const estado = JSON.parse(raw);
+    const cards  = document.querySelectorAll('#docs-static-grid .doc-card');
+    estado.forEach((s, i) => {
+      const card = cards[i];
+      if (!card) return;
+      card.setAttribute('data-cat',       s.cat);
+      card.setAttribute('data-drive-url', s.url);
+      card.setAttribute('data-tamanho',   s.tamanho);
+      card.setAttribute('data-nome',      (s.nome || '').toLowerCase());
+
+      const nomeEl = card.querySelector('.doc-static-nome');
+      if (nomeEl && s.nome) nomeEl.textContent = s.nome;
+
+      const tamEl = card.querySelector('.doc-static-tamanho');
+      if (tamEl && s.tamanho) tamEl.textContent = s.tamanho;
+
+      const linkInd = card.querySelector('.doc-link-indicator');
+      if (linkInd) linkInd.style.display = s.url ? 'block' : 'none';
+
+      const badgeMap = { Ata:'lav', Financeiro:'gold', Regulamento:'teal', Marketing:'lav',
+                         Pesquisa:'teal', 'Extensão':'sage', Ensino:'sage', Imagem:'lav', Geral:'sage' };
+      const badge = card.querySelector('.badge');
+      if (badge && s.cat) {
+        badge.className = 'badge ' + (badgeMap[s.cat] || 'teal');
+        badge.textContent = s.cat;
+        badge.style.cssText = 'font-size:9px;position:absolute;top:8px;right:8px';
+      }
+    });
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GOOGLE APPS SCRIPT — Código de referência para o backend
+// ══════════════════════════════════════════════════════════════
+/*
+  ┌─────────────────────────────────────────────────────────────┐
+  │  Cole o código abaixo no Google Apps Script e reimplante   │
+  │  como Web App (acesso: qualquer pessoa, mesmo anônima)      │
+  └─────────────────────────────────────────────────────────────┘
+
+// ── Configurações ──────────────────────────────────────────────
+const SS_ID         = SpreadsheetApp.getActiveSpreadsheet().getId();
+const DRIVE_FOLDER  = ''; // (Opcional) ID da pasta no Drive para uploads
+
+// ── GET: getAll / getById ──────────────────────────────────────
+function doGet(e) {
+  try {
+    const p      = e.parameter || {};
+    const action = p.action || 'getAll';
+    const sheet  = p.sheet  || 'Membros';
+    const ss     = SpreadsheetApp.openById(SS_ID);
+
+    if (action === 'getAll') {
+      const data = sheetToObjects(ss.getSheetByName(sheet));
+      return jsonOk(data);
+    }
+    if (action === 'getById') {
+      const data = sheetToObjects(ss.getSheetByName(sheet));
+      const row  = data.find(r => String(r.id) === String(p.id));
+      return jsonOk(row || null);
+    }
+    return jsonErr('Ação GET não reconhecida: ' + action);
+  } catch(err) {
+    return jsonErr(err.message);
+  }
+}
+
+// ── POST: insert / update / uploadFile ────────────────────────
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    const action  = payload.action;
+    const sheet   = payload.sheet;
+    const ss      = SpreadsheetApp.openById(SS_ID);
+
+    // ── INSERT ────────────────────────────────────────────────
+    if (action === 'insert') {
+      const ws   = getOrCreateSheet(ss, sheet);
+      const row  = payload.row || {};
+      row.id     = row.id || Utilities.getUuid();
+      appendRow(ws, row);
+      return jsonOk({ id: row.id });
+    }
+
+    // ── UPDATE ────────────────────────────────────────────────
+    if (action === 'update') {
+      const ws   = ss.getSheetByName(sheet);
+      if (!ws) return jsonErr('Sheet não encontrada: ' + sheet);
+      const rows = sheetToObjects(ws);
+      const idx  = rows.findIndex(r => String(r.id) === String(payload.id));
+      if (idx < 0) return jsonErr('Registro não encontrado: id=' + payload.id);
+      const updated = Object.assign(rows[idx], payload.row || {});
+      writeRow(ws, idx + 2, ws.getRange(1,1,1, ws.getLastColumn()).getValues()[0], updated);
+      return jsonOk({ updated: true });
+    }
+
+    // ── UPLOAD FILE → Google Drive + registro em "Documentos" ─
+    if (action === 'uploadFile') {
+      const bytes    = Utilities.base64Decode(payload.data);
+      const blob     = Utilities.newBlob(bytes, payload.mimeType, payload.fileName);
+
+      // Salva no Drive
+      let folder;
+      try {
+        folder = DRIVE_FOLDER ? DriveApp.getFolderById(DRIVE_FOLDER) : DriveApp.getRootFolder();
+      } catch(_) {
+        folder = DriveApp.getRootFolder();
+      }
+      const file = folder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      const fileUrl = file.getUrl();
+
+      // Registra na sheet "Documentos"
+      const docsSheet = getOrCreateSheet(ss, 'Documentos');
+      const docRow = {
+        id:         Utilities.getUuid(),
+        fileName:   payload.fileName   || '',
+        mimeType:   payload.mimeType   || '',
+        categoria:  payload.categoria  || 'Geral',
+        descricao:  payload.descricao  || '',
+        tamanho:    payload.tamanho    || '',
+        dataUpload: payload.dataUpload || new Date().toISOString().split('T')[0],
+        url:        fileUrl,
+      };
+      appendRow(docsSheet, docRow);
+
+      return jsonOk({ url: fileUrl, id: docRow.id });
+    }
+
+    // ── DELETE ────────────────────────────────────────────────
+    if (action === 'delete') {
+      const ws   = ss.getSheetByName(sheet);
+      if (!ws) return jsonErr('Sheet não encontrada: ' + sheet);
+      const rows = sheetToObjects(ws);
+      const idx  = rows.findIndex(r => String(r.id) === String(payload.id));
+      if (idx < 0) return jsonErr('Registro não encontrado.');
+      ws.deleteRow(idx + 2);
+      return jsonOk({ deleted: true });
+    }
+
+    return jsonErr('Ação POST não reconhecida: ' + action);
+  } catch(err) {
+    return jsonErr(err.message);
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function sheetToObjects(ws) {
+  if (!ws) return [];
+  const [headers, ...rows] = ws.getDataRange().getValues();
+  return rows.map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
+}
+
+function appendRow(ws, obj) {
+  if (ws.getLastRow() === 0) {
+    ws.appendRow(Object.keys(obj));
+  }
+  const headers = ws.getRange(1, 1, 1, ws.getLastColumn()).getValues()[0];
+  ws.appendRow(headers.map(h => obj[h] ?? ''));
+}
+
+function writeRow(ws, rowNum, headers, obj) {
+  ws.getRange(rowNum, 1, 1, headers.length)
+    .setValues([headers.map(h => obj[h] ?? '')]);
+}
+
+function getOrCreateSheet(ss, name) {
+  return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+
+function jsonOk(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ success: true, data }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function jsonErr(msg) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ success: false, error: msg }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+*/
+// ── Fim do código de referência do Apps Script ────────────────
+
+// ══════════════════════════════════════════════════════════════
 //  INICIALIZAÇÃO
 // ══════════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme();
   setupKanbanIds();
+  _restaurarDocsStatic(); // Restaura links/nomes salvos dos cards estáticos
 
   // Verifica sessão salva
   const savedRole = sessionStorage.getItem('lapa-role');
