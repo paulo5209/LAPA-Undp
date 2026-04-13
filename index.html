@@ -814,6 +814,54 @@ body.is-admin .admin-only-block { display: block; }
 
 /* Hero shimmer */
 .hero::before { animation: lapaPulse 6s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════════
+   SKELETON LOADERS
+═══════════════════════════════════════════════════ */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--card2) 50%, var(--bg3) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+  display: block;
+}
+.skel-inline {
+  background: linear-gradient(90deg, var(--bg3) 25%, var(--card2) 50%, var(--bg3) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+  display: inline-block;
+  width: 60px; height: 1em; vertical-align: middle;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOOLTIP
+═══════════════════════════════════════════════════ */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--card2); color: var(--text);
+  font-size: 11px; padding: 4px 8px; border-radius: 6px;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .2s;
+  border: 1px solid var(--border2);
+  z-index: 9999;
+}
+[data-tooltip]:hover::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   LAST REFRESH BADGE
+═══════════════════════════════════════════════════ */
+#last-refresh {
+  font-size: 10px; color: var(--text3);
+  display: flex; align-items: center; gap: 4px;
+}
 </style>
 </head>
 <body>
@@ -879,7 +927,7 @@ body.is-admin .admin-only-block { display: block; }
     </div>
     <div class="nav-item" onclick="showPage('agenda')">
       <i class="icon fas fa-calendar-alt"></i><span>Agenda & Eventos</span>
-      <span class="nav-badge">3</span>
+      <span class="nav-badge" id="nav-badge-agenda" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('membros')">
       <i class="icon fas fa-users"></i><span>Membros</span>
@@ -894,7 +942,7 @@ body.is-admin .admin-only-block { display: block; }
     </div>
     <div class="nav-item" onclick="showPage('tesouraria')">
       <i class="icon fas fa-coins"></i><span>Tesouraria</span>
-      <span class="nav-badge warn">!</span>
+      <span class="nav-badge warn" id="nav-badge-tesouraria" style="display:none">!</span>
     </div>
     <div class="nav-item" onclick="showPage('marketing')">
       <i class="icon fas fa-bullhorn"></i><span>Marketing</span>
@@ -912,7 +960,7 @@ body.is-admin .admin-only-block { display: block; }
     </div>
     <div class="nav-item" onclick="showPage('ouvidoria')">
       <i class="icon fas fa-comment-dots"></i><span>Ouvidoria</span>
-      <span class="nav-badge alert">2</span>
+      <span class="nav-badge alert" id="nav-badge-ouvidoria" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('relatorios')">
       <i class="icon fas fa-chart-bar"></i><span>Relatórios</span>
@@ -946,7 +994,12 @@ body.is-admin .admin-only-block { display: block; }
       <div class="btn-icon" data-tooltip="Configurações" onclick="openConfiguracoes()">
         <i class="fas fa-cog"></i>
       </div>
-      <span id="topbar-role-badge" class="role-badge admin" style="margin-right:4px"><i class="fas fa-shield-alt"></i> Admin</span><div class="btn-icon" data-tooltip="Tema" onclick="toggleTheme()">
+      <span id="topbar-role-badge" class="role-badge admin" style="margin-right:4px"><i class="fas fa-shield-alt"></i> Admin</span>
+      <span id="last-refresh" data-tooltip="Última atualização dos dados"></span>
+      <div class="btn-icon" data-tooltip="Recarregar dados" onclick="recarregarDados()" id="btn-refresh">
+        <i class="fas fa-sync-alt"></i>
+      </div>
+      <div class="btn-icon" data-tooltip="Tema claro/escuro" onclick="toggleTheme()">
         <i class="fas fa-adjust"></i>
       </div>
     <div class="btn-icon" data-tooltip="Sair" onclick="doLogout()" style="color:var(--coral)"><i class="fas fa-sign-out-alt"></i></div>
@@ -965,11 +1018,11 @@ body.is-admin .admin-only-block { display: block; }
         <h1>Dashboard<br>LAPA 2026</h1>
         <p>Central de gestão da nossa liga acadêmica. Acompanhe eventos, finanças, treinamentos e toda a operação da LAPA em um só lugar.</p>
         <div class="hero-stats">
-          <div class="hero-stat"><div class="value" id="cnt-membros">34</div><div class="label">Membros ativos</div></div>
+          <div class="hero-stat"><div class="value" id="cnt-membros"><span class="skel-inline"></span></div><div class="label">Membros ativos</div></div>
           <div class="hero-divider"></div>
-          <div class="hero-stat"><div class="value" id="cnt-eventos">8</div><div class="label">Treinamentos no semestre</div></div>
+          <div class="hero-stat"><div class="value" id="cnt-eventos"><span class="skel-inline"></span></div><div class="label">Treinamentos no semestre</div></div>
           <div class="hero-divider"></div>
-          <div class="hero-stat"><div class="value" id="cnt-projetos">5</div><div class="label">Projetos em andamento</div></div>
+          <div class="hero-stat"><div class="value" id="cnt-projetos"><span class="skel-inline"></span></div><div class="label">Projetos em andamento</div></div>
           <div class="hero-divider"></div>
           <div class="hero-stat"><div class="value" id="cnt-anos">3</div><div class="label">Anos de existência</div></div>
         </div>
@@ -1048,13 +1101,8 @@ body.is-admin .admin-only-block { display: block; }
           <div class="card-header">
             <div class="card-title">Atividade por setor (semestre)</div>
           </div>
-          <div class="chart-placeholder" style="padding-bottom:28px">
-            <div class="bar" style="height:70%" data-label="Secretaria"></div>
-            <div class="bar" style="height:55%;background:linear-gradient(0deg,var(--gold),var(--coral))" data-label="Tesouraria"></div>
-            <div class="bar" style="height:90%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="Marketing"></div>
-            <div class="bar" style="height:80%;background:linear-gradient(0deg,var(--sage),var(--teal))" data-label="Pesquisa"></div>
-            <div class="bar" style="height:65%;background:linear-gradient(0deg,var(--coral),var(--lavender))" data-label="Extensão"></div>
-            <div class="bar" style="height:75%;background:linear-gradient(0deg,var(--sky),var(--sage))" data-label="Ensino"></div>
+          <div class="chart-placeholder" id="home-atividade-chart" style="padding-bottom:28px">
+            <div style="width:100%;text-align:center;color:var(--text3);font-size:13px;padding:20px 0"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
           </div>
         </div>
       </div>
@@ -1082,27 +1130,8 @@ body.is-admin .admin-only-block { display: block; }
 
         <div class="card">
           <div class="card-header"><div class="card-title">Distribuição por setor</div></div>
-          <div class="donut-wrap">
-            <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
-              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--bg3)" stroke-width="18"/>
-              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--teal)" stroke-width="18"
-                stroke-dasharray="62.8 188.5" stroke-dashoffset="0" transform="rotate(-90 55 55)"/>
-              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--lavender)" stroke-width="18"
-                stroke-dasharray="50.3 251.3" stroke-dashoffset="-62.8" transform="rotate(-90 55 55)"/>
-              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--gold)" stroke-width="18"
-                stroke-dasharray="37.7 251.3" stroke-dashoffset="-113.1" transform="rotate(-90 55 55)"/>
-              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--sage)" stroke-width="18"
-                stroke-dasharray="50.3 251.3" stroke-dashoffset="-150.8" transform="rotate(-90 55 55)"/>
-              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--coral)" stroke-width="18"
-                stroke-dasharray="25.1 251.3" stroke-dashoffset="-201.1" transform="rotate(-90 55 55)"/>
-            </svg>
-            <div class="donut-legend">
-              <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Pesquisa <strong style="margin-left:auto">10</strong></div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--lavender)"></div>Marketing <strong style="margin-left:auto">8</strong></div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Tesouraria <strong style="margin-left:auto">6</strong></div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--sage)"></div>Extensão <strong style="margin-left:auto">7</strong></div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>Ensino <strong style="margin-left:auto">3</strong></div>
-            </div>
+          <div class="donut-wrap" id="home-setor-donut">
+            <div style="text-align:center;width:100%;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin"></i></div>
           </div>
         </div>
       </div>
@@ -1125,7 +1154,7 @@ body.is-admin .admin-only-block { display: block; }
       <!-- ABA ATAS -->
       <div class="inner-panel active" id="sec-atas">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-          <div style="color:var(--text2);font-size:14px">12 atas registradas em 2026</div>
+          <div style="color:var(--text2);font-size:14px" id="atas-counter-label"><i class="fas fa-spinner fa-spin" style="font-size:10px"></i> carregando…</div>
           <button class="btn btn-primary admin-only" onclick="openModal('modal-nova-ata')"><i class="fas fa-plus"></i> Nova Ata</button>
         </div>
         <div id="atas-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
@@ -1381,20 +1410,20 @@ body.is-admin .admin-only-block { display: block; }
       <div class="grid grid-3 gap-20">
         <div class="stat-card" style="--accent-color:var(--teal)">
           <div class="stat-label">Projetos ativos</div>
-          <div class="stat-value">5</div>
-          <div class="stat-change up"><i class="fas fa-flask"></i>3 em coleta de dados</div>
+          <div class="stat-value" id="pesq-stat-ativos"><span class="skel-inline"></span></div>
+          <div class="stat-change up" id="pesq-stat-ativos-sub"><i class="fas fa-flask"></i> carregando</div>
           <i class="fas fa-microscope stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--lavender)">
           <div class="stat-label">Publicações 2026</div>
-          <div class="stat-value">7</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-book"></i>2 em revisão</div>
+          <div class="stat-value" id="pesq-stat-pub"><span class="skel-inline"></span></div>
+          <div class="stat-change" style="color:var(--text2)" id="pesq-stat-pub-sub"><i class="fas fa-book"></i> carregando</div>
           <i class="fas fa-file-alt stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--gold)">
           <div class="stat-label">Congressos inscritos</div>
-          <div class="stat-value">4</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-trophy"></i>1 premiação</div>
+          <div class="stat-value" id="pesq-stat-cong"><span class="skel-inline"></span></div>
+          <div class="stat-change" style="color:var(--text2)" id="pesq-stat-cong-sub"><i class="fas fa-trophy"></i> carregando</div>
           <i class="fas fa-award stat-icon"></i>
         </div>
       </div>
@@ -1446,20 +1475,20 @@ body.is-admin .admin-only-block { display: block; }
       <div class="grid grid-3 gap-20">
         <div class="stat-card" style="--accent-color:var(--sage)">
           <div class="stat-label">Ações realizadas</div>
-          <div class="stat-value">12</div>
-          <div class="stat-change up"><i class="fas fa-check"></i>Semestre atual</div>
+          <div class="stat-value" id="ext-stat-acoes"><span class="skel-inline"></span></div>
+          <div class="stat-change up" id="ext-stat-acoes-sub"><i class="fas fa-check"></i> carregando</div>
           <i class="fas fa-hands-helping stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--sky)">
           <div class="stat-label">Pessoas impactadas</div>
-          <div class="stat-value">430</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+120 vs semestre ant.</div>
+          <div class="stat-value" id="ext-stat-pessoas"><span class="skel-inline"></span></div>
+          <div class="stat-change up" id="ext-stat-pessoas-sub"><i class="fas fa-arrow-up"></i> carregando</div>
           <i class="fas fa-heart stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--teal)">
           <div class="stat-label">Parcerias ativas</div>
-          <div class="stat-value">6</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-handshake"></i>Instituições</div>
+          <div class="stat-value" id="ext-stat-parcerias"><span class="skel-inline"></span></div>
+          <div class="stat-change" style="color:var(--text2)" id="ext-stat-parcerias-sub"><i class="fas fa-handshake"></i> carregando</div>
           <i class="fas fa-building stat-icon"></i>
         </div>
       </div>
@@ -1488,20 +1517,20 @@ body.is-admin .admin-only-block { display: block; }
       <div class="grid grid-3 gap-20">
         <div class="stat-card" style="--accent-color:var(--lavender)">
           <div class="stat-label">Cursos ativos</div>
-          <div class="stat-value">4</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-book-open"></i>Semestre 2026.1</div>
+          <div class="stat-value" id="ens-stat-cursos"><span class="skel-inline"></span></div>
+          <div class="stat-change" style="color:var(--text2)" id="ens-stat-cursos-sub"><i class="fas fa-book-open"></i> carregando</div>
           <i class="fas fa-graduation-cap stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--teal)">
           <div class="stat-label">Certificados emitidos <button class="btn-edit-ind admin-only" onclick="editarIndicador('certificados_emitidos')" title="Editar" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;margin-left:4px"><i class="fas fa-edit"></i></button></div>
-          <div class="stat-value">87</div>
-          <div class="stat-change up"><i class="fas fa-award"></i>Total acumulado</div>
+          <div class="stat-value" id="home-certs-val2"><span class="skel-inline"></span></div>
+          <div class="stat-change up" id="home-certs-change2"><i class="fas fa-award"></i> carregando</div>
           <i class="fas fa-certificate stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--gold)">
           <div class="stat-label">Carga horária ofertada</div>
-          <div class="stat-value">64h</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-clock"></i>Semestre atual</div>
+          <div class="stat-value" id="ens-stat-horas"><span class="skel-inline"></span></div>
+          <div class="stat-change" style="color:var(--text2)" id="ens-stat-horas-sub"><i class="fas fa-clock"></i> carregando</div>
           <i class="fas fa-clock stat-icon"></i>
         </div>
       </div>
@@ -2481,8 +2510,7 @@ function loginSuccess(role) {
   loadHomeStats();
 
   showToast('Bem-vindo' + (role === 'admin' ? ', Administrador!' : ' à LAPA!'), 'success');
-  _aplicarIndicadoresLocais();
-  _aplicarIndicadoresMkt();
+  _aplicarTodosIndicadores();
 }
 
 function doLogout() {
@@ -2796,6 +2824,11 @@ async function apiPost(payload) {
     });
     const data = await resp.json();
     if (!data.success) throw new Error(data.error || 'Erro desconhecido');
+    // Invalida cache da sheet afetada para forçar re-fetch
+    if (payload.sheet) {
+      const sheetKey = JSON.stringify({ action: 'getAll', sheet: payload.sheet });
+      delete _apiCache[sheetKey];
+    }
     return data.data;
   } catch (e) {
     throw e;
@@ -2914,25 +2947,30 @@ function setEmptyMsg(containerId, icon, msg) {
 async function loadHomeStats() {
   try {
     // Carrega tudo em paralelo — muito mais rápido
-    const [stats, membros, financeiro, eventos] = await Promise.all([
-      apiGet({ action: 'getStats' }),
+    const [membros, financeiro, eventos, pesquisas] = await Promise.all([
       apiGet({ action: 'getAll', sheet: 'Membros' }),
       apiGet({ action: 'getAll', sheet: 'Financeiro' }),
       apiGet({ action: 'getAll', sheet: 'Eventos' }),
+      apiGet({ action: 'getAll', sheet: 'Pesquisas' }),
     ]);
 
-    // ── Counters do hero ──────────────────────────────────
-    if (stats) {
-      animateCounter(document.getElementById('cnt-membros'),  stats.membros_ativos   || 0);
-      animateCounter(document.getElementById('cnt-eventos'),  stats.eventos_semestre || 0);
-      animateCounter(document.getElementById('cnt-projetos'), stats.projetos_ativos  || 0);
-      animateCounter(document.getElementById('cnt-anos'),     3);
-    } else {
-      ['cnt-membros','cnt-eventos','cnt-projetos','cnt-anos'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = id === 'cnt-anos' ? '3' : '—';
-      });
-    }
+    // ── Counters do hero — calculados dos dados reais ─────
+    const membrosAtivos = membros ? membros.filter(m => m.Status === 'Ativo').length : null;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const inicioSem = new Date(hoje.getFullYear(), hoje.getMonth() <= 5 ? 0 : 6, 1);
+    const eventosSem = eventos
+      ? eventos.filter(e => { const d = new Date((e.Data||'')+'T00:00:00'); return d >= inicioSem; }).length
+      : null;
+    const projAtivos = pesquisas
+      ? pesquisas.filter(p => !['Publicado','Encerrado'].includes(p.Status)).length
+      : null;
+
+    const cntMembros  = document.getElementById('cnt-membros');
+    const cntEventos  = document.getElementById('cnt-eventos');
+    const cntProjetos = document.getElementById('cnt-projetos');
+    if (cntMembros)  { if (membrosAtivos  !== null) animateCounter(cntMembros,  membrosAtivos);  else cntMembros.textContent  = '—'; }
+    if (cntEventos)  { if (eventosSem     !== null) animateCounter(cntEventos,  eventosSem);     else cntEventos.textContent  = '—'; }
+    if (cntProjetos) { if (projAtivos     !== null) animateCounter(cntProjetos, projAtivos);     else cntProjetos.textContent = '—'; }
 
     // ── Saldo em caixa (home) — calculado da sheet Financeiro ──
     const saldoEl  = document.getElementById('home-saldo-val');
@@ -2985,14 +3023,25 @@ async function loadHomeStats() {
       if (evMeta) evMeta.innerHTML  = '<i class="fas fa-minus"></i> —';
     }
 
-    // ── Indicadores editáveis (localStorage) ─────────────────
-    _aplicarIndicadoresLocais();
+    // ── Indicadores editáveis via API ─────────────────────────
+    _aplicarTodosIndicadores();
 
     // ── Membros recentes ──────────────────────────────────────
     renderHomeMembros(membros);
 
+    // ── Gráficos dinâmicos ────────────────────────────────────
+    renderDonutSetor(membros);
+    renderBarChart(membros);
+
     // ── Timeline de eventos recentes ──────────────────────────
     renderHomeTimeline(eventos);
+
+    // ── Badges dinâmicos da sidebar ───────────────────────────
+    const ouvidoria = await apiGet({ action: 'getAll', sheet: 'Ouvidoria' });
+    _updateNavBadges({ eventos, ouvidoria, financeiro });
+
+    // ── Timestamp da última atualização ──────────────────────
+    _updateLastRefresh();
 
   } catch(e) { console.warn('loadHomeStats:', e); }
 }
@@ -3004,7 +3053,10 @@ function renderHomeTimeline(eventos) {
   const tl_colors = ['teal','lav','gold','sage','coral'];
   const tl_icons  = ['fa-first-aid','fa-users','fa-heartbeat','fa-book-open','fa-calendar-check'];
 
-  if (!eventos || eventos.length === 0) return; // mantém conteúdo estático como placeholder
+  if (!eventos || eventos.length === 0) {
+    list.innerHTML = '<li style="color:var(--text3);font-size:13px;padding:12px 0">Nenhum evento cadastrado. <span style="cursor:pointer;color:var(--teal)" onclick="showPage(\'agenda\')">Adicionar →</span></li>';
+    return;
+  }
 
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const proximos = eventos
@@ -3012,7 +3064,10 @@ function renderHomeTimeline(eventos) {
     .sort((a,b) => new Date(a.Data) - new Date(b.Data))
     .slice(0, 4);
 
-  if (proximos.length === 0) return;
+  if (proximos.length === 0) {
+    list.innerHTML = '<li style="color:var(--text3);font-size:13px;padding:12px 0">Nenhum evento próximo. <span style="cursor:pointer;color:var(--teal)" onclick="showPage(\'agenda\')">Ver agenda →</span></li>';
+    return;
+  }
 
   list.innerHTML = proximos.map((ev, i) => {
     const d   = new Date(ev.Data + 'T00:00:00');
@@ -3147,6 +3202,14 @@ async function loadAtas() {
 
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'Atas' });
+
+    // Atualiza contador dinâmico
+    const labelEl = document.getElementById('atas-counter-label');
+    if (labelEl) {
+      const ano = new Date().getFullYear();
+      const cnt = data ? data.filter(a => String(a.Data || '').startsWith(String(ano))).length : 0;
+      labelEl.textContent = cnt > 0 ? `${cnt} ata(s) registrada(s) em ${ano}` : `Nenhuma ata em ${ano}`;
+    }
 
     if (!data || data.length === 0) {
       setEmptyMsg('atas-list-container', 'fa-file-alt', 'Nenhuma ata registrada ainda.');
@@ -3540,6 +3603,9 @@ async function loadPesquisa() {
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'Pesquisas' });
 
+    // Atualiza stats dinâmicos
+    _updatePesquisaStats(data);
+
     if (!data || data.length === 0) {
       grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-flask" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>Nenhum projeto cadastrado ainda.</div>';
       return;
@@ -3587,6 +3653,10 @@ async function loadExtensao() {
 
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'Extensao' });
+
+    // Atualiza stats dinâmicos
+    _updateExtensaoStats(data);
+
     if (!data || data.length === 0) {
       container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Nenhuma ação registrada ainda.</div>';
       return;
@@ -3611,31 +3681,46 @@ async function loadExtensao() {
 async function loadEnsino() {
   const grid = document.getElementById('ensino-cursos-grid');
   if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando cursos…</div>';
 
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'Cursos' });
+
+    // Atualiza stats dinâmicos
+    _updateEnsinoStats(data);
+
     if (!data || data.length === 0) {
-      grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1">Nenhum curso cadastrado ainda.</div>';
+      grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-graduation-cap" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>Nenhum curso cadastrado ainda.</div>';
       return;
     }
     grid.innerHTML = data.map(c => {
-      const prog = parseInt(c.Progresso) || 0;
+      const prog    = parseInt(c.Progresso) || 0;
+      const editBtn = isAdmin()
+        ? `<button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" onclick="editCurso('${esc(String(c.ID))}')"><i class="fas fa-edit"></i> Editar</button>`
+        : '';
       return `<div class="research-card">
-        <div class="badge ${statusBadge(c.Status)}" style="margin-bottom:10px">${esc(c.Status)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="badge ${statusBadge(c.Status)}">${esc(c.Status)}</span>
+          <span style="font-size:11px;color:var(--text3)">${c.DataInicio ? formatDate(c.DataInicio) : 'Sem data'}</span>
+        </div>
         <div class="research-title">${esc(c.Titulo)}</div>
         <div class="research-desc">${esc(c.Descricao)}</div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:8px">
-          <i class="fas fa-clock"></i> ${esc(c.CargaHoraria)}h &nbsp;•&nbsp;
-          <i class="fas fa-users"></i> ${esc(c.Vagas)} vagas &nbsp;•&nbsp;
-          <i class="fas fa-laptop"></i> ${esc(c.Modalidade)}
+          <i class="fas fa-clock"></i> ${esc(c.CargaHoraria) || '—'}h &nbsp;•&nbsp;
+          <i class="fas fa-users"></i> ${esc(c.Vagas) || '—'} vagas &nbsp;•&nbsp;
+          <i class="fas fa-laptop"></i> ${esc(c.Modalidade) || '—'}
         </div>
         <div style="font-size:12px;margin-bottom:4px;display:flex;justify-content:space-between">
           <span>Progresso</span><strong>${prog}%</strong>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div>
+        ${editBtn}
       </div>`;
     }).join('');
-  } catch(e) { console.warn('loadEnsino:', e); }
+  } catch(e) {
+    grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--coral);grid-column:1/-1">Erro ao carregar cursos.</div>';
+    console.warn('loadEnsino:', e);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3680,19 +3765,18 @@ async function loadOuvidoria() {
 // ══════════════════════════════════════════════════════════════
 
 async function loadMarketing() {
-  // ── Aplica indicadores salvos localmente ─────────────────
-  _aplicarIndicadoresMkt();
+  // ── Aplica indicadores via API ────────────────────────────
+  _aplicarTodosIndicadores();
 
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'TarefasMarketing' });
-    if (!data || data.length === 0) return; // mantém kanban estático como placeholder
 
-    // ── Com dados da API, substitui o kanban inteiro ──────
+    // ── Mapeamento exato Status → coluna ──────────────────
     const cols = {
       'Ideia':     'backlog-col',
       'Produção':  'producao-col',
       'Revisão':   'revisao-col',
-      'Publicado': 'publicado-col'
+      'Publicado': 'publicado-col',
     };
 
     const colTitles = {
@@ -3702,34 +3786,48 @@ async function loadMarketing() {
       'publicado-col': { emoji:'✅', label:'Publicado',    badge:'sage'  },
     };
 
-    // Limpa cards estáticos (data-task-id ausente = estático)
+    // Limpa apenas cards dinâmicos (mantém estáticos se API vazia)
     Object.values(cols).forEach(colId => {
       const col = document.getElementById(colId);
       if (!col) return;
-      col.querySelectorAll('.kanban-card:not([data-task-id])').forEach(el => el.remove());
+      col.querySelectorAll('.kanban-card[data-task-id]').forEach(el => el.remove());
     });
+
+    if (!data || data.length === 0) {
+      // Recalcula contadores com base nos cards estáticos restantes
+      Object.entries(cols).forEach(([, colId]) => {
+        const col = document.getElementById(colId);
+        const info = colTitles[colId];
+        if (!col || !info) return;
+        const cnt = col.querySelectorAll('.kanban-card').length;
+        const titleEl = col.querySelector('.kanban-col-title');
+        if (titleEl) titleEl.innerHTML = `${info.emoji} ${info.label} <span class="badge ${info.badge}">${cnt}</span>`;
+      });
+      return;
+    }
 
     // Organiza contagens por coluna
     const counts = { 'backlog-col':0,'producao-col':0,'revisao-col':0,'publicado-col':0 };
 
     data.forEach(t => {
-      const colKey = Object.keys(cols).find(k =>
-        String(t.Status).toLowerCase().includes(k.toLowerCase())
-      ) || 'Ideia';
-      const colId = cols[colKey];
+      // Mapeamento direto por Status exato; fallback para Backlog
+      const colId = cols[t.Status] || 'backlog-col';
       const col   = document.getElementById(colId);
       if (!col) return;
 
       counts[colId] = (counts[colId] || 0) + 1;
 
-      if (col.querySelector(`[data-task-id="${esc(String(t.ID))}"]`)) return;
+      // Evita duplicata
+      if (col.querySelector(`[data-task-id="${CSS.escape(String(t.ID))}"]`)) return;
 
       const cor  = setorCor(t.Formato);
       const card = document.createElement('div');
       card.className = 'kanban-card';
       card.setAttribute('data-task-id', String(t.ID));
       const editBtn = isAdmin()
-        ? `<button class="btn btn-outline btn-sm" style="margin-left:auto;padding:3px 8px;font-size:11px" onclick="excluirTarefaMkt('${esc(String(t.ID))}','${esc(t.Titulo)}')" title="Excluir"><i class="fas fa-trash" style="color:var(--coral)"></i></button>`
+        ? `<button class="btn btn-outline btn-sm" style="margin-left:auto;padding:3px 8px;font-size:11px"
+             onclick="excluirTarefaMkt('${esc(String(t.ID))}','${esc(t.Titulo)}')" title="Excluir">
+             <i class="fas fa-trash" style="color:var(--coral)"></i></button>`
         : '';
       card.innerHTML = `
         <div style="display:flex;align-items:flex-start;justify-content:space-between">
@@ -3737,20 +3835,21 @@ async function loadMarketing() {
           ${editBtn}
         </div>
         <div class="kanban-card-meta">
-          <span class="badge ${cor.badge}">${esc(t.Formato)}</span>
+          <span class="badge ${cor.badge}">${esc(t.Formato || '—')}</span>
           ${t.Prazo ? ' • ' + formatDate(t.Prazo) : ''}
           ${t.Responsavel ? `<span style="font-size:10px;color:var(--text3);display:block;margin-top:3px"><i class="fas fa-user"></i> ${esc(t.Responsavel)}</span>` : ''}
         </div>`;
       col.appendChild(card);
     });
 
-    // Atualiza contadores das colunas
+    // Atualiza contadores das colunas (API + estáticos)
     Object.entries(counts).forEach(([colId, cnt]) => {
       const info = colTitles[colId];
       const col  = document.getElementById(colId);
       if (!col || !info) return;
+      const total = col.querySelectorAll('.kanban-card').length;
       const titleEl = col.querySelector('.kanban-col-title');
-      if (titleEl) titleEl.innerHTML = `${info.emoji} ${info.label} <span class="badge ${info.badge}">${cnt}</span>`;
+      if (titleEl) titleEl.innerHTML = `${info.emoji} ${info.label} <span class="badge ${info.badge}">${total}</span>`;
     });
 
   } catch(e) { console.warn('loadMarketing:', e); }
@@ -4079,6 +4178,60 @@ async function salvarProjeto() {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-flask"></i> Cadastrar projeto';
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  EDITAR — CURSO
+// ══════════════════════════════════════════════════════════════
+
+async function editCurso(id) {
+  if (!requireAdmin('editar cursos')) return;
+  showToast('Buscando dados do curso…', 'info');
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Cursos' });
+    const c    = data?.find(x => String(x.ID) === String(id));
+    if (!c) { showToast('Curso não encontrado.', 'error'); return; }
+    // Reutiliza modal de novo curso preenchido
+    const modal = document.getElementById('modal-novo-curso');
+    if (!modal) return;
+    const inputs  = modal.querySelectorAll('input');
+    const selects = modal.querySelectorAll('select');
+    const textas  = modal.querySelectorAll('textarea');
+    if (inputs[0])  inputs[0].value  = c.Titulo      || '';
+    if (selects[0]) selects[0].value = c.Modalidade   || '';
+    if (inputs[1])  inputs[1].value  = c.CargaHoraria || '';
+    if (inputs[2])  inputs[2].value  = c.Vagas        || '';
+    if (inputs[3])  inputs[3].value  = c.DataInicio   || '';
+    if (textas[0])  textas[0].value  = c.Descricao    || '';
+    // Muda botão para modo edição
+    const btn = modal.querySelector('.btn-primary');
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-save"></i> Salvar alterações';
+      btn.onclick = async () => {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+        const row = {
+          Titulo:       inputs[0]?.value.trim(),
+          Modalidade:   selects[0]?.value,
+          CargaHoraria: inputs[1]?.value,
+          Vagas:        inputs[2]?.value,
+          DataInicio:   inputs[3]?.value,
+          Descricao:    textas[0]?.value.trim(),
+        };
+        try {
+          await apiPost({ action: 'update', sheet: 'Cursos', id, row });
+          closeModal('modal-novo-curso');
+          showToast('Curso atualizado com sucesso!', 'success');
+          loadEnsino();
+        } catch(e) {
+          showToast('Erro: ' + e.message, 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-save"></i> Salvar alterações';
+        }
+      };
+    }
+    openModal('modal-novo-curso');
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -4573,18 +4726,87 @@ function bindUploadFileInput() {
 
 
 // ══════════════════════════════════════════════════════════════
-//  INDICADORES EDITÁVEIS (localStorage)
+//  INDICADORES EDITÁVEIS — persiste em Google Sheets (sheet: Configuracoes)
 // ══════════════════════════════════════════════════════════════
 
-const IND_KEY = 'lapa-indicadores';
+/**
+ * Salva ou atualiza uma chave na sheet Configuracoes.
+ * Estrutura esperada da sheet: id | chave | valor | complemento
+ */
+async function _upsertConfig(chave, valor, complemento) {
+  try {
+    // Tenta atualizar; se falhar, insere
+    try {
+      await apiPost({
+        action: 'update',
+        sheet:  'Configuracoes',
+        id:     chave,
+        row:    { chave, valor, complemento: complemento || '' },
+      });
+    } catch(_) {
+      await apiPost({
+        action: 'insert',
+        sheet:  'Configuracoes',
+        row:    { id: chave, chave, valor, complemento: complemento || '' },
+      });
+    }
+  } catch(e) {
+    console.warn('_upsertConfig:', e.message);
+  }
+}
 
-function _getIndicadores() {
-  try { return JSON.parse(localStorage.getItem(IND_KEY) || '{}'); }
-  catch(e) { return {}; }
+/**
+ * Carrega todas as configurações da sheet Configuracoes e retorna
+ * um objeto { chave: { valor, complemento } }.
+ */
+async function _carregarConfiguracoes() {
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Configuracoes' });
+    if (!data || data.length === 0) return {};
+    const map = {};
+    data.forEach(row => {
+      if (row.chave) map[row.chave] = { valor: row.valor || '', complemento: row.complemento || '' };
+    });
+    return map;
+  } catch(e) {
+    console.warn('_carregarConfiguracoes:', e.message);
+    return {};
+  }
 }
-function _saveIndicadores(obj) {
-  localStorage.setItem(IND_KEY, JSON.stringify(obj));
+
+/**
+ * Aplica TODOS os indicadores (home + marketing + tesouraria)
+ * buscando dados da sheet Configuracoes. Fallback para defaults se API
+ * não estiver disponível.
+ */
+async function _aplicarTodosIndicadores() {
+  const saved = await _carregarConfiguracoes();
+
+  // ── Indicadores de home/tesouraria ──────────────────────
+  Object.entries(_indConfig).forEach(([key, cfg]) => {
+    const val = saved[key]?.valor        || cfg.defaultVal;
+    const ch  = saved[key]?.complemento  || cfg.defaultChange;
+    const el  = document.getElementById(cfg.valorId);
+    const chEl= document.getElementById(cfg.changeId);
+    if (el)   el.textContent = val;
+    if (chEl) chEl.innerHTML = `<i class="fas ${cfg.changeIcon}"></i> ${ch}`;
+    if (chEl && cfg.changeCls) chEl.className = 'stat-change ' + cfg.changeCls;
+  });
+
+  // ── Indicadores de marketing ─────────────────────────────
+  const set    = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
+  const setHTML= (id, v) => { const el = document.getElementById(id); if (el && v) el.innerHTML = v; };
+  set('mkt-seg-val',   saved['mkt.seguidores']?.valor);
+  set('mkt-eng-val',   saved['mkt.engajamento']?.valor);
+  set('mkt-posts-val', saved['mkt.posts']?.valor);
+  set('mkt-camp-val',  saved['mkt.campanhas']?.valor);
+  if (saved['mkt.segChange']?.valor) setHTML('mkt-seg-change', '<i class="fas fa-arrow-up"></i> ' + saved['mkt.segChange'].valor);
+  if (saved['mkt.engChange']?.valor) setHTML('mkt-eng-change', '<i class="fas fa-arrow-up"></i> ' + saved['mkt.engChange'].valor);
 }
+
+// Compat: funções síncronas usadas em chamadas legadas → delegam para a versão async
+function _aplicarIndicadoresLocais() { _aplicarTodosIndicadores(); }
+function _aplicarIndicadoresMkt()    { _aplicarTodosIndicadores(); }
 
 // Config de cada indicador: key → { label, valorId, changeId, defaultVal, defaultChange }
 const _indConfig = {
@@ -4617,89 +4839,58 @@ const _indConfig = {
   },
 };
 
-function _aplicarIndicadoresLocais() {
-  const saved = _getIndicadores();
-  Object.entries(_indConfig).forEach(([key, cfg]) => {
-    const val = saved[key]?.valor || cfg.defaultVal;
-    const ch  = saved[key]?.complemento || cfg.defaultChange;
-    const el  = document.getElementById(cfg.valorId);
-    const chEl= document.getElementById(cfg.changeId);
-    if (el)   el.textContent = val;
-    if (chEl) chEl.innerHTML = `<i class="fas ${cfg.changeIcon}"></i> ${ch}`;
-    if (chEl && cfg.changeCls) chEl.className = 'stat-change ' + cfg.changeCls;
-  });
-}
-
-function editarIndicador(key) {
+async function editarIndicador(key) {
   if (!requireAdmin('editar indicadores')) return;
   const cfg   = _indConfig[key];
   if (!cfg) return;
-  const saved = _getIndicadores();
+  const saved = await _carregarConfiguracoes();
   document.getElementById('edit-ind-key').value         = key;
   document.getElementById('edit-ind-titulo').textContent= 'Editar: ' + cfg.label;
   document.getElementById('edit-ind-label').textContent = 'Valor do indicador';
-  document.getElementById('edit-ind-valor').value       = saved[key]?.valor || cfg.defaultVal;
-  document.getElementById('edit-ind-complemento').value = saved[key]?.complemento || cfg.defaultChange;
+  document.getElementById('edit-ind-valor').value       = saved[key]?.valor        || cfg.defaultVal;
+  document.getElementById('edit-ind-complemento').value = saved[key]?.complemento  || cfg.defaultChange;
   document.getElementById('edit-ind-sub-label').textContent = 'Texto complementar (ex: +24h vs semestre passado)';
   openModal('modal-edit-indicador');
 }
 
-function salvarIndicador() {
+async function salvarIndicador() {
   const key = document.getElementById('edit-ind-key').value;
   const val = document.getElementById('edit-ind-valor').value.trim();
   const ch  = document.getElementById('edit-ind-complemento').value.trim();
   if (!val) { showToast('Informe o valor.', 'warning'); return; }
-  const saved = _getIndicadores();
-  saved[key] = { valor: val, complemento: ch };
-  _saveIndicadores(saved);
-  _aplicarIndicadoresLocais();
+  await _upsertConfig(key, val, ch);
+  await _aplicarTodosIndicadores();
   closeModal('modal-edit-indicador');
   showToast('Indicador atualizado!', 'success');
 }
 
 // ── Marketing indicators ──────────────────────────────────
-const MKT_KEY = 'lapa-mkt-ind';
 
-function _getMktInd() {
-  try { return JSON.parse(localStorage.getItem(MKT_KEY) || '{}'); }
-  catch(e) { return {}; }
-}
-
-function _aplicarIndicadoresMkt() {
-  const d = _getMktInd();
-  const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
-  const setHTML = (id, v) => { const el = document.getElementById(id); if (el && v) el.innerHTML = v; };
-  set('mkt-seg-val',   d.seguidores);
-  set('mkt-eng-val',   d.engajamento);
-  set('mkt-posts-val', d.posts);
-  set('mkt-camp-val',  d.campanhas);
-  if (d.segChange) setHTML('mkt-seg-change',   '<i class="fas fa-arrow-up"></i> ' + d.segChange);
-  if (d.engChange) setHTML('mkt-eng-change',   '<i class="fas fa-arrow-up"></i> ' + d.engChange);
-}
-
-function editarIndicadoresMkt() {
+async function editarIndicadoresMkt() {
   if (!requireAdmin('editar indicadores')) return;
-  const d = _getMktInd();
-  document.getElementById('mkt-input-seg').value     = d.seguidores  || '1.2k';
-  document.getElementById('mkt-input-seg-ch').value  = d.segChange   || '+87 este mês';
-  document.getElementById('mkt-input-eng').value     = d.engajamento || '8.4%';
-  document.getElementById('mkt-input-eng-ch').value  = d.engChange   || '+1.2pp';
-  document.getElementById('mkt-input-posts').value   = d.posts       || '38';
-  document.getElementById('mkt-input-camp').value    = d.campanhas   || '3';
+  const saved = await _carregarConfiguracoes();
+  document.getElementById('mkt-input-seg').value     = saved['mkt.seguidores']?.valor  || '1.2k';
+  document.getElementById('mkt-input-seg-ch').value  = saved['mkt.segChange']?.valor   || '+87 este mês';
+  document.getElementById('mkt-input-eng').value     = saved['mkt.engajamento']?.valor || '8.4%';
+  document.getElementById('mkt-input-eng-ch').value  = saved['mkt.engChange']?.valor   || '+1.2pp';
+  document.getElementById('mkt-input-posts').value   = saved['mkt.posts']?.valor       || '38';
+  document.getElementById('mkt-input-camp').value    = saved['mkt.campanhas']?.valor   || '3';
   openModal('modal-edit-mkt');
 }
 
-function salvarIndicadoresMkt() {
-  const d = {
-    seguidores:  document.getElementById('mkt-input-seg').value.trim(),
-    segChange:   document.getElementById('mkt-input-seg-ch').value.trim(),
-    engajamento: document.getElementById('mkt-input-eng').value.trim(),
-    engChange:   document.getElementById('mkt-input-eng-ch').value.trim(),
-    posts:       document.getElementById('mkt-input-posts').value.trim(),
-    campanhas:   document.getElementById('mkt-input-camp').value.trim(),
+async function salvarIndicadoresMkt() {
+  const campos = {
+    'mkt.seguidores':  document.getElementById('mkt-input-seg').value.trim(),
+    'mkt.segChange':   document.getElementById('mkt-input-seg-ch').value.trim(),
+    'mkt.engajamento': document.getElementById('mkt-input-eng').value.trim(),
+    'mkt.engChange':   document.getElementById('mkt-input-eng-ch').value.trim(),
+    'mkt.posts':       document.getElementById('mkt-input-posts').value.trim(),
+    'mkt.campanhas':   document.getElementById('mkt-input-camp').value.trim(),
   };
-  localStorage.setItem(MKT_KEY, JSON.stringify(d));
-  _aplicarIndicadoresMkt();
+  for (const [chave, valor] of Object.entries(campos)) {
+    await _upsertConfig(chave, valor, '');
+  }
+  await _aplicarTodosIndicadores();
   closeModal('modal-edit-mkt');
   showToast('Indicadores de marketing salvos!', 'success');
 }
@@ -4990,11 +5181,9 @@ function salvarConfiguracoes() {
     document.querySelector('.logo-title').textContent = nomeOrg;
   }
   if (apiUrlCfg) {
-    // Atualiza API_URL em tempo de execução (persiste apenas na sessão)
+    // Atualiza API_URL em tempo de execução (persiste apenas na sessão — sem localStorage)
     window.API_URL = apiUrlCfg;
-    // eslint-disable-next-line no-global-assign
     try { eval('API_URL = apiUrlCfg'); } catch(e) { /* non-strict fallback */ }
-    localStorage.setItem('lapa-api-url', apiUrlCfg);
   }
   closeModal('modal-configuracoes');
   showToast('Configurações salvas com sucesso!', 'success');
@@ -5067,11 +5256,7 @@ async function carregarNotificacoes() {
   document.querySelector('.notif-dot')?.remove();
 }
 
-// Restaura API_URL salva em localStorage (se o admin a alterou)
-(function restoreSettings() {
-  const savedUrl = localStorage.getItem('lapa-api-url');
-  if (savedUrl) { try { API_URL = savedUrl; } catch(e) {} }
-})();
+// API_URL é fixa em código — não utiliza localStorage para isso
 
 function setupKanbanIds() {
   const cols = document.querySelectorAll('.kanban-col');
@@ -5134,7 +5319,7 @@ function _atualizarPreviewDocStatic(url) {
 /**
  * Salva as alterações do card estático (persiste em localStorage).
  */
-function salvarDocStatic() {
+async function salvarDocStatic() {
   const card = _editDocCard;
   if (!card) return;
 
@@ -5172,8 +5357,8 @@ function salvarDocStatic() {
     badge.style.cssText = 'font-size:9px;position:absolute;top:8px;right:8px';
   }
 
-  // Persiste no localStorage para sobreviver a recarregamentos
-  _persistirDocsStatic();
+  // Persiste na sheet ConfigDocumentos via API
+  await _persistirDocsStatic();
 
   closeModal('modal-edit-doc-static');
   showToast(`"${nome}" atualizado com sucesso!`, 'success');
@@ -5196,58 +5381,95 @@ function abrirDocStatic(card) {
   }
 }
 
-// ── Persistência dos cards estáticos via localStorage ──────────
+// ── Persistência dos cards estáticos via API (sheet: ConfigDocumentos) ──────
 
-const _STATIC_DOCS_KEY = 'lapa-static-docs';
-
-function _persistirDocsStatic() {
+/**
+ * Persiste o estado atual de todos os cards estáticos na sheet ConfigDocumentos.
+ * Cada card é um registro identificado pelo campo "nome" (chave natural).
+ */
+async function _persistirDocsStatic() {
+  if (!isAdmin()) return;
   const cards = document.querySelectorAll('#docs-static-grid .doc-card');
-  const estado = [];
+  const registros = [];
   cards.forEach(card => {
-    const nome = card.querySelector('.doc-static-nome')?.textContent || '';
-    estado.push({
+    const nome = card.querySelector('.doc-static-nome')?.textContent?.trim() || '';
+    if (!nome) return;
+    registros.push({
       nome,
       cat:     card.getAttribute('data-cat')       || '',
       url:     card.getAttribute('data-drive-url') || '',
       tamanho: card.getAttribute('data-tamanho')   || '',
     });
   });
-  try { localStorage.setItem(_STATIC_DOCS_KEY, JSON.stringify(estado)); } catch(e) {}
+
+  // Estratégia: apaga todos e recria (upsert simples via insert com id=nome)
+  try {
+    for (const reg of registros) {
+      // Tenta atualizar; se falhar (não existe), insere
+      try {
+        await apiPost({
+          action: 'update',
+          sheet:  'ConfigDocumentos',
+          id:     reg.nome,
+          row:    reg,
+        });
+      } catch(_) {
+        await apiPost({
+          action: 'insert',
+          sheet:  'ConfigDocumentos',
+          row:    { id: reg.nome, ...reg },
+        });
+      }
+    }
+  } catch(e) {
+    console.warn('_persistirDocsStatic:', e.message);
+  }
 }
 
-function _restaurarDocsStatic() {
+/**
+ * Restaura o estado dos cards estáticos a partir da sheet ConfigDocumentos.
+ */
+async function _restaurarDocsStatic() {
   try {
-    const raw = localStorage.getItem(_STATIC_DOCS_KEY);
-    if (!raw) return;
-    const estado = JSON.parse(raw);
-    const cards  = document.querySelectorAll('#docs-static-grid .doc-card');
-    estado.forEach((s, i) => {
-      const card = cards[i];
-      if (!card) return;
-      card.setAttribute('data-cat',       s.cat);
-      card.setAttribute('data-drive-url', s.url);
-      card.setAttribute('data-tamanho',   s.tamanho);
-      card.setAttribute('data-nome',      (s.nome || '').toLowerCase());
+    const data = await apiGet({ action: 'getAll', sheet: 'ConfigDocumentos' });
+    if (!data || data.length === 0) return;
 
-      const nomeEl = card.querySelector('.doc-static-nome');
-      if (nomeEl && s.nome) nomeEl.textContent = s.nome;
+    const cards = document.querySelectorAll('#docs-static-grid .doc-card');
+    const badgeMap = {
+      Ata:'lav', Financeiro:'gold', Regulamento:'teal', Marketing:'lav',
+      Pesquisa:'teal', 'Extensão':'sage', Ensino:'sage', Imagem:'lav', Geral:'sage',
+    };
+
+    cards.forEach(card => {
+      const nomeEl  = card.querySelector('.doc-static-nome');
+      const nomeAtual = nomeEl?.textContent?.trim() || '';
+      // Encontra o registro pelo nome atual do card
+      const reg = data.find(r => String(r.nome || r.id || '').toLowerCase() === nomeAtual.toLowerCase());
+      if (!reg) return;
+
+      if (reg.cat)     card.setAttribute('data-cat',       reg.cat);
+      if (reg.url)     card.setAttribute('data-drive-url', reg.url);
+      if (reg.tamanho) card.setAttribute('data-tamanho',   reg.tamanho);
+      if (reg.nome)    card.setAttribute('data-nome',      reg.nome.toLowerCase());
+
+      if (nomeEl && reg.nome) nomeEl.textContent = reg.nome;
 
       const tamEl = card.querySelector('.doc-static-tamanho');
-      if (tamEl && s.tamanho) tamEl.textContent = s.tamanho;
+      if (tamEl && reg.tamanho) tamEl.textContent = reg.tamanho;
 
       const linkInd = card.querySelector('.doc-link-indicator');
-      if (linkInd) linkInd.style.display = s.url ? 'block' : 'none';
+      if (linkInd) linkInd.style.display = reg.url ? 'block' : 'none';
 
-      const badgeMap = { Ata:'lav', Financeiro:'gold', Regulamento:'teal', Marketing:'lav',
-                         Pesquisa:'teal', 'Extensão':'sage', Ensino:'sage', Imagem:'lav', Geral:'sage' };
       const badge = card.querySelector('.badge');
-      if (badge && s.cat) {
-        badge.className = 'badge ' + (badgeMap[s.cat] || 'teal');
-        badge.textContent = s.cat;
+      if (badge && reg.cat) {
+        badge.className = 'badge ' + (badgeMap[reg.cat] || 'teal');
+        badge.textContent = reg.cat;
         badge.style.cssText = 'font-size:9px;position:absolute;top:8px;right:8px';
       }
     });
-  } catch(e) {}
+  } catch(e) {
+    console.warn('_restaurarDocsStatic:', e.message);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -5404,13 +5626,237 @@ function jsonErr(msg) {
 // ── Fim do código de referência do Apps Script ────────────────
 
 // ══════════════════════════════════════════════════════════════
+//  GRÁFICO DONUT — Distribuição por setor (dinâmico)
+// ══════════════════════════════════════════════════════════════
+
+function renderDonutSetor(membros) {
+  const wrap = document.getElementById('home-setor-donut');
+  if (!wrap) return;
+
+  if (!membros || membros.length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;width:100%;padding:20px;color:var(--text3);font-size:13px">Sem dados de membros</div>';
+    return;
+  }
+
+  // Conta membros ativos por setor
+  const contagem = {};
+  membros.filter(m => m.Status === 'Ativo' || !m.Status).forEach(m => {
+    const s = m.Setor || 'Outros';
+    contagem[s] = (contagem[s] || 0) + 1;
+  });
+
+  const total = Object.values(contagem).reduce((a, b) => a + b, 0);
+  if (total === 0) { wrap.innerHTML = '<div style="text-align:center;width:100%;padding:20px;color:var(--text3)">Nenhum membro ativo</div>'; return; }
+
+  const cores = {
+    Pesquisa:   'var(--teal)',
+    Marketing:  'var(--lavender)',
+    Tesouraria: 'var(--gold)',
+    Extensão:   'var(--sky)',
+    Ensino:     'var(--sage)',
+    Secretaria: 'var(--coral)',
+    Outros:     'var(--text3)',
+  };
+  const coresFallback = ['var(--teal)','var(--lavender)','var(--gold)','var(--sage)','var(--sky)','var(--coral)'];
+
+  const sorted  = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
+  const circ    = 2 * Math.PI * 40; // circumference
+
+  let offset = 0;
+  const arcs = sorted.map(([setor, cnt], i) => {
+    const pct  = cnt / total;
+    const dash = circ * pct;
+    const cor  = cores[setor] || coresFallback[i % coresFallback.length];
+    const arc  = `<circle cx="55" cy="55" r="40" fill="none" stroke="${cor}" stroke-width="18"
+      stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}"
+      stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 55 55)"/>`;
+    offset += dash;
+    return { arc, cor, setor, cnt };
+  });
+
+  const svgArcs = arcs.map(a => a.arc).join('\n');
+  const legendHtml = arcs.map(a =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${a.cor}"></div>${a.setor} <strong style="margin-left:auto">${a.cnt}</strong></div>`
+  ).join('');
+
+  wrap.innerHTML = `
+    <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
+      <circle cx="55" cy="55" r="40" fill="none" stroke="var(--bg3)" stroke-width="18"/>
+      ${svgArcs}
+      <text x="55" y="59" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="700" font-family="Syne,sans-serif">${total}</text>
+    </svg>
+    <div class="donut-legend">${legendHtml}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GRÁFICO DE BARRAS — Atividade por setor (dinâmico)
+// ══════════════════════════════════════════════════════════════
+
+function renderBarChart(membros) {
+  const chart = document.getElementById('home-atividade-chart');
+  if (!chart) return;
+
+  const setores = ['Secretaria','Tesouraria','Marketing','Pesquisa','Extensão','Ensino'];
+  const gradientes = [
+    'linear-gradient(0deg,var(--teal),var(--sky))',
+    'linear-gradient(0deg,var(--gold),var(--coral))',
+    'linear-gradient(0deg,var(--lavender),var(--sky))',
+    'linear-gradient(0deg,var(--teal),var(--sage))',
+    'linear-gradient(0deg,var(--sage),var(--teal))',
+    'linear-gradient(0deg,var(--sky),var(--sage))',
+  ];
+
+  let contagem = {};
+  if (membros && membros.length > 0) {
+    membros.forEach(m => {
+      const s = m.Setor || 'Outros';
+      contagem[s] = (contagem[s] || 0) + 1;
+    });
+  }
+
+  const maxVal = Math.max(...setores.map(s => contagem[s] || 0), 1);
+
+  chart.innerHTML = setores.map((s, i) => {
+    const val = contagem[s] || 0;
+    const h   = maxVal > 0 ? Math.max(8, Math.round((val / maxVal) * 90)) : 15;
+    return `<div class="bar" style="height:${h}%;background:${gradientes[i]};position:relative" data-label="${s}" title="${s}: ${val} membro(s)">
+      <span style="position:absolute;top:-18px;width:100%;text-align:center;font-size:10px;color:var(--text2);font-weight:600">${val || '—'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BADGES DINÂMICOS DA SIDEBAR
+// ══════════════════════════════════════════════════════════════
+
+function _updateNavBadges({ eventos, ouvidoria, financeiro }) {
+  // Agenda: eventos próximos (próximos 30 dias)
+  const badgeAg = document.getElementById('nav-badge-agenda');
+  if (badgeAg && eventos) {
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const em30 = new Date(hoje); em30.setDate(hoje.getDate() + 30);
+    const prox = eventos.filter(e => {
+      const d = new Date((e.Data || '') + 'T00:00:00');
+      return d >= hoje && d <= em30;
+    }).length;
+    badgeAg.textContent = prox;
+    badgeAg.style.display = prox > 0 ? '' : 'none';
+  }
+
+  // Ouvidoria: pendências
+  const badgeOuv = document.getElementById('nav-badge-ouvidoria');
+  if (badgeOuv && ouvidoria) {
+    const pend = ouvidoria.filter(o => o.Status !== 'Resolvido').length;
+    badgeOuv.textContent = pend;
+    badgeOuv.style.display = pend > 0 ? '' : 'none';
+  }
+
+  // Tesouraria: saldo negativo → alerta
+  const badgeTes = document.getElementById('nav-badge-tesouraria');
+  if (badgeTes && financeiro) {
+    let saldo = 0;
+    financeiro.forEach(m => {
+      const v = parseFloat(m.Valor) || 0;
+      saldo += String(m.Tipo).toLowerCase() === 'receita' ? v : -v;
+    });
+    badgeTes.style.display = saldo < 0 ? '' : 'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ATUALIZA STATS DAS PÁGINAS DE EXTENSÃO, PESQUISA E ENSINO
+// ══════════════════════════════════════════════════════════════
+
+function _updateExtensaoStats(data) {
+  const total      = data ? data.length : 0;
+  const pessoas    = data ? data.reduce((a, r) => a + (parseInt(r.Participantes) || 0), 0) : 0;
+
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setEl('ext-stat-acoes',        total || '—');
+  setEl('ext-stat-acoes-sub',    total > 0 ? `${total} ação(ões) registrada(s)` : 'Nenhuma ação ainda');
+  setEl('ext-stat-pessoas',      pessoas > 0 ? pessoas.toLocaleString('pt-BR') : '—');
+  setEl('ext-stat-pessoas-sub',  pessoas > 0 ? 'Participantes somados' : 'Sem dados de participantes');
+  // Parcerias: carregadas via sheet Parceiros (separada) – mostramos placeholder se não houver
+  setEl('ext-stat-parcerias',    '—');
+  setEl('ext-stat-parcerias-sub','Dados em Parceiros sheet');
+}
+
+function _updatePesquisaStats(data) {
+  const ativos   = data ? data.filter(p => ['Coleta de dados','Análise','Escrita','Aguardando CEP','Planejamento'].includes(p.Status)).length : 0;
+  const publicados = data ? data.filter(p => p.Status === 'Publicado').length : 0;
+  const total    = data ? data.length : 0;
+
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const setHTML = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+  setEl('pesq-stat-ativos',     ativos || '—');
+  setHTML('pesq-stat-ativos-sub', `<i class="fas fa-flask"></i> ${total - ativos - publicados} em análise`);
+  setEl('pesq-stat-pub',        publicados || '—');
+  setHTML('pesq-stat-pub-sub',   `<i class="fas fa-book"></i> ${ativos} em andamento`);
+  // Congressos não temos sheet → indicador manual via configurações
+  setEl('pesq-stat-cong',       '—');
+  setHTML('pesq-stat-cong-sub',  `<i class="fas fa-info-circle"></i> Configure via Configuracoes`);
+}
+
+function _updateEnsinoStats(data) {
+  const ativos = data ? data.filter(c => c.Status !== 'Encerrado').length : 0;
+  const horas  = data ? data.reduce((a, c) => a + (parseInt(c.CargaHoraria) || 0), 0) : 0;
+
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const setHTML = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+  setEl('ens-stat-cursos',       ativos || '—');
+  setHTML('ens-stat-cursos-sub', `<i class="fas fa-book-open"></i> ${data ? data.length : 0} total cadastrado(s)`);
+  setEl('ens-stat-horas',        horas > 0 ? horas + 'h' : '—');
+  setHTML('ens-stat-horas-sub',  `<i class="fas fa-clock"></i> Carga total ofertada`);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LAST REFRESH INDICATOR
+// ══════════════════════════════════════════════════════════════
+
+function _updateLastRefresh() {
+  const el = document.getElementById('last-refresh');
+  if (!el) return;
+  const now = new Date();
+  el.innerHTML = `<i class="fas fa-circle" style="color:var(--sage);font-size:7px"></i> ${now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RECARREGAR TODOS OS DADOS (botão refresh)
+// ══════════════════════════════════════════════════════════════
+
+async function recarregarDados() {
+  // Limpa cache para forçar re-fetch
+  Object.keys(_apiCache).forEach(k => delete _apiCache[k]);
+
+  const btn = document.getElementById('btn-refresh');
+  if (btn) { btn.style.pointerEvents = 'none'; btn.querySelector('i').classList.add('fa-spin'); }
+
+  // Recarrega a página atual
+  const active = document.querySelector('.page.active');
+  if (active) {
+    const id = active.id.replace('page-','');
+    const loaders = {
+      home: loadHomeStats, membros: loadMembros, secretaria: loadSecretaria,
+      tesouraria: loadTesouraria, agenda: loadAgenda, pesquisa: loadPesquisa,
+      extensao: loadExtensao, ensino: loadEnsino, ouvidoria: loadOuvidoria,
+      marketing: loadMarketing, documentos: loadDocumentos,
+    };
+    if (loaders[id]) await loaders[id]();
+  }
+
+  if (btn) { btn.style.pointerEvents = ''; btn.querySelector('i').classList.remove('fa-spin'); }
+  _updateLastRefresh();
+  showToast('Dados atualizados!', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════
 //  INICIALIZAÇÃO
 // ══════════════════════════════════════════════════════════════
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   applyTheme();
   setupKanbanIds();
-  _restaurarDocsStatic(); // Restaura links/nomes salvos dos cards estáticos
+  await _restaurarDocsStatic(); // Restaura links/nomes dos cards estáticos via API
 
   // Verifica sessão salva
   const savedRole = sessionStorage.getItem('lapa-role');
