@@ -979,26 +979,26 @@ body.is-admin .admin-only-block { display: block; }
       <div class="grid grid-4 gap-20">
         <div class="stat-card" style="--accent-color: var(--teal)">
           <div class="stat-label">Saldo em caixa</div>
-          <div class="stat-value">R$ 1.240</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+R$ 300 este mês</div>
+          <div class="stat-value" id="home-saldo-val">—</div>
+          <div class="stat-change up" id="home-saldo-change"><i class="fas fa-sync fa-spin" style="font-size:10px"></i> carregando</div>
           <i class="fas fa-wallet stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color: var(--lavender)">
           <div class="stat-label">Próximo evento</div>
-          <div class="stat-value" style="font-size:22px">18 Abr</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-map-marker-alt"></i> Auditório A</div>
+          <div class="stat-value" style="font-size:22px" id="home-evento-val">—</div>
+          <div class="stat-change" style="color:var(--text2)" id="home-evento-meta"><i class="fas fa-map-marker-alt"></i> —</div>
           <i class="fas fa-calendar stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color: var(--sage)">
-          <div class="stat-label">Horas de treinamento</div>
-          <div class="stat-value">186h</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+24h vs semestre passado</div>
+          <div class="stat-label">Horas de treinamento <button class="btn-edit-ind admin-only" onclick="editarIndicador('horas_treinamento')" title="Editar" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;margin-left:4px"><i class="fas fa-edit"></i></button></div>
+          <div class="stat-value" id="home-horas-val">—</div>
+          <div class="stat-change up" id="home-horas-change"><i class="fas fa-sync fa-spin" style="font-size:10px"></i> carregando</div>
           <i class="fas fa-hand-holding-heart stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color: var(--gold)">
-          <div class="stat-label">Certificados emitidos</div>
-          <div class="stat-value">7</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-file-alt"></i>2 em revisão</div>
+          <div class="stat-label">Certificados emitidos <button class="btn-edit-ind admin-only" onclick="editarIndicador('certificados_emitidos')" title="Editar" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;margin-left:4px"><i class="fas fa-edit"></i></button></div>
+          <div class="stat-value" id="home-certs-val">—</div>
+          <div class="stat-change" style="color:var(--text2)" id="home-certs-change"><i class="fas fa-sync fa-spin" style="font-size:10px"></i> carregando</div>
           <i class="fas fa-microscope stat-icon"></i>
         </div>
       </div>
@@ -1012,7 +1012,7 @@ body.is-admin .admin-only-block { display: block; }
             <div class="card-title">Próximos eventos</div>
             <div class="card-action" onclick="showPage('agenda')">Ver agenda →</div>
           </div>
-          <ul class="timeline">
+          <ul class="timeline" id="home-timeline-list">
             <li class="timeline-item">
               <div class="tl-dot teal"><i class="fas fa-chalkboard-teacher"></i></div>
               <div class="tl-info">
@@ -1211,26 +1211,26 @@ body.is-admin .admin-only-block { display: block; }
       <div class="grid grid-4 gap-20">
         <div class="stat-card" style="--accent-color:var(--sage)">
           <div class="stat-label">Saldo atual</div>
-          <div class="stat-value" style="color:var(--sage)">R$ 1.240</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>Atualizado hoje</div>
+          <div class="stat-value" style="color:var(--sage)" id="tesour-saldo-val">Calculando…</div>
+          <div class="stat-change up" id="tesour-saldo-change"><i class="fas fa-sync fa-spin" style="font-size:10px"></i> carregando</div>
           <i class="fas fa-piggy-bank stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--teal)">
           <div class="stat-label">Receitas (mês)</div>
-          <div class="stat-value">R$ 850</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+R$ 200 vs mês ant.</div>
+          <div class="stat-value" id="tesour-rec-val">—</div>
+          <div class="stat-change up" id="tesour-rec-change"><i class="fas fa-sync fa-spin" style="font-size:10px"></i> carregando</div>
           <i class="fas fa-arrow-down stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--coral)">
           <div class="stat-label">Despesas (mês)</div>
-          <div class="stat-value">R$ 550</div>
-          <div class="stat-change down"><i class="fas fa-arrow-up"></i>+R$ 80 vs mês ant.</div>
+          <div class="stat-value" id="tesour-desp-val">—</div>
+          <div class="stat-change down" id="tesour-desp-change"><i class="fas fa-sync fa-spin" style="font-size:10px"></i> carregando</div>
           <i class="fas fa-arrow-up stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--gold)">
-          <div class="stat-label">Inadimplência</div>
-          <div class="stat-value">6</div>
-          <div class="stat-change down"><i class="fas fa-exclamation-triangle"></i>Membros em atraso</div>
+          <div class="stat-label">Inadimplência <button class="btn-edit-ind admin-only" onclick="editarIndicador('inadimplencia')" title="Editar" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;margin-left:4px"><i class="fas fa-edit"></i></button></div>
+          <div class="stat-value" id="tesour-inadim-val">—</div>
+          <div class="stat-change down" id="tesour-inadim-change"><i class="fas fa-exclamation-triangle"></i>Membros em atraso</div>
           <i class="fas fa-exclamation-circle stat-icon"></i>
         </div>
       </div>
@@ -1279,31 +1279,34 @@ body.is-admin .admin-only-block { display: block; }
     ══════════════════════════════ -->
     <div class="page" id="page-marketing">
       <div class="section-title">Marketing & Comunicação</div>
-      <div class="section-sub">Gerenciamento de conteúdo, redes sociais, campanhas e identidade visual da LAPA.</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div class="section-sub" style="margin-bottom:0">Gerenciamento de conteúdo, redes sociais, campanhas e identidade visual da LAPA.</div>
+        <button class="btn btn-outline btn-sm admin-only" onclick="editarIndicadoresMkt()" style="white-space:nowrap;margin-left:16px"><i class="fas fa-sliders-h"></i> Editar indicadores</button>
+      </div>
 
       <div class="grid grid-4 gap-20">
         <div class="stat-card" style="--accent-color:var(--lavender)">
           <div class="stat-label">Seguidores (Instagram)</div>
-          <div class="stat-value">1.2k</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+87 este mês</div>
+          <div class="stat-value" id="mkt-seg-val">1.2k</div>
+          <div class="stat-change up" id="mkt-seg-change"><i class="fas fa-arrow-up"></i>+87 este mês</div>
           <i class="fab fa-instagram stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--sky)">
           <div class="stat-label">Engajamento médio</div>
-          <div class="stat-value">8.4%</div>
-          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+1.2pp</div>
+          <div class="stat-value" id="mkt-eng-val">8.4%</div>
+          <div class="stat-change up" id="mkt-eng-change"><i class="fas fa-arrow-up"></i>+1.2pp</div>
           <i class="fas fa-chart-line stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--teal)">
           <div class="stat-label">Posts publicados</div>
-          <div class="stat-value">38</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-calendar"></i>Semestre atual</div>
+          <div class="stat-value" id="mkt-posts-val">38</div>
+          <div class="stat-change" style="color:var(--text2)" id="mkt-posts-change"><i class="fas fa-calendar"></i>Semestre atual</div>
           <i class="fas fa-images stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--gold)">
           <div class="stat-label">Campanhas ativas</div>
-          <div class="stat-value">3</div>
-          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-rocket"></i>Em andamento</div>
+          <div class="stat-value" id="mkt-camp-val">3</div>
+          <div class="stat-change" style="color:var(--text2)" id="mkt-camp-change"><i class="fas fa-rocket"></i>Em andamento</div>
           <i class="fas fa-bullhorn stat-icon"></i>
         </div>
       </div>
@@ -1315,9 +1318,9 @@ body.is-admin .admin-only-block { display: block; }
           <div class="card-title">Kanban de Conteúdo</div>
           <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-new-task')"><i class="fas fa-plus"></i> Nova tarefa</button>
         </div>
-        <div class="kanban">
-          <div class="kanban-col">
-            <div class="kanban-col-title">📋 Backlog <span class="badge teal">4</span></div>
+        <div class="kanban" id="kanban-board">
+          <div class="kanban-col" id="backlog-col">
+            <div class="kanban-col-title">📋 Backlog <span class="badge teal" id="kanban-backlog-count">4</span></div>
             <div class="kanban-card"><div class="kanban-card-title">Post: Dia Mundial de Primeiros Socorros</div><div class="kanban-card-meta"><span class="badge lav">Carrossel</span> • 10 Mai</div></div>
             <div class="kanban-card"><div class="kanban-card-title">Reels: Depoimentos membros</div><div class="kanban-card-meta"><span class="badge sky">Reels</span> • Sem data</div></div>
             <div class="kanban-card"><div class="kanban-card-title">Story quiz: RCP na prática</div><div class="kanban-card-meta"><span class="badge teal">Stories</span> • Sem data</div></div>
@@ -1490,7 +1493,7 @@ body.is-admin .admin-only-block { display: block; }
           <i class="fas fa-graduation-cap stat-icon"></i>
         </div>
         <div class="stat-card" style="--accent-color:var(--teal)">
-          <div class="stat-label">Certificados emitidos</div>
+          <div class="stat-label">Certificados emitidos <button class="btn-edit-ind admin-only" onclick="editarIndicador('certificados_emitidos')" title="Editar" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;margin-left:4px"><i class="fas fa-edit"></i></button></div>
           <div class="stat-value">87</div>
           <div class="stat-change up"><i class="fas fa-award"></i>Total acumulado</div>
           <i class="fas fa-certificate stat-icon"></i>
@@ -2314,6 +2317,75 @@ body.is-admin .admin-only-block { display: block; }
   </div>
 </div>
 
+
+<!-- MODAL: Editar Indicador Único (admin) -->
+<div class="modal-overlay" id="modal-edit-indicador">
+  <div class="modal" style="width:380px">
+    <div class="modal-header">
+      <div class="modal-title" id="edit-ind-titulo">Editar Indicador</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-indicador')">✕</button>
+    </div>
+    <input type="hidden" id="edit-ind-key">
+    <div class="form-group">
+      <label class="form-label" id="edit-ind-label">Valor</label>
+      <input class="form-input" id="edit-ind-valor" type="text" placeholder="Digite o valor">
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="edit-ind-sub-label">Texto complementar</label>
+      <input class="form-input" id="edit-ind-complemento" type="text" placeholder="Ex: +24h vs semestre passado">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-indicador')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarIndicador()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Indicadores Marketing -->
+<div class="modal-overlay" id="modal-edit-mkt">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Indicadores de Marketing</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-mkt')">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px">Atualize os indicadores manualmente. Os valores são salvos localmente neste dispositivo.</p>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Seguidores (Instagram)</label>
+        <input class="form-input" id="mkt-input-seg" type="text" placeholder="Ex: 1.2k">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Variação seguidores</label>
+        <input class="form-input" id="mkt-input-seg-ch" type="text" placeholder="Ex: +87 este mês">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Engajamento médio</label>
+        <input class="form-input" id="mkt-input-eng" type="text" placeholder="Ex: 8.4%">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Variação engajamento</label>
+        <input class="form-input" id="mkt-input-eng-ch" type="text" placeholder="Ex: +1.2pp">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Posts publicados</label>
+        <input class="form-input" id="mkt-input-posts" type="text" placeholder="Ex: 38">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Campanhas ativas</label>
+        <input class="form-input" id="mkt-input-camp" type="text" placeholder="Ex: 3">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-mkt')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarIndicadoresMkt()"><i class="fas fa-save"></i> Salvar indicadores</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
 <script>
 'use strict';
@@ -2409,6 +2481,8 @@ function loginSuccess(role) {
   loadHomeStats();
 
   showToast('Bem-vindo' + (role === 'admin' ? ', Administrador!' : ' à LAPA!'), 'success');
+  _aplicarIndicadoresLocais();
+  _aplicarIndicadoresMkt();
 }
 
 function doLogout() {
@@ -2687,13 +2761,24 @@ function animateCounter(el, target, prefix = '', suffix = '') {
 //  API
 // ══════════════════════════════════════════════════════════════
 
+// ─── Cache de respostas (TTL: 30s) ────────────────────────
+const _apiCache = {};
+const _apiCacheTTL = 30000;
+function _cacheKey(p){ return JSON.stringify(p); }
+
 async function apiGet(params) {
   if (!API_URL || API_URL.includes('COLE_A_URL')) return null;
+  const key = _cacheKey(params);
+  const now = Date.now();
+  if (_apiCache[key] && (now - _apiCache[key].ts < _apiCacheTTL)) {
+    return _apiCache[key].data;
+  }
   try {
     const url  = API_URL + '?' + new URLSearchParams(params).toString();
     const resp = await fetch(url);
     const data = await resp.json();
     if (!data.success) throw new Error(data.error || 'Erro desconhecido');
+    _apiCache[key] = { data: data.data, ts: now };
     return data.data;
   } catch (e) {
     console.warn('API GET falhou:', e.message);
@@ -2828,25 +2913,122 @@ function setEmptyMsg(containerId, icon, msg) {
 
 async function loadHomeStats() {
   try {
-    const stats = await apiGet({ action: 'getStats' });
+    // Carrega tudo em paralelo — muito mais rápido
+    const [stats, membros, financeiro, eventos] = await Promise.all([
+      apiGet({ action: 'getStats' }),
+      apiGet({ action: 'getAll', sheet: 'Membros' }),
+      apiGet({ action: 'getAll', sheet: 'Financeiro' }),
+      apiGet({ action: 'getAll', sheet: 'Eventos' }),
+    ]);
+
+    // ── Counters do hero ──────────────────────────────────
     if (stats) {
       animateCounter(document.getElementById('cnt-membros'),  stats.membros_ativos   || 0);
       animateCounter(document.getElementById('cnt-eventos'),  stats.eventos_semestre || 0);
       animateCounter(document.getElementById('cnt-projetos'), stats.projetos_ativos  || 0);
       animateCounter(document.getElementById('cnt-anos'),     3);
     } else {
-      // Modo offline: valores zerados
       ['cnt-membros','cnt-eventos','cnt-projetos','cnt-anos'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.textContent = id === 'cnt-anos' ? '3' : '0';
+        if (el) el.textContent = id === 'cnt-anos' ? '3' : '—';
       });
     }
 
-    // Carrega membros recentes na home
-    const membros = await apiGet({ action: 'getAll', sheet: 'Membros' });
+    // ── Saldo em caixa (home) — calculado da sheet Financeiro ──
+    const saldoEl  = document.getElementById('home-saldo-val');
+    const saldoChEl= document.getElementById('home-saldo-change');
+    if (financeiro && financeiro.length > 0) {
+      let saldo = 0, recMes = 0, despMes = 0;
+      const hoje = new Date();
+      financeiro.forEach(m => {
+        const v    = parseFloat(m.Valor) || 0;
+        const isRec= String(m.Tipo).toLowerCase() === 'receita';
+        saldo += isRec ? v : -v;
+        const d = new Date((m.Data || '') + 'T00:00:00');
+        if (!isNaN(d) && d.getMonth()===hoje.getMonth() && d.getFullYear()===hoje.getFullYear()) {
+          if (isRec) recMes += v; else despMes += v;
+        }
+      });
+      const fmt = v => 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      if (saldoEl)  saldoEl.textContent = fmt(saldo);
+      if (saldoChEl) {
+        const diff = recMes - despMes;
+        saldoChEl.innerHTML = diff >= 0
+          ? '<i class="fas fa-arrow-up"></i>' + fmt(diff) + ' este mês'
+          : '<i class="fas fa-arrow-down"></i>' + fmt(diff) + ' este mês';
+        saldoChEl.className = 'stat-change ' + (diff >= 0 ? 'up' : 'down');
+      }
+    } else {
+      if (saldoEl) saldoEl.textContent = '—';
+      if (saldoChEl) saldoChEl.innerHTML = '<i class="fas fa-minus"></i> sem dados';
+    }
+
+    // ── Próximo evento ──────────────────────────────────────
+    const evVal = document.getElementById('home-evento-val');
+    const evMeta= document.getElementById('home-evento-meta');
+    if (eventos && eventos.length > 0) {
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const proximos = eventos
+        .filter(e => e.Data && new Date(e.Data + 'T00:00:00') >= hoje)
+        .sort((a,b) => new Date(a.Data) - new Date(b.Data));
+      if (proximos.length > 0) {
+        const ev = proximos[0];
+        const d  = new Date(ev.Data + 'T00:00:00');
+        if (evVal)  evVal.textContent = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
+        if (evMeta) evMeta.innerHTML  = '<i class="fas fa-map-marker-alt"></i> ' + (ev.Local || '—');
+      } else {
+        if (evVal)  evVal.textContent = '—';
+        if (evMeta) evMeta.innerHTML  = '<i class="fas fa-calendar-check"></i> Sem próximos eventos';
+      }
+    } else {
+      if (evVal)  evVal.textContent = '—';
+      if (evMeta) evMeta.innerHTML  = '<i class="fas fa-minus"></i> —';
+    }
+
+    // ── Indicadores editáveis (localStorage) ─────────────────
+    _aplicarIndicadoresLocais();
+
+    // ── Membros recentes ──────────────────────────────────────
     renderHomeMembros(membros);
 
+    // ── Timeline de eventos recentes ──────────────────────────
+    renderHomeTimeline(eventos);
+
   } catch(e) { console.warn('loadHomeStats:', e); }
+}
+
+function renderHomeTimeline(eventos) {
+  const list = document.getElementById('home-timeline-list');
+  if (!list) return;
+
+  const tl_colors = ['teal','lav','gold','sage','coral'];
+  const tl_icons  = ['fa-first-aid','fa-users','fa-heartbeat','fa-book-open','fa-calendar-check'];
+
+  if (!eventos || eventos.length === 0) return; // mantém conteúdo estático como placeholder
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const proximos = eventos
+    .filter(e => e.Data && new Date(e.Data + 'T00:00:00') >= hoje)
+    .sort((a,b) => new Date(a.Data) - new Date(b.Data))
+    .slice(0, 4);
+
+  if (proximos.length === 0) return;
+
+  list.innerHTML = proximos.map((ev, i) => {
+    const d   = new Date(ev.Data + 'T00:00:00');
+    const dt  = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
+    const cor = tl_colors[i % tl_colors.length];
+    const ico = tl_icons[i % tl_icons.length];
+    const hora = ev.HoraInicio ? ` • ${ev.HoraInicio}` : '';
+    const local= ev.Local      ? ` • ${esc(ev.Local)}` : '';
+    return `<li class="timeline-item">
+      <div class="tl-dot ${cor}"><i class="fas ${ico}"></i></div>
+      <div class="tl-info">
+        <div class="tl-title">${esc(ev.Titulo)}</div>
+        <div class="tl-meta">${dt}${hora}${local}</div>
+      </div>
+    </li>`;
+  }).join('');
 }
 
 function renderHomeMembros(data) {
@@ -3038,27 +3220,76 @@ async function loadTesouraria() {
 
     if (!data || data.length === 0) {
       setEmptyMsg('finance-movimentacoes', 'fa-receipt', 'Nenhum lançamento registrado ainda.');
+      // Mostra indicadores editáveis mesmo sem dados
+      _aplicarIndicadoresLocais();
       return;
     }
 
     let saldo = 0, recMes = 0, despMes = 0;
     const hoje = new Date();
+    const catTotals = {};
 
     data.forEach(mov => {
-      const v = parseFloat(mov.Valor) || 0;
-      const isRec = String(mov.Tipo).toLowerCase() === 'receita';
+      const v    = parseFloat(mov.Valor) || 0;
+      const isRec= String(mov.Tipo).toLowerCase() === 'receita';
       saldo += isRec ? v : -v;
-      const d = new Date(mov.Data + 'T00:00:00');
-      if (d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear()) {
+      const d = new Date((mov.Data || '') + 'T00:00:00');
+      if (!isNaN(d) && d.getMonth()===hoje.getMonth() && d.getFullYear()===hoje.getFullYear()) {
         if (isRec) recMes += v; else despMes += v;
+      }
+      if (!isRec && mov.Categoria) {
+        catTotals[mov.Categoria] = (catTotals[mov.Categoria] || 0) + v;
       }
     });
 
-    // Atualiza stat cards
-    const fmt = v => 'R$ ' + Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-    const saldoEl = document.querySelector('#page-tesouraria .stat-value');
-    if (saldoEl) saldoEl.textContent = fmt(saldo);
+    const fmt = v => 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
+    // ── Atualiza os 4 stat cards ──────────────────────────
+    const s = document.getElementById('tesour-saldo-val');
+    const sc= document.getElementById('tesour-saldo-change');
+    const r = document.getElementById('tesour-rec-val');
+    const rc= document.getElementById('tesour-rec-change');
+    const d2= document.getElementById('tesour-desp-val');
+    const dc= document.getElementById('tesour-desp-change');
+
+    if (s)  s.textContent  = fmt(saldo);
+    if (sc) sc.innerHTML   = '<i class="fas fa-sync-alt"></i> Atualizado agora';
+    if (r)  r.textContent  = fmt(recMes);
+    if (rc) rc.innerHTML   = '<i class="fas fa-arrow-up"></i> Este mês';
+    if (d2) d2.textContent = fmt(despMes);
+    if (dc) dc.innerHTML   = '<i class="fas fa-arrow-down"></i> Este mês';
+
+    // Atualiza também o card de saldo na home (se estiver visível)
+    const homeS = document.getElementById('home-saldo-val');
+    if (homeS && homeS.textContent === '—') homeS.textContent = fmt(saldo);
+
+    // ── Indicadores editáveis (inadimplência etc.) ────────
+    _aplicarIndicadoresLocais();
+
+    // ── Distribuição de despesas (dinâmico) ───────────────
+    const totalDesp = Object.values(catTotals).reduce((a,b)=>a+b, 0);
+    if (totalDesp > 0) {
+      const sorted = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,4);
+      const distrEl = document.querySelector('#page-tesouraria .donut-wrap');
+      if (distrEl) {
+        const colors = ['var(--teal)','var(--lavender)','var(--gold)','var(--sage)'];
+        distrEl.innerHTML = sorted.map(([cat, val], i) => {
+          const pct = Math.round(val/totalDesp*100);
+          return `<div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+              <span>${esc(cat)}</span><strong>${pct}%</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${pct}%;background:${colors[i]}"></div>
+            </div>
+          </div>`;
+        }).join('') + `<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">
+          <i class="fas fa-info-circle"></i> Próximo prazo de prestação de contas: <strong style="color:var(--gold)">30 Abr 2026</strong>
+        </div>`;
+      }
+    }
+
+    // ── Lista de movimentações ────────────────────────────
     container.innerHTML = data
       .sort((a,b) => new Date(b.Data) - new Date(a.Data))
       .slice(0, 12)
@@ -3073,8 +3304,10 @@ async function loadTesouraria() {
           <div class="finance-val ${isRec?'pos':'neg'}">${isRec?'+':'−'} R$ ${v.toFixed(2).replace('.',',')}</div>
         </div>`;
       }).join('');
+
   } catch(e) {
     setEmptyMsg('finance-movimentacoes', 'fa-exclamation-circle', 'Erro ao carregar movimentações.');
+    _aplicarIndicadoresLocais();
   }
 }
 
@@ -3447,19 +3680,38 @@ async function loadOuvidoria() {
 // ══════════════════════════════════════════════════════════════
 
 async function loadMarketing() {
+  // ── Aplica indicadores salvos localmente ─────────────────
+  _aplicarIndicadoresMkt();
+
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'TarefasMarketing' });
-    if (!data || data.length === 0) return;
+    if (!data || data.length === 0) return; // mantém kanban estático como placeholder
 
-    // Organiza por status no Kanban
+    // ── Com dados da API, substitui o kanban inteiro ──────
     const cols = {
-      'Ideia': 'backlog-col',
-      'Produção': 'producao-col',
-      'Revisão': 'revisao-col',
+      'Ideia':     'backlog-col',
+      'Produção':  'producao-col',
+      'Revisão':   'revisao-col',
       'Publicado': 'publicado-col'
     };
 
-    // Apenas adiciona novas tarefas da API ao kanban existente
+    const colTitles = {
+      'backlog-col':   { emoji:'📋', label:'Backlog',      badge:'teal'  },
+      'producao-col':  { emoji:'🛠',  label:'Em Produção',  badge:'gold'  },
+      'revisao-col':   { emoji:'🔍', label:'Revisão',      badge:'coral' },
+      'publicado-col': { emoji:'✅', label:'Publicado',    badge:'sage'  },
+    };
+
+    // Limpa cards estáticos (data-task-id ausente = estático)
+    Object.values(cols).forEach(colId => {
+      const col = document.getElementById(colId);
+      if (!col) return;
+      col.querySelectorAll('.kanban-card:not([data-task-id])').forEach(el => el.remove());
+    });
+
+    // Organiza contagens por coluna
+    const counts = { 'backlog-col':0,'producao-col':0,'revisao-col':0,'publicado-col':0 };
+
     data.forEach(t => {
       const colKey = Object.keys(cols).find(k =>
         String(t.Status).toLowerCase().includes(k.toLowerCase())
@@ -3468,15 +3720,22 @@ async function loadMarketing() {
       const col   = document.getElementById(colId);
       if (!col) return;
 
-      // Verifica se já existe
-      if (col.querySelector(`[data-task-id="${esc(t.ID)}"]`)) return;
+      counts[colId] = (counts[colId] || 0) + 1;
 
-      const cor = setorCor(t.Formato);
+      if (col.querySelector(`[data-task-id="${esc(String(t.ID))}"]`)) return;
+
+      const cor  = setorCor(t.Formato);
       const card = document.createElement('div');
       card.className = 'kanban-card';
-      card.setAttribute('data-task-id', t.ID);
+      card.setAttribute('data-task-id', String(t.ID));
+      const editBtn = isAdmin()
+        ? `<button class="btn btn-outline btn-sm" style="margin-left:auto;padding:3px 8px;font-size:11px" onclick="excluirTarefaMkt('${esc(String(t.ID))}','${esc(t.Titulo)}')" title="Excluir"><i class="fas fa-trash" style="color:var(--coral)"></i></button>`
+        : '';
       card.innerHTML = `
-        <div class="kanban-card-title">${esc(t.Titulo)}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div class="kanban-card-title" style="flex:1">${esc(t.Titulo)}</div>
+          ${editBtn}
+        </div>
         <div class="kanban-card-meta">
           <span class="badge ${cor.badge}">${esc(t.Formato)}</span>
           ${t.Prazo ? ' • ' + formatDate(t.Prazo) : ''}
@@ -3484,7 +3743,27 @@ async function loadMarketing() {
         </div>`;
       col.appendChild(card);
     });
+
+    // Atualiza contadores das colunas
+    Object.entries(counts).forEach(([colId, cnt]) => {
+      const info = colTitles[colId];
+      const col  = document.getElementById(colId);
+      if (!col || !info) return;
+      const titleEl = col.querySelector('.kanban-col-title');
+      if (titleEl) titleEl.innerHTML = `${info.emoji} ${info.label} <span class="badge ${info.badge}">${cnt}</span>`;
+    });
+
   } catch(e) { console.warn('loadMarketing:', e); }
+}
+
+async function excluirTarefaMkt(id, titulo) {
+  if (!requireAdmin('excluir tarefas')) return;
+  if (!confirm(`Excluir a tarefa "${titulo}"?`)) return;
+  try {
+    await apiPost({ action: 'delete', sheet: 'TarefasMarketing', id });
+    showToast('Tarefa excluída.', 'success');
+    loadMarketing();
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -4292,6 +4571,139 @@ function bindUploadFileInput() {
   });
 }
 
+
+// ══════════════════════════════════════════════════════════════
+//  INDICADORES EDITÁVEIS (localStorage)
+// ══════════════════════════════════════════════════════════════
+
+const IND_KEY = 'lapa-indicadores';
+
+function _getIndicadores() {
+  try { return JSON.parse(localStorage.getItem(IND_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function _saveIndicadores(obj) {
+  localStorage.setItem(IND_KEY, JSON.stringify(obj));
+}
+
+// Config de cada indicador: key → { label, valorId, changeId, defaultVal, defaultChange }
+const _indConfig = {
+  horas_treinamento: {
+    label: 'Horas de treinamento',
+    valorId: 'home-horas-val',
+    changeId: 'home-horas-change',
+    defaultVal: '186h',
+    defaultChange: '+24h vs semestre passado',
+    changeIcon: 'fa-arrow-up',
+    changeCls: 'up'
+  },
+  certificados_emitidos: {
+    label: 'Certificados emitidos',
+    valorId: 'home-certs-val',
+    changeId: 'home-certs-change',
+    defaultVal: '0',
+    defaultChange: 'Acumulado no ano',
+    changeIcon: 'fa-certificate',
+    changeCls: ''
+  },
+  inadimplencia: {
+    label: 'Inadimplência (membros em atraso)',
+    valorId: 'tesour-inadim-val',
+    changeId: 'tesour-inadim-change',
+    defaultVal: '0',
+    defaultChange: 'Membros em atraso',
+    changeIcon: 'fa-exclamation-triangle',
+    changeCls: 'down'
+  },
+};
+
+function _aplicarIndicadoresLocais() {
+  const saved = _getIndicadores();
+  Object.entries(_indConfig).forEach(([key, cfg]) => {
+    const val = saved[key]?.valor || cfg.defaultVal;
+    const ch  = saved[key]?.complemento || cfg.defaultChange;
+    const el  = document.getElementById(cfg.valorId);
+    const chEl= document.getElementById(cfg.changeId);
+    if (el)   el.textContent = val;
+    if (chEl) chEl.innerHTML = `<i class="fas ${cfg.changeIcon}"></i> ${ch}`;
+    if (chEl && cfg.changeCls) chEl.className = 'stat-change ' + cfg.changeCls;
+  });
+}
+
+function editarIndicador(key) {
+  if (!requireAdmin('editar indicadores')) return;
+  const cfg   = _indConfig[key];
+  if (!cfg) return;
+  const saved = _getIndicadores();
+  document.getElementById('edit-ind-key').value         = key;
+  document.getElementById('edit-ind-titulo').textContent= 'Editar: ' + cfg.label;
+  document.getElementById('edit-ind-label').textContent = 'Valor do indicador';
+  document.getElementById('edit-ind-valor').value       = saved[key]?.valor || cfg.defaultVal;
+  document.getElementById('edit-ind-complemento').value = saved[key]?.complemento || cfg.defaultChange;
+  document.getElementById('edit-ind-sub-label').textContent = 'Texto complementar (ex: +24h vs semestre passado)';
+  openModal('modal-edit-indicador');
+}
+
+function salvarIndicador() {
+  const key = document.getElementById('edit-ind-key').value;
+  const val = document.getElementById('edit-ind-valor').value.trim();
+  const ch  = document.getElementById('edit-ind-complemento').value.trim();
+  if (!val) { showToast('Informe o valor.', 'warning'); return; }
+  const saved = _getIndicadores();
+  saved[key] = { valor: val, complemento: ch };
+  _saveIndicadores(saved);
+  _aplicarIndicadoresLocais();
+  closeModal('modal-edit-indicador');
+  showToast('Indicador atualizado!', 'success');
+}
+
+// ── Marketing indicators ──────────────────────────────────
+const MKT_KEY = 'lapa-mkt-ind';
+
+function _getMktInd() {
+  try { return JSON.parse(localStorage.getItem(MKT_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function _aplicarIndicadoresMkt() {
+  const d = _getMktInd();
+  const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.textContent = v; };
+  const setHTML = (id, v) => { const el = document.getElementById(id); if (el && v) el.innerHTML = v; };
+  set('mkt-seg-val',   d.seguidores);
+  set('mkt-eng-val',   d.engajamento);
+  set('mkt-posts-val', d.posts);
+  set('mkt-camp-val',  d.campanhas);
+  if (d.segChange) setHTML('mkt-seg-change',   '<i class="fas fa-arrow-up"></i> ' + d.segChange);
+  if (d.engChange) setHTML('mkt-eng-change',   '<i class="fas fa-arrow-up"></i> ' + d.engChange);
+}
+
+function editarIndicadoresMkt() {
+  if (!requireAdmin('editar indicadores')) return;
+  const d = _getMktInd();
+  document.getElementById('mkt-input-seg').value     = d.seguidores  || '1.2k';
+  document.getElementById('mkt-input-seg-ch').value  = d.segChange   || '+87 este mês';
+  document.getElementById('mkt-input-eng').value     = d.engajamento || '8.4%';
+  document.getElementById('mkt-input-eng-ch').value  = d.engChange   || '+1.2pp';
+  document.getElementById('mkt-input-posts').value   = d.posts       || '38';
+  document.getElementById('mkt-input-camp').value    = d.campanhas   || '3';
+  openModal('modal-edit-mkt');
+}
+
+function salvarIndicadoresMkt() {
+  const d = {
+    seguidores:  document.getElementById('mkt-input-seg').value.trim(),
+    segChange:   document.getElementById('mkt-input-seg-ch').value.trim(),
+    engajamento: document.getElementById('mkt-input-eng').value.trim(),
+    engChange:   document.getElementById('mkt-input-eng-ch').value.trim(),
+    posts:       document.getElementById('mkt-input-posts').value.trim(),
+    campanhas:   document.getElementById('mkt-input-camp').value.trim(),
+  };
+  localStorage.setItem(MKT_KEY, JSON.stringify(d));
+  _aplicarIndicadoresMkt();
+  closeModal('modal-edit-mkt');
+  showToast('Indicadores de marketing salvos!', 'success');
+}
+
 // ══════════════════════════════════════════════════════════════
 //  BIND — CONECTA BOTÕES AOS HANDLERS
 // ══════════════════════════════════════════════════════════════
@@ -4318,6 +4730,12 @@ function bindModalButtons() {
     btn.parentNode.replaceChild(newBtn, btn);
     newBtn.addEventListener('click', fn);
   });
+
+  // Modais de indicadores
+  const indBtn = document.querySelector('#modal-edit-indicador .btn-primary');
+  if (indBtn) { const nb = indBtn.cloneNode(true); indBtn.parentNode.replaceChild(nb, indBtn); nb.addEventListener('click', salvarIndicador); }
+  const mktBtn = document.querySelector('#modal-edit-mkt .btn-primary');
+  if (mktBtn) { const nb = mktBtn.cloneNode(true); mktBtn.parentNode.replaceChild(nb, mktBtn); nb.addEventListener('click', salvarIndicadoresMkt); }
 
   // Ouvidoria — botão inline (fora de modal)
   const ouvBtn = document.querySelector('#page-ouvidoria .card:last-child .btn-primary');
