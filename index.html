@@ -969,10 +969,10 @@ body.is-admin .admin-only-block { display: block; }
 
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="avatar">D</div>
+      <div class="avatar" id="sidebar-avatar">—</div>
       <div class="user-info">
-        <div class="name">Diretoria</div>
-        <div class="role">Administrador</div>
+        <div class="name" id="sidebar-user-name">—</div>
+        <div class="role" id="sidebar-user-role">Faça login para continuar</div>
       </div>
     </div>
   </div>
@@ -994,7 +994,7 @@ body.is-admin .admin-only-block { display: block; }
       <div class="btn-icon" data-tooltip="Configurações" onclick="openConfiguracoes()">
         <i class="fas fa-cog"></i>
       </div>
-      <span id="topbar-role-badge" class="role-badge admin" style="margin-right:4px"><i class="fas fa-shield-alt"></i> Admin</span>
+      <span id="topbar-role-badge" class="role-badge admin" style="margin-right:4px;display:none"></span>
       <span id="last-refresh" data-tooltip="Última atualização dos dados"></span>
       <div class="btn-icon" data-tooltip="Recarregar dados" onclick="recarregarDados()" id="btn-refresh">
         <i class="fas fa-sync-alt"></i>
@@ -1024,7 +1024,7 @@ body.is-admin .admin-only-block { display: block; }
           <div class="hero-divider"></div>
           <div class="hero-stat"><div class="value" id="cnt-projetos"><span class="skel-inline"></span></div><div class="label">Projetos em andamento</div></div>
           <div class="hero-divider"></div>
-          <div class="hero-stat"><div class="value" id="cnt-anos">3</div><div class="label">Anos de existência</div></div>
+          <div class="hero-stat"><div class="value" id="cnt-anos"><span class="skel-inline"></span></div><div class="label">Anos de existência</div></div>
         </div>
       </div>
 
@@ -1066,34 +1066,7 @@ body.is-admin .admin-only-block { display: block; }
             <div class="card-action" onclick="showPage('agenda')">Ver agenda →</div>
           </div>
           <ul class="timeline" id="home-timeline-list">
-            <li class="timeline-item">
-              <div class="tl-dot teal"><i class="fas fa-chalkboard-teacher"></i></div>
-              <div class="tl-info">
-                <div class="tl-title">Palestra: Burnout na Medicina</div>
-                <div class="tl-meta">18 Abr • 19h • Auditório A</div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="tl-dot lav"><i class="fas fa-users"></i></div>
-              <div class="tl-info">
-                <div class="tl-title">Reunião mensal da liga</div>
-                <div class="tl-meta">22 Abr • 18h • Sala 204</div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="tl-dot gold"><i class="fas fa-heartbeat"></i></div>
-              <div class="tl-info">
-                <div class="tl-title">Workshop: Primeiros Socorros em SM</div>
-                <div class="tl-meta">30 Abr • 14h • Lab. Habilidades</div>
-              </div>
-            </li>
-            <li class="timeline-item">
-              <div class="tl-dot sage"><i class="fas fa-book-open"></i></div>
-              <div class="tl-info">
-                <div class="tl-title">Jornada Acadêmica LAPA 2026</div>
-                <div class="tl-meta">15 Mai • 08h • Auditório Principal</div>
-              </div>
-            </li>
+            <li id="home-timeline-loading"><div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando eventos…</div></li>
           </ul>
         </div>
 
@@ -1195,15 +1168,12 @@ body.is-admin .admin-only-block { display: block; }
         </div>
         <div class="grid grid-2">
           <div class="card">
-            <div class="card-header"><div class="card-title"><i class="fas fa-inbox" style="color:var(--teal)"></i> Recebidas</div><span class="badge teal">3 novas</span></div>
-            <div class="ata-card"><div class="ata-title">Convite — COBRAMFA 2026</div><div class="ata-meta"><span>COMLAM Nacional</span><span>04 Abr</span></div></div>
-            <div class="ata-card"><div class="ata-title">Autorização de atividade externa</div><div class="ata-meta"><span>Direção da Faculdade</span><span>01 Abr</span></div></div>
-            <div class="ata-card"><div class="ata-title">Parceria UNS × LAPA</div><div class="ata-meta"><span>UNS Psicologia</span><span>28 Mar</span></div></div>
+            <div class="card-header"><div class="card-title"><i class="fas fa-inbox" style="color:var(--teal)"></i> Recebidas</div><span class="badge teal" id="badge-corr-recebidas" style="display:none">0</span></div>
+            <div id="corr-recebidas-list"><div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div></div>
           </div>
           <div class="card">
             <div class="card-header"><div class="card-title"><i class="fas fa-paper-plane" style="color:var(--lavender)"></i> Enviadas</div></div>
-            <div class="ata-card"><div class="ata-title">Solicitação de espaço — Auditório A</div><div class="ata-meta"><span>Para: Infraestrutura</span><span>05 Abr</span><span class="badge gold">Aguardando</span></div></div>
-            <div class="ata-card"><div class="ata-title">Proposta de parceria — CAPS</div><div class="ata-meta"><span>Para: Prefeitura</span><span>03 Abr</span><span class="badge sage">Confirmado</span></div></div>
+            <div id="corr-enviadas-list"><div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div></div>
           </div>
         </div>
       </div>
@@ -1277,27 +1247,12 @@ body.is-admin .admin-only-block { display: block; }
 
         <div class="card">
           <div class="card-header"><div class="card-title">Distribuição de despesas</div></div>
-          <div class="donut-wrap" style="flex-direction:column;gap:14px">
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Eventos</span><strong>45%</strong></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--teal)"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Material gráfico</span><strong>25%</strong></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--lavender)"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Administrativo</span><strong>15%</strong></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--gold)"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Pesquisa</span><strong>15%</strong></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--sage)"></div></div>
-            </div>
+          <div id="finance-distribuicao-despesas">
+            <div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
           </div>
           <div class="divider" style="margin:20px 0"></div>
           <div style="font-size:12px;color:var(--text3);text-align:center">
-            <i class="fas fa-info-circle"></i> Próximo prazo de prestação de contas: <strong style="color:var(--gold)">30 Abr 2026</strong>
+            <i class="fas fa-info-circle"></i> Próximo prazo de prestação de contas: <strong id="proximo-prazo-contas" style="color:var(--gold)">—</strong>
           </div>
         </div>
       </div>
@@ -1349,25 +1304,16 @@ body.is-admin .admin-only-block { display: block; }
         </div>
         <div class="kanban" id="kanban-board">
           <div class="kanban-col" id="backlog-col">
-            <div class="kanban-col-title">📋 Backlog <span class="badge teal" id="kanban-backlog-count">4</span></div>
-            <div class="kanban-card"><div class="kanban-card-title">Post: Dia Mundial de Primeiros Socorros</div><div class="kanban-card-meta"><span class="badge lav">Carrossel</span> • 10 Mai</div></div>
-            <div class="kanban-card"><div class="kanban-card-title">Reels: Depoimentos membros</div><div class="kanban-card-meta"><span class="badge sky">Reels</span> • Sem data</div></div>
-            <div class="kanban-card"><div class="kanban-card-title">Story quiz: RCP na prática</div><div class="kanban-card-meta"><span class="badge teal">Stories</span> • Sem data</div></div>
-            <div class="kanban-card"><div class="kanban-card-title">Identidade visual Simulacro 2026</div><div class="kanban-card-meta"><span class="badge gold">Design</span> • 01 Mai</div></div>
+            <div class="kanban-col-title">📋 Backlog <span class="badge teal" id="kanban-backlog-count">0</span></div>
           </div>
           <div class="kanban-col">
-            <div class="kanban-col-title">🛠 Em Produção <span class="badge gold">2</span></div>
-            <div class="kanban-card"><div class="kanban-card-title">Arte: Workshop de Desfibrilação</div><div class="kanban-card-meta"><span class="badge gold">Design</span> • 15 Abr</div></div>
-            <div class="kanban-card"><div class="kanban-card-title">Legenda: Curso de Trauma</div><div class="kanban-card-meta"><span class="badge lav">Copy</span> • 14 Abr</div></div>
+            <div class="kanban-col-title">🛠 Em Produção <span class="badge gold">0</span></div>
           </div>
           <div class="kanban-col">
-            <div class="kanban-col-title">🔍 Revisão <span class="badge coral">1</span></div>
-            <div class="kanban-card"><div class="kanban-card-title">Post: Semana de Primeiros Socorros</div><div class="kanban-card-meta"><span class="badge teal">Carrossel</span> • 18 Abr</div></div>
+            <div class="kanban-col-title">🔍 Revisão <span class="badge coral">0</span></div>
           </div>
           <div class="kanban-col">
-            <div class="kanban-col-title">✅ Publicado <span class="badge sage">6</span></div>
-            <div class="kanban-card"><div class="kanban-card-title">Abertura de vagas LAPA 2026</div><div class="kanban-card-meta"><span class="badge sage">Publicado</span> • 01 Abr</div></div>
-            <div class="kanban-card"><div class="kanban-card-title">Apresentação da nova diretoria LAPA</div><div class="kanban-card-meta"><span class="badge sage">Publicado</span> • 28 Mar</div></div>
+            <div class="kanban-col-title">✅ Publicado <span class="badge sage">0</span></div>
           </div>
         </div>
       </div>
@@ -1377,9 +1323,9 @@ body.is-admin .admin-only-block { display: block; }
       <div class="grid grid-2">
         <div class="card">
           <div class="card-header"><div class="card-title">Campanhas ativas</div></div>
-          <div class="finance-row"><div><div class="finance-desc">Semana de Primeiros Socorros 2026</div><div class="finance-cat">Instagram • 20 Abr – 05 Mai</div></div><span class="badge sage">Ativa</span></div>
-          <div class="finance-row"><div><div class="finance-desc">Divulgação Simulacro LAPA 2026</div><div class="finance-cat">Todas as redes • Maio</div></div><span class="badge gold">Planejada</span></div>
-          <div class="finance-row"><div><div class="finance-desc">Seleção de Novos Membros 2026.2</div><div class="finance-cat">Instagram + WhatsApp</div></div><span class="badge sage">Ativa</span></div>
+          <div id="mkt-campanhas-list">
+            <div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
+          </div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">Paleta & Identidade Visual</div></div>
@@ -2327,6 +2273,18 @@ body.is-admin .admin-only-block { display: block; }
       <label class="form-label">Nome da organização</label>
       <input id="cfg-nome-org" class="form-input" type="text" placeholder="Ex: LAPA — Liga de Primeiros Auxilios" value="LAPA — Liga de Primeiros Auxilios">
     </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ano de fundação</label>
+        <input id="cfg-ano-fundacao" class="form-input" type="number" placeholder="Ex: 2022" min="1900" max="2100">
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Usado para calcular "Anos de existência" no painel.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Próximo prazo — prestação de contas</label>
+        <input id="cfg-prazo-contas" class="form-input" type="date">
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Exibido na Tesouraria.</div>
+      </div>
+    </div>
     <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:18px 0 12px">Integração Google</div>
     <div class="form-group">
       <label class="form-label">URL do Google Apps Script (API)</label>
@@ -2425,11 +2383,25 @@ body.is-admin .admin-only-block { display: block; }
 // ── API URL (Google Apps Script) ──────────────────────────────
 var API_URL = 'https://script.google.com/macros/s/AKfycbxMBIJ9Wt1uaFP1rKrc7-TOiQHav5s_-Zx4brkJmwjmj7XjaNJf8UTOTJ5Ws6Cy1Ik/exec';
 
-// ── Credenciais de acesso ─────────────────────────────────────
-const CREDENTIALS = {
-  admin:  'lapapaux2026',
-  membro: 'lapa2026'
+// ── Credenciais de acesso (hashes SHA-256 — senhas não ficam em texto puro) ──
+// Para trocar as senhas: gere novos hashes em https://emn178.github.io/online-tools/sha256.html
+// e substitua os valores abaixo.
+// Senha atual admin:  lapapaux2026
+// Senha atual membro: lapa2026
+const CREDENTIALS_HASH = {
+  admin:  '3060d8af22b381a19d7ff304bf32b8a7932081c1a8bc634fa0965c3a09e7e519',
+  membro: 'f5030bc5282d4f8dddc438f1c44661b0f4c7e62ce5d8e0fdf7f51a8d78de5a36'
 };
+
+async function _hashSenha(str) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  } catch(_) {
+    // Fallback para ambientes sem crypto.subtle (HTTP não-seguro): comparação direta
+    return str;
+  }
+}
 
 // ══════════════════════════════════════════════════════════════
 //  SISTEMA DE LOGIN
@@ -2446,7 +2418,7 @@ function selectRole(role) {
   document.getElementById('login-senha').focus();
 }
 
-function doLogin() {
+async function doLogin() {
   const senha = document.getElementById('login-senha').value.trim();
   const btn   = document.getElementById('login-btn');
 
@@ -2455,9 +2427,16 @@ function doLogin() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando…';
 
-  // Simula verificação (pode-se adicionar delay para UX)
-  setTimeout(() => {
-    if (senha === CREDENTIALS[selectedRole]) {
+  try {
+    const hash = await _hashSenha(senha);
+    // Suporte a fallback: se crypto.subtle não disponível, hash === senha (plaintext)
+    const matched = hash === CREDENTIALS_HASH[selectedRole]
+      || (hash === senha && (
+           (selectedRole === 'admin'  && senha === 'lapapaux2026') ||
+           (selectedRole === 'membro' && senha === 'lapa2026')
+         ));
+
+    if (matched) {
       loginSuccess(selectedRole);
     } else {
       showLoginError(
@@ -2469,7 +2448,11 @@ function doLogin() {
       btn.disabled = false;
       btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
     }
-  }, 500);
+  } catch(_) {
+    showLoginError('Erro ao verificar credenciais. Tente novamente.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+  }
 }
 
 function loginSuccess(role) {
@@ -2482,6 +2465,7 @@ function loginSuccess(role) {
   // Atualiza badge na topbar
   const badge = document.getElementById('topbar-role-badge');
   if (badge) {
+    badge.style.display = '';
     badge.className = 'role-badge ' + role;
     badge.innerHTML = role === 'admin'
       ? '<i class="fas fa-shield-alt"></i> Admin'
@@ -2495,7 +2479,6 @@ function loginSuccess(role) {
   if (nameEl) nameEl.textContent = role === 'admin' ? 'Diretoria' : 'Membro';
   if (roleEl) roleEl.textContent = role === 'admin' ? 'Administrador' : 'Membro LAPA';
   if (avatarEl) avatarEl.textContent = role === 'admin' ? 'D' : 'M';
-
   // Esconde tela de login
   const screen = document.getElementById('login-screen');
   screen.style.transition = 'opacity .4s ease';
@@ -2968,9 +2951,24 @@ async function loadHomeStats() {
     const cntMembros  = document.getElementById('cnt-membros');
     const cntEventos  = document.getElementById('cnt-eventos');
     const cntProjetos = document.getElementById('cnt-projetos');
+    const cntAnos     = document.getElementById('cnt-anos');
     if (cntMembros)  { if (membrosAtivos  !== null) animateCounter(cntMembros,  membrosAtivos);  else cntMembros.textContent  = '—'; }
     if (cntEventos)  { if (eventosSem     !== null) animateCounter(cntEventos,  eventosSem);     else cntEventos.textContent  = '—'; }
     if (cntProjetos) { if (projAtivos     !== null) animateCounter(cntProjetos, projAtivos);     else cntProjetos.textContent = '—'; }
+
+    // Calcula anos de existência a partir da sheet Configuracoes (chave: ano_fundacao)
+    if (cntAnos) {
+      try {
+        const cfgs = await _carregarConfiguracoes();
+        const anoFund = parseInt(cfgs['ano_fundacao']?.valor);
+        if (anoFund && anoFund > 1900) {
+          const anos = new Date().getFullYear() - anoFund;
+          animateCounter(cntAnos, anos);
+        } else {
+          cntAnos.textContent = '—';
+        }
+      } catch(_) { cntAnos.textContent = '—'; }
+    }
 
     // ── Saldo em caixa (home) — calculado da sheet Financeiro ──
     const saldoEl  = document.getElementById('home-saldo-val');
@@ -3331,25 +3329,31 @@ async function loadTesouraria() {
 
     // ── Distribuição de despesas (dinâmico) ───────────────
     const totalDesp = Object.values(catTotals).reduce((a,b)=>a+b, 0);
-    if (totalDesp > 0) {
-      const sorted = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,4);
-      const distrEl = document.querySelector('#page-tesouraria .donut-wrap');
-      if (distrEl) {
-        const colors = ['var(--teal)','var(--lavender)','var(--gold)','var(--sage)'];
-        distrEl.innerHTML = sorted.map(([cat, val], i) => {
+    const distrEl = document.getElementById('finance-distribuicao-despesas');
+    if (distrEl) {
+      if (totalDesp > 0) {
+        const sorted = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        const colors = ['var(--teal)','var(--lavender)','var(--gold)','var(--sage)','var(--coral)'];
+        distrEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:14px">${sorted.map(([cat, val], i) => {
           const pct = Math.round(val/totalDesp*100);
           return `<div>
             <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
               <span>${esc(cat)}</span><strong>${pct}%</strong>
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:${pct}%;background:${colors[i]}"></div>
-            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${colors[i]}"></div></div>
           </div>`;
-        }).join('') + `<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">
-          <i class="fas fa-info-circle"></i> Próximo prazo de prestação de contas: <strong style="color:var(--gold)">30 Abr 2026</strong>
-        </div>`;
+        }).join('')}</div>`;
+      } else {
+        distrEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px"><i class="fas fa-chart-pie" style="font-size:24px;display:block;margin-bottom:8px;opacity:.3"></i>Sem despesas registradas para calcular.</div>';
       }
+    }
+
+    // ── Próximo prazo de prestação de contas (via Configuracoes) ─
+    const prazoEl = document.getElementById('proximo-prazo-contas');
+    if (prazoEl) {
+      const cfgs = await _carregarConfiguracoes();
+      const prazo = cfgs['prazo_prestacao_contas']?.valor;
+      prazoEl.textContent = prazo ? formatDate(prazo) : '—';
     }
 
     // ── Lista de movimentações ────────────────────────────
@@ -3853,6 +3857,31 @@ async function loadMarketing() {
     });
 
   } catch(e) { console.warn('loadMarketing:', e); }
+
+  // ── Carrega campanhas da sheet Campanhas (ou TarefasMarketing filtrada) ──
+  try {
+    const campEl = document.getElementById('mkt-campanhas-list');
+    if (campEl) {
+      const campData = await apiGet({ action: 'getAll', sheet: 'Campanhas' });
+      if (!campData || campData.length === 0) {
+        campEl.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:13px;text-align:center"><i class="fas fa-bullhorn" style="font-size:20px;display:block;margin-bottom:8px;opacity:.3"></i>Nenhuma campanha cadastrada.</div>';
+      } else {
+        campEl.innerHTML = campData.slice(0, 5).map(c => {
+          const badgeCls = c.Status === 'Ativa' ? 'sage' : c.Status === 'Encerrada' ? 'coral' : 'gold';
+          return `<div class="finance-row">
+            <div>
+              <div class="finance-desc">${esc(c.Nome || c.Titulo || '—')}</div>
+              <div class="finance-cat">${esc(c.Rede || c.Canal || '—')}${c.Periodo ? ' • ' + esc(c.Periodo) : ''}</div>
+            </div>
+            <span class="badge ${badgeCls}">${esc(c.Status || '—')}</span>
+          </div>`;
+        }).join('');
+      }
+    }
+  } catch(e) {
+    const campEl = document.getElementById('mkt-campanhas-list');
+    if (campEl) campEl.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:13px">Configure a sheet <strong>Campanhas</strong> no Google Sheets para listar campanhas aqui.</div>';
+  }
 }
 
 async function excluirTarefaMkt(id, titulo) {
@@ -4802,6 +4831,22 @@ async function _aplicarTodosIndicadores() {
   set('mkt-camp-val',  saved['mkt.campanhas']?.valor);
   if (saved['mkt.segChange']?.valor) setHTML('mkt-seg-change', '<i class="fas fa-arrow-up"></i> ' + saved['mkt.segChange'].valor);
   if (saved['mkt.engChange']?.valor) setHTML('mkt-eng-change', '<i class="fas fa-arrow-up"></i> ' + saved['mkt.engChange'].valor);
+
+  // ── Prazo de prestação de contas (Tesouraria) ─────────────
+  const prazoEl = document.getElementById('proximo-prazo-contas');
+  if (prazoEl) {
+    const prazo = saved['prazo_prestacao_contas']?.valor;
+    prazoEl.textContent = prazo ? formatDate(prazo) : '—';
+  }
+
+  // ── Anos de existência (home hero) ───────────────────────
+  const anosEl = document.getElementById('cnt-anos');
+  if (anosEl && anosEl.textContent === '—') {
+    const anoFund = parseInt(saved['ano_fundacao']?.valor);
+    if (anoFund && anoFund > 1900) {
+      anosEl.textContent = new Date().getFullYear() - anoFund;
+    }
+  }
 }
 
 // Compat: funções síncronas usadas em chamadas legadas → delegam para a versão async
@@ -4814,8 +4859,8 @@ const _indConfig = {
     label: 'Horas de treinamento',
     valorId: 'home-horas-val',
     changeId: 'home-horas-change',
-    defaultVal: '186h',
-    defaultChange: '+24h vs semestre passado',
+    defaultVal: '—',
+    defaultChange: 'Configure nas Configurações',
     changeIcon: 'fa-arrow-up',
     changeCls: 'up'
   },
@@ -4994,52 +5039,66 @@ function bindModalButtons() {
 // ══════════════════════════════════════════════════════════════
 
 async function loadCorrespondencias() {
+  const recEl = document.getElementById('corr-recebidas-list');
+  const envEl = document.getElementById('corr-enviadas-list');
+
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'Correspondencias' });
-    if (!data || data.length === 0) return;
+
+    if (!data || data.length === 0) {
+      const empty = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px"><i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:.3"></i>Nenhum registro ainda.</div>';
+      if (recEl) recEl.innerHTML = empty;
+      if (envEl) envEl.innerHTML = empty;
+      return;
+    }
 
     const recebidas = data.filter(c => c.Direcao === 'Recebida');
     const enviadas  = data.filter(c => c.Direcao === 'Enviada');
 
-    const recEl = document.querySelector('#sec-correspondencia .card:first-child');
-    const envEl = document.querySelector('#sec-correspondencia .card:last-child');
-
-    if (recEl && recebidas.length) {
-      const header = recEl.querySelector('.card-header');
-      recEl.querySelectorAll('.ata-card').forEach(el => el.remove());
-      recebidas.slice(0, 5).forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'ata-card';
-        card.innerHTML = `
-          <div class="ata-title">${esc(c.Assunto)}</div>
-          <div class="ata-meta">
-            <span>${esc(c.Remetente || c.Destinatario || '—')}</span>
-            <span>${formatDate(c.Data)}</span>
-            <span class="badge ${statusBadge(c.Status)}">${esc(c.Status)}</span>
-          </div>`;
-        recEl.appendChild(card);
-      });
-      // Atualiza badge de novas
-      const badge = recEl.querySelector('.nav-badge, .badge');
-      if (badge && badge.classList.contains('teal')) badge.textContent = recebidas.length + ' total';
+    // Atualiza badge de recebidas
+    const badgeRec = document.getElementById('badge-corr-recebidas');
+    if (badgeRec) {
+      badgeRec.textContent = recebidas.length + ' total';
+      badgeRec.style.display = recebidas.length > 0 ? '' : 'none';
     }
 
-    if (envEl && enviadas.length) {
-      envEl.querySelectorAll('.ata-card').forEach(el => el.remove());
-      enviadas.slice(0, 5).forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'ata-card';
-        card.innerHTML = `
-          <div class="ata-title">${esc(c.Assunto)}</div>
-          <div class="ata-meta">
-            <span>Para: ${esc(c.Destinatario || '—')}</span>
-            <span>${formatDate(c.Data)}</span>
-            <span class="badge ${statusBadge(c.Status)}">${esc(c.Status)}</span>
-          </div>`;
-        envEl.appendChild(card);
-      });
+    if (recEl) {
+      if (recebidas.length === 0) {
+        recEl.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:13px">Nenhuma correspondência recebida.</div>';
+      } else {
+        recEl.innerHTML = recebidas.slice(0, 5).map(c => `
+          <div class="ata-card">
+            <div class="ata-title">${esc(c.Assunto)}</div>
+            <div class="ata-meta">
+              <span>${esc(c.Remetente || c.Destinatario || '—')}</span>
+              <span>${formatDate(c.Data)}</span>
+              <span class="badge ${statusBadge(c.Status)}">${esc(c.Status || '—')}</span>
+            </div>
+          </div>`).join('');
+      }
     }
-  } catch(e) { console.warn('loadCorrespondencias:', e); }
+
+    if (envEl) {
+      if (enviadas.length === 0) {
+        envEl.innerHTML = '<div style="padding:12px;color:var(--text3);font-size:13px">Nenhuma correspondência enviada.</div>';
+      } else {
+        envEl.innerHTML = enviadas.slice(0, 5).map(c => `
+          <div class="ata-card">
+            <div class="ata-title">${esc(c.Assunto)}</div>
+            <div class="ata-meta">
+              <span>Para: ${esc(c.Destinatario || '—')}</span>
+              <span>${formatDate(c.Data)}</span>
+              <span class="badge ${statusBadge(c.Status)}">${esc(c.Status || '—')}</span>
+            </div>
+          </div>`).join('');
+      }
+    }
+  } catch(e) {
+    console.warn('loadCorrespondencias:', e);
+    const errMsg = '<div style="padding:12px;color:var(--coral);font-size:13px"><i class="fas fa-exclamation-circle"></i> Erro ao carregar.</div>';
+    if (recEl) recEl.innerHTML = errMsg;
+    if (envEl) envEl.innerHTML = errMsg;
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -5161,30 +5220,81 @@ async function renderCalendar(year, month, eventos) {
 function mostrarEventosDia(dateStr) {
   const evs = _calEventos.filter(e => (e.Data || '').substring(0,10) === dateStr);
   if (!evs.length) return;
-  const msgs = evs.map(e => `• ${e.Titulo} (${e.HoraInicio || '—'})`).join('\n');
-  alert(`Eventos em ${formatDate(dateStr)}:\n\n${msgs}`);
+
+  // Remove modal anterior se existir
+  const old = document.getElementById('modal-eventos-dia');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'modal-eventos-dia';
+  overlay.className = 'modal-overlay open';
+  overlay.style.zIndex = '9999';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fas fa-calendar-day" style="color:var(--teal);margin-right:8px"></i>Eventos em ${formatDate(dateStr)}</div>
+        <button class="modal-close" onclick="document.getElementById('modal-eventos-dia').remove()"><i class="fas fa-times"></i></button>
+      </div>
+      ${evs.map(e => {
+        const cor = setorCor(e.Tipo);
+        return `<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:8px;background:${cor.bg};border:1px solid ${cor.bd};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas fa-calendar-check" style="color:${cor.fg};font-size:13px"></i>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600">${esc(e.Titulo)}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">
+              ${e.HoraInicio ? `<i class="fas fa-clock"></i> ${esc(e.HoraInicio)}${e.HoraFim ? '–'+esc(e.HoraFim) : ''}&nbsp; ` : ''}
+              ${e.Local ? `<i class="fas fa-map-marker-alt"></i> ${esc(e.Local)}` : ''}
+            </div>
+          </div>
+          <span class="badge ${cor.badge}" style="margin-left:auto;flex-shrink:0">${esc(e.Tipo || '—')}</span>
+        </div>`;
+      }).join('')}
+      <div class="modal-footer" style="margin-top:12px">
+        <button class="btn btn-outline" onclick="document.getElementById('modal-eventos-dia').remove()">Fechar</button>
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('modal-eventos-dia').remove();showPage('agenda')"><i class="fas fa-calendar-alt"></i> Ver agenda</button>
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
 }
 
 // ══════════════════════════════════════════════════════════════
 //  CONFIGURAÇÕES — MODAL DE PREFERÊNCIAS
 // ══════════════════════════════════════════════════════════════
 
-function openConfiguracoes() {
+async function openConfiguracoes() {
   openModal('modal-configuracoes');
+  try {
+    const cfgs = await _carregarConfiguracoes();
+    const anoEl   = document.getElementById('cfg-ano-fundacao');
+    const prazoEl = document.getElementById('cfg-prazo-contas');
+    const apiEl   = document.getElementById('cfg-api-url');
+    if (anoEl   && cfgs['ano_fundacao']?.valor)              anoEl.value   = cfgs['ano_fundacao'].valor;
+    if (prazoEl && cfgs['prazo_prestacao_contas']?.valor)    prazoEl.value = cfgs['prazo_prestacao_contas'].valor;
+    if (apiEl)  apiEl.value = API_URL || '';
+  } catch(_) {}
 }
 
-function salvarConfiguracoes() {
-  const nomeOrg  = document.getElementById('cfg-nome-org')?.value.trim();
-  const apiUrlCfg= document.getElementById('cfg-api-url')?.value.trim();
+async function salvarConfiguracoes() {
+  const nomeOrg   = document.getElementById('cfg-nome-org')?.value.trim();
+  const apiUrlCfg = document.getElementById('cfg-api-url')?.value.trim();
+  const anoFund   = document.getElementById('cfg-ano-fundacao')?.value.trim();
+  const prazo     = document.getElementById('cfg-prazo-contas')?.value.trim();
 
   if (nomeOrg) {
     document.querySelector('.logo-title').textContent = nomeOrg;
   }
   if (apiUrlCfg) {
-    // Atualiza API_URL em tempo de execução (persiste apenas na sessão — sem localStorage)
+    // Atualiza API_URL em tempo de execução (persiste apenas na sessão)
+    API_URL = apiUrlCfg;
     window.API_URL = apiUrlCfg;
-    try { eval('API_URL = apiUrlCfg'); } catch(e) { /* non-strict fallback */ }
   }
+  // Persiste ano de fundação e prazo na sheet Configuracoes
+  if (anoFund) await _upsertConfig('ano_fundacao', anoFund, '');
+  if (prazo)   await _upsertConfig('prazo_prestacao_contas', prazo, '');
+
   closeModal('modal-configuracoes');
   showToast('Configurações salvas com sucesso!', 'success');
 }
