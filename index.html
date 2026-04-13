@@ -1,0 +1,3445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAPA — Liga de Primeiros Auxilios</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   VARIÁVEIS & RESET
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:          #0b0e12;
+  --bg2:         #111418;
+  --bg3:         #181d24;
+  --card:        #1c2028;
+  --card2:       #222830;
+  --border:      rgba(239,68,68,.10);
+  --border2:     rgba(239,68,68,.20);
+  --teal:        #ef4444;
+  --teal2:       #dc2626;
+  --sage:        #22c55e;
+  --lavender:    #f97316;
+  --gold:        #f59e0b;
+  --coral:       #f43f5e;
+  --sky:         #38bdf8;
+  --text:        #f0f4f8;
+  --text2:       #94a3b8;
+  --text3:       #4a5568;
+  --radius:      16px;
+  --radius2:     10px;
+  --shadow:      0 10px 40px rgba(0,0,0,.55);
+  --shadow2:     0 2px 12px rgba(0,0,0,.3);
+  --transition:  .25s cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════ */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  box-shadow: 4px 0 24px rgba(0,0,0,.3);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  z-index: 100;
+  transition: width var(--transition);
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-icon {
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, var(--teal), var(--lavender));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 12px;
+}
+.logo-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.logo-sub {
+  font-size: 11px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-top: 4px;
+}
+
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+.nav-section-label {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 2px;
+  color: var(--text3); padding: 10px 12px 6px;
+  margin-top: 8px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: var(--radius2);
+  cursor: pointer; color: var(--text2);
+  transition: all var(--transition);
+  margin-bottom: 2px; font-size: 14px; font-weight: 500;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(239,68,68,.15), rgba(249,115,22,.1));
+  color: var(--teal);
+  border: 1px solid rgba(239,68,68,.2);
+}
+.nav-item .icon { width: 18px; text-align: center; font-size: 15px; }
+.nav-badge {
+  margin-left: auto; background: var(--teal); color: var(--bg);
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; min-width: 20px; text-align: center;
+}
+.nav-badge.warn { background: var(--gold); }
+.nav-badge.alert { background: var(--coral); }
+
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius2);
+  background: var(--bg3);
+}
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--lavender));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: var(--bg); flex-shrink: 0;
+}
+.user-info .name { font-size: 13px; font-weight: 600; }
+.user-info .role { font-size: 11px; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════════════ */
+.main {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 64px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(239,68,68,.08);
+  display: flex; align-items: center;
+  padding: 0 32px; gap: 16px;
+  position: sticky; top: 0; z-index: 50;
+}
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px; font-weight: 700;
+  flex: 1;
+}
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.btn-icon {
+  width: 36px; height: 36px; border-radius: var(--radius2);
+  border: 1px solid var(--border2); background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text2); transition: all var(--transition);
+  font-size: 14px;
+}
+.btn-icon:hover { color: var(--teal); border-color: var(--teal); }
+
+.content { padding: 32px; flex: 1; }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .35s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ═══════════════════════════════════════════════════
+   CARDS & GRIDS
+═══════════════════════════════════════════════════ */
+.grid { display: grid; gap: 20px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-1-2 { grid-template-columns: 1fr 2fr; }
+.grid-2-1 { grid-template-columns: 2fr 1fr; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: border-color var(--transition);
+}
+.card:hover { border-color: var(--border2); }
+
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.card-title {
+  font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text2);
+}
+.card-action {
+  font-size: 12px; color: var(--teal); cursor: pointer;
+  transition: opacity var(--transition);
+}
+.card-action:hover { opacity: .75; }
+
+/* STAT CARDS */
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  position: relative; overflow: hidden;
+  transition: all var(--transition);
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent-color, var(--teal));
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.stat-label { font-size: 12px; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; }
+.stat-change {
+  font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px;
+}
+.stat-change.up { color: var(--sage); }
+.stat-change.down { color: var(--coral); }
+.stat-icon {
+  position: absolute; right: 20px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 36px; opacity: .08;
+}
+
+/* ═══════════════════════════════════════════════════
+   HOME — HERO
+═══════════════════════════════════════════════════ */
+.hero {
+  background: linear-gradient(135deg, var(--bg3) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px;
+  margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(239,68,68,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: -80px; left: 30%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(249,115,22,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.25);
+  color: var(--teal); border-radius: 20px;
+  padding: 5px 14px; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 42px; font-weight: 900;
+  line-height: 1.15; margin-bottom: 14px;
+  background: linear-gradient(135deg, var(--text) 30%, var(--teal) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p { color: var(--text2); font-size: 15px; line-height: 1.7; max-width: 560px; }
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 32px;
+}
+.hero-stat .value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px; font-weight: 700; color: var(--teal);
+}
+.hero-stat .label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.hero-divider { width: 1px; background: var(--border2); }
+
+/* ═══════════════════════════════════════════════════
+   TIMELINE / AGENDA
+═══════════════════════════════════════════════════ */
+.timeline { list-style: none; }
+.timeline-item {
+  display: flex; gap: 16px;
+  padding-bottom: 20px;
+  position: relative;
+}
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute; left: 15px; top: 30px; bottom: 0;
+  width: 1px; background: var(--border);
+}
+.tl-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0; margin-top: 2px;
+}
+.tl-dot.teal { background: rgba(239,68,68,.15); color: var(--teal); border: 1px solid rgba(239,68,68,.3); }
+.tl-dot.lav  { background: rgba(249,115,22,.15); color: var(--lavender); border: 1px solid rgba(249,115,22,.3); }
+.tl-dot.gold { background: rgba(232,196,106,.15); color: var(--gold); border: 1px solid rgba(232,196,106,.3); }
+.tl-dot.sage { background: rgba(107,191,160,.15); color: var(--sage); border: 1px solid rgba(107,191,160,.3); }
+.tl-info .tl-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.tl-info .tl-meta { font-size: 12px; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════
+   MEMBERS TABLE
+═══════════════════════════════════════════════════ */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; padding: 10px 14px;
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text3); border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 13px 14px; font-size: 14px;
+  border-bottom: 1px solid rgba(100,160,220,.06);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(239,68,68,.03); }
+.td-name { display: flex; align-items: center; gap: 10px; }
+.td-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge.teal   { background: rgba(239,68,68,.12); color: var(--teal);    border: 1px solid rgba(239,68,68,.2); }
+.badge.lav    { background: rgba(249,115,22,.12); color: var(--lavender); border: 1px solid rgba(249,115,22,.2); }
+.badge.sage   { background: rgba(107,191,160,.12); color: var(--sage);   border: 1px solid rgba(107,191,160,.2); }
+.badge.gold   { background: rgba(232,196,106,.12); color: var(--gold);   border: 1px solid rgba(232,196,106,.2); }
+.badge.coral  { background: rgba(224,122,122,.12); color: var(--coral);  border: 1px solid rgba(224,122,122,.2); }
+.badge.sky    { background: rgba(106,179,232,.12); color: var(--sky);    border: 1px solid rgba(106,179,232,.2); }
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════════════ */
+.progress-bar {
+  height: 6px; background: var(--bg3);
+  border-radius: 10px; overflow: hidden; margin-top: 8px;
+}
+.progress-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(90deg, var(--teal), var(--lavender));
+  transition: width 1s ease;
+}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: var(--radius2);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all var(--transition); border: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color: var(--bg);
+}
+.btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border2); color: var(--text2);
+}
+.btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { background: rgba(224,122,122,.15); color: var(--coral); border: 1px solid rgba(224,122,122,.25); }
+.btn-danger:hover { background: rgba(224,122,122,.25); }
+
+/* ═══════════════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════════════ */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .8px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--radius2); color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+  transition: border-color var(--transition);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+}
+.form-textarea { resize: vertical; min-height: 90px; }
+.form-select { appearance: none; cursor: pointer; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.65);
+  z-index: 200; display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; animation: fadeIn .2s ease; }
+.modal {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 32px; width: 520px; max-width: 95vw;
+  box-shadow: 0 32px 80px rgba(0,0,0,.5);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+.modal-close { background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; }
+.modal-footer { margin-top: 24px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ═══════════════════════════════════════════════════
+   CHART PLACEHOLDERS
+═══════════════════════════════════════════════════ */
+.chart-placeholder {
+  height: 180px; background: var(--bg3);
+  border-radius: var(--radius2); display: flex;
+  align-items: flex-end; gap: 8px; padding: 16px;
+}
+.bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  background: linear-gradient(0deg, var(--teal), var(--lavender));
+  opacity: .75; transition: opacity var(--transition);
+  position: relative;
+}
+.bar:hover { opacity: 1; }
+.bar::after {
+  content: attr(data-label);
+  position: absolute; bottom: -20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; color: var(--text3);
+  white-space: nowrap;
+}
+
+.donut-wrap { display: flex; align-items: center; gap: 24px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { flex: 1; }
+.legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; margin-bottom: 8px;
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════════
+   NOTIFICATION BELL DROPDOWN
+═══════════════════════════════════════════════════ */
+.notif-btn { position: relative; }
+.notif-dot {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--coral); border: 2px solid var(--bg2);
+}
+
+/* ═══════════════════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════════════════ */
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius2); padding: 7px 14px;
+  font-size: 13px; color: var(--text3); min-width: 200px;
+}
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; flex: 1;
+}
+
+/* ═══════════════════════════════════════════════════
+   KANBAN
+═══════════════════════════════════════════════════ */
+.kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.kanban-col { background: var(--bg3); border-radius: var(--radius); padding: 16px; }
+.kanban-col-title {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text3); margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.kanban-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius2); padding: 14px;
+  margin-bottom: 10px; cursor: pointer;
+  transition: all var(--transition);
+}
+.kanban-card:hover { transform: translateY(-2px); border-color: var(--border2); box-shadow: var(--shadow2); }
+.kanban-card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.kanban-card-meta { font-size: 11px; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════
+   FINANÇAS
+═══════════════════════════════════════════════════ */
+.finance-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid rgba(100,160,220,.06);
+}
+.finance-row:last-child { border-bottom: none; }
+.finance-desc { font-size: 14px; }
+.finance-cat { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.finance-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; }
+.finance-val.pos { color: var(--sage); }
+.finance-val.neg { color: var(--coral); }
+
+/* ═══════════════════════════════════════════════════
+   TOOLTIP
+═══════════════════════════════════════════════════ */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--card2); border: 1px solid var(--border2);
+  color: var(--text); font-size: 12px; padding: 5px 10px;
+  border-radius: 6px; white-space: nowrap;
+  pointer-events: none; opacity: 0; transition: opacity .2s;
+  z-index: 999;
+}
+[data-tooltip]:hover::after { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVO
+═══════════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .kanban { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .sidebar { width: 72px; }
+  .logo-title, .logo-sub, .nav-item span, .nav-section-label, .user-info, .nav-badge { display: none; }
+  .main { margin-left: 72px; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-1-2, .grid-2-1 { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .content { padding: 16px; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .hero h1 { font-size: 28px; }
+  .hero-stats { gap: 16px; }
+  .hero { padding: 28px 20px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--card2); }
+
+/* ═══════════════════════════════════════════════════
+   MISC
+═══════════════════════════════════════════════════ */
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.section-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+.divider { height: 1px; background: var(--border); margin: 28px 0; }
+.gap-20 { margin-bottom: 20px; }
+.gap-28 { margin-bottom: 28px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 11px; padding: 3px 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; color: var(--text2);
+}
+
+/* Ata card */
+.ata-card {
+  padding: 16px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: var(--radius2);
+  margin-bottom: 12px; cursor: pointer; transition: all var(--transition);
+}
+.ata-card:hover { border-color: var(--border2); }
+.ata-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.ata-meta { font-size: 12px; color: var(--text3); display: flex; gap: 14px; }
+
+/* Pesquisa card */
+.research-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  transition: all var(--transition);
+}
+.research-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.research-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.research-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+
+/* Tabs internos */
+.inner-tabs { display: flex; gap: 4px; margin-bottom: 24px; }
+.inner-tab {
+  padding: 8px 16px; border-radius: var(--radius2);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; color: var(--text3);
+  border: 1px solid transparent;
+  transition: all var(--transition);
+}
+.inner-tab.active {
+  background: var(--card2); color: var(--teal);
+  border-color: rgba(239,68,68,.2);
+}
+.inner-tab:hover:not(.active) { color: var(--text); background: var(--bg3); }
+.inner-panel { display: none; }
+.inner-panel.active { display: block; }
+
+
+/* ═══════════════════════════════════════════════════
+   TELA DE LOGIN
+═══════════════════════════════════════════════════ */
+#login-screen {
+  position: fixed; inset: 0; z-index: 10000;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(239,68,68,.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(249,115,22,.06) 0%, transparent 40%);
+}
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 48px 44px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  animation: fadeIn .4s ease;
+}
+.login-logo {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 36px;
+}
+.login-logo-icon {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--teal), var(--lavender));
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(239,68,68,.3);
+}
+.login-logo h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px; font-weight: 900;
+  background: linear-gradient(135deg, var(--text) 30%, var(--teal) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 6px; text-align: center;
+}
+.login-logo p {
+  font-size: 12px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 2px; text-align: center;
+}
+.login-role-tabs {
+  display: flex; background: var(--bg3);
+  border-radius: var(--radius2); padding: 4px;
+  margin-bottom: 28px; gap: 4px;
+}
+.login-role-tab {
+  flex: 1; padding: 9px; text-align: center;
+  border-radius: 6px; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: var(--text3);
+  transition: all var(--transition);
+}
+.login-role-tab.active {
+  background: var(--card2); color: var(--teal);
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.login-field { margin-bottom: 18px; }
+.login-field label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 8px;
+}
+.login-field input {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border2); border-radius: var(--radius2);
+  padding: 12px 16px; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text); transition: all var(--transition);
+  outline: none;
+}
+.login-field input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.12);
+}
+.login-field input.error { border-color: var(--coral); }
+.login-error {
+  display: none; align-items: center; gap: 8px;
+  background: rgba(224,122,122,.1); border: 1px solid rgba(224,122,122,.25);
+  border-radius: var(--radius2); padding: 10px 14px;
+  color: var(--coral); font-size: 13px; margin-bottom: 18px;
+}
+.login-error.show { display: flex; animation: fadeIn .2s ease; }
+.login-btn {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color: var(--bg); border: none; border-radius: var(--radius2);
+  font-size: 15px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer; transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(239,68,68,.35); }
+.login-btn:active { transform: translateY(0); }
+.login-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.login-footer {
+  text-align: center; margin-top: 24px;
+  font-size: 12px; color: var(--text3);
+}
+.login-footer a { color: var(--teal); cursor: pointer; text-decoration: none; }
+.login-footer a:hover { opacity: .8; }
+.login-show-pass {
+  position: relative;
+}
+.login-show-pass input { padding-right: 44px; }
+.login-show-pass .toggle-pass {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer; color: var(--text3); font-size: 14px;
+  transition: color var(--transition);
+}
+.login-show-pass .toggle-pass:hover { color: var(--teal); }
+
+/* Badge de papel (admin/membro) na topbar */
+.role-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.role-badge.admin { background: rgba(232,196,106,.15); color: var(--gold); border: 1px solid rgba(232,196,106,.3); }
+.role-badge.membro { background: rgba(239,68,68,.12); color: var(--teal); border: 1px solid rgba(239,68,68,.2); }
+
+/* Bloqueia elementos para não-admin */
+.admin-only { display: none; }
+body.is-admin .admin-only { display: inline-flex; }
+body.is-admin .admin-only-block { display: block; }
+.admin-only-block { display: none; }
+
+/* Overlay de bloqueio */
+.locked-overlay {
+  position: absolute; inset: 0; z-index: 10;
+  background: rgba(13,17,23,.7); backdrop-filter: blur(2px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: var(--radius);
+}
+.locked-overlay i { font-size: 28px; color: var(--gold); margin-bottom: 10px; }
+.locked-overlay p { font-size: 14px; color: var(--text2); }
+
+
+/* ═══════════════════════════════════════════════════
+   LAPA — Decoração com cruz pulsante
+═══════════════════════════════════════════════════ */
+@keyframes lapaPulse {
+  0%,100% { opacity:.08; transform:scale(1); }
+  50%      { opacity:.14; transform:scale(1.08); }
+}
+.hero-cross-decor {
+  position: absolute; right: 48px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 120px; opacity: .07;
+  animation: lapaPulse 4s ease-in-out infinite;
+  pointer-events: none; user-select: none;
+  color: var(--teal);
+}
+/* Login card glow */
+.login-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(239,68,68,.06) 0%, rgba(249,115,22,.04) 100%);
+  pointer-events: none;
+}
+.login-card { position: relative; overflow: hidden; }
+
+/* Nav badge pulse on alerts */
+.nav-badge.alert {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(244,63,94,0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg3); }
+::-webkit-scrollbar-thumb { background: rgba(239,68,68,.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(239,68,68,.5); }
+
+/* Hero shimmer */
+.hero::before { animation: lapaPulse 6s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+
+<!-- ═══════════ TELA DE LOGIN ═══════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">⛑️</div>
+      <h1>LAPA</h1>
+      <p>Liga de Primeiros Auxilios</p>
+    </div>
+
+    <div class="login-role-tabs">
+      <div class="login-role-tab active" id="tab-admin" onclick="selectRole('admin')">
+        <i class="fas fa-shield-alt" style="margin-right:6px"></i>Admin
+      </div>
+      <div class="login-role-tab" id="tab-membro" onclick="selectRole('membro')">
+        <i class="fas fa-user" style="margin-right:6px"></i>Membro
+      </div>
+    </div>
+
+    <div id="login-error" class="login-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="login-error-msg">Senha incorreta. Tente novamente.</span>
+    </div>
+
+    <div class="login-field">
+      <label for="login-senha">Senha de acesso</label>
+      <div class="login-show-pass">
+        <input type="password" id="login-senha" placeholder="Digite sua senha de acesso…"
+          autocomplete="current-password"
+          onkeydown="if(event.key==='Enter') doLogin()">
+        <i class="fas fa-eye toggle-pass" id="toggle-pass-icon"
+          onclick="togglePassVisibility()"></i>
+      </div>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Entrar
+    </button>
+
+    <div class="login-footer">
+      <p>Acesso restrito a membros da LAPA</p>
+      <p style="margin-top:6px">Esqueceu sua senha? <a onclick="showToastLogin()">Fale com a Secretaria</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⛑️</div>
+    <div class="logo-title">LAPA</div>
+    <div class="logo-sub">Liga de Primeiros Auxilios</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <div class="nav-item active" onclick="showPage('home')">
+      <i class="icon fas fa-home"></i><span>Início</span>
+    </div>
+    <div class="nav-item" onclick="showPage('agenda')">
+      <i class="icon fas fa-calendar-alt"></i><span>Agenda & Eventos</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('membros')">
+      <i class="icon fas fa-users"></i><span>Membros</span>
+    </div>
+    <div class="nav-item" onclick="showPage('documentos')">
+      <i class="icon fas fa-folder-open"></i><span>Documentos</span>
+    </div>
+
+    <div class="nav-section-label">Setores</div>
+    <div class="nav-item" onclick="showPage('secretaria')">
+      <i class="icon fas fa-file-alt"></i><span>Secretaria</span>
+    </div>
+    <div class="nav-item" onclick="showPage('tesouraria')">
+      <i class="icon fas fa-coins"></i><span>Tesouraria</span>
+      <span class="nav-badge warn">!</span>
+    </div>
+    <div class="nav-item" onclick="showPage('marketing')">
+      <i class="icon fas fa-bullhorn"></i><span>Marketing</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pesquisa')">
+      <i class="icon fas fa-microscope"></i><span>Pesquisa</span>
+    </div>
+
+    <div class="nav-section-label">Operações</div>
+    <div class="nav-item" onclick="showPage('extensao')">
+      <i class="icon fas fa-hands-helping"></i><span>Extensão</span>
+    </div>
+    <div class="nav-item" onclick="showPage('ensino')">
+      <i class="icon fas fa-graduation-cap"></i><span>Ensino</span>
+    </div>
+    <div class="nav-item" onclick="showPage('ouvidoria')">
+      <i class="icon fas fa-comment-dots"></i><span>Ouvidoria</span>
+      <span class="nav-badge alert">2</span>
+    </div>
+    <div class="nav-item" onclick="showPage('relatorios')">
+      <i class="icon fas fa-chart-bar"></i><span>Relatórios</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">D</div>
+      <div class="user-info">
+        <div class="name">Diretoria</div>
+        <div class="role">Administrador</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="page-title">Início</div>
+    <div class="topbar-actions" id="topbar-actions">
+      <div class="search-box">
+        <i class="fas fa-search" style="color:var(--text3)"></i>
+        <input type="text" placeholder="Buscar…">
+      </div>
+      <div class="btn-icon notif-btn" data-tooltip="Notificações" onclick="showToast('Sistema de notificações em breve.','info')">
+        <i class="fas fa-bell"></i>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="btn-icon" data-tooltip="Configurações" onclick="showToast('Configurações em breve.','info')">
+        <i class="fas fa-cog"></i>
+      </div>
+      <span id="topbar-role-badge" class="role-badge admin" style="margin-right:4px"><i class="fas fa-shield-alt"></i> Admin</span><div class="btn-icon" data-tooltip="Tema" onclick="toggleTheme()">
+        <i class="fas fa-adjust"></i>
+      </div>
+    <div class="btn-icon" data-tooltip="Sair" onclick="doLogout()" style="color:var(--coral)"><i class="fas fa-sign-out-alt"></i></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════
+         PÁGINA: INÍCIO
+    ══════════════════════════════ -->
+    <div class="page active" id="page-home">
+      <div class="hero">
+        <div class="hero-tag"><i class="fas fa-first-aid"></i> Liga de Primeiros Auxilios</div>
+        <div class="hero-cross-decor">✚</div>
+        <h1>Dashboard<br>LAPA 2026</h1>
+        <p>Central de gestão da nossa liga acadêmica. Acompanhe eventos, finanças, treinamentos e toda a operação da LAPA em um só lugar.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="value" id="cnt-membros">34</div><div class="label">Membros ativos</div></div>
+          <div class="hero-divider"></div>
+          <div class="hero-stat"><div class="value" id="cnt-eventos">8</div><div class="label">Treinamentos no semestre</div></div>
+          <div class="hero-divider"></div>
+          <div class="hero-stat"><div class="value" id="cnt-projetos">5</div><div class="label">Projetos em andamento</div></div>
+          <div class="hero-divider"></div>
+          <div class="hero-stat"><div class="value" id="cnt-anos">3</div><div class="label">Anos de existência</div></div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="grid grid-4 gap-20">
+        <div class="stat-card" style="--accent-color: var(--teal)">
+          <div class="stat-label">Saldo em caixa</div>
+          <div class="stat-value">R$ 1.240</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+R$ 300 este mês</div>
+          <i class="fas fa-wallet stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color: var(--lavender)">
+          <div class="stat-label">Próximo evento</div>
+          <div class="stat-value" style="font-size:22px">18 Abr</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-map-marker-alt"></i> Auditório A</div>
+          <i class="fas fa-calendar stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color: var(--sage)">
+          <div class="stat-label">Horas de treinamento</div>
+          <div class="stat-value">186h</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+24h vs semestre passado</div>
+          <i class="fas fa-hand-holding-heart stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color: var(--gold)">
+          <div class="stat-label">Certificados emitidos</div>
+          <div class="stat-value">7</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-file-alt"></i>2 em revisão</div>
+          <i class="fas fa-microscope stat-icon"></i>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- EVENTOS + ANIVERSÁRIOS -->
+      <div class="grid grid-1-2 gap-20">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Próximos eventos</div>
+            <div class="card-action" onclick="showPage('agenda')">Ver agenda →</div>
+          </div>
+          <ul class="timeline">
+            <li class="timeline-item">
+              <div class="tl-dot teal"><i class="fas fa-chalkboard-teacher"></i></div>
+              <div class="tl-info">
+                <div class="tl-title">Palestra: Burnout na Medicina</div>
+                <div class="tl-meta">18 Abr • 19h • Auditório A</div>
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="tl-dot lav"><i class="fas fa-users"></i></div>
+              <div class="tl-info">
+                <div class="tl-title">Reunião mensal da liga</div>
+                <div class="tl-meta">22 Abr • 18h • Sala 204</div>
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="tl-dot gold"><i class="fas fa-heartbeat"></i></div>
+              <div class="tl-info">
+                <div class="tl-title">Workshop: Primeiros Socorros em SM</div>
+                <div class="tl-meta">30 Abr • 14h • Lab. Habilidades</div>
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="tl-dot sage"><i class="fas fa-book-open"></i></div>
+              <div class="tl-info">
+                <div class="tl-title">Jornada Acadêmica LAPA 2026</div>
+                <div class="tl-meta">15 Mai • 08h • Auditório Principal</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Atividade por setor (semestre)</div>
+          </div>
+          <div class="chart-placeholder" style="padding-bottom:28px">
+            <div class="bar" style="height:70%" data-label="Secretaria"></div>
+            <div class="bar" style="height:55%;background:linear-gradient(0deg,var(--gold),var(--coral))" data-label="Tesouraria"></div>
+            <div class="bar" style="height:90%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="Marketing"></div>
+            <div class="bar" style="height:80%;background:linear-gradient(0deg,var(--sage),var(--teal))" data-label="Pesquisa"></div>
+            <div class="bar" style="height:65%;background:linear-gradient(0deg,var(--coral),var(--lavender))" data-label="Extensão"></div>
+            <div class="bar" style="height:75%;background:linear-gradient(0deg,var(--sky),var(--sage))" data-label="Ensino"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- MEMBROS + DONUT -->
+      <div class="grid grid-2-1 gap-20">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Membros recentes</div>
+            <div class="card-action" onclick="showPage('membros')">Ver todos →</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Setor</th><th>Período</th><th>Status</th></tr>
+              </thead>
+              <tbody id="home-membros-tbody">
+                <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Distribuição por setor</div></div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
+              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--bg3)" stroke-width="18"/>
+              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--teal)" stroke-width="18"
+                stroke-dasharray="62.8 188.5" stroke-dashoffset="0" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--lavender)" stroke-width="18"
+                stroke-dasharray="50.3 251.3" stroke-dashoffset="-62.8" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--gold)" stroke-width="18"
+                stroke-dasharray="37.7 251.3" stroke-dashoffset="-113.1" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--sage)" stroke-width="18"
+                stroke-dasharray="50.3 251.3" stroke-dashoffset="-150.8" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="40" fill="none" stroke="var(--coral)" stroke-width="18"
+                stroke-dasharray="25.1 251.3" stroke-dashoffset="-201.1" transform="rotate(-90 55 55)"/>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Pesquisa <strong style="margin-left:auto">10</strong></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--lavender)"></div>Marketing <strong style="margin-left:auto">8</strong></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Tesouraria <strong style="margin-left:auto">6</strong></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--sage)"></div>Extensão <strong style="margin-left:auto">7</strong></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>Ensino <strong style="margin-left:auto">3</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: SECRETARIA
+    ══════════════════════════════ -->
+    <div class="page" id="page-secretaria">
+      <div class="section-title">Secretaria</div>
+      <div class="section-sub">Gestão de atas, correspondências, controle de membros e documentação oficial da LAPA.</div>
+
+      <div class="inner-tabs">
+        <div class="inner-tab active" onclick="switchTab(this,'sec-atas')">📝 Atas de Reunião</div>
+        <div class="inner-tab" onclick="switchTab(this,'sec-membros-ctrl')">👤 Controle de Membros</div>
+        <div class="inner-tab" onclick="switchTab(this,'sec-correspondencia')">📬 Correspondências</div>
+        <div class="inner-tab" onclick="switchTab(this,'sec-estatuto')">📜 Estatuto & Regimento</div>
+      </div>
+
+      <!-- ABA ATAS -->
+      <div class="inner-panel active" id="sec-atas">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div style="color:var(--text2);font-size:14px">12 atas registradas em 2026</div>
+          <button class="btn btn-primary admin-only" onclick="openModal('modal-nova-ata')"><i class="fas fa-plus"></i> Nova Ata</button>
+        </div>
+        <div id="atas-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+      </div>
+
+      <!-- ABA MEMBROS CTRL -->
+      <div class="inner-panel" id="sec-membros-ctrl">
+        <div style="display:flex;justify-content:space-between;margin-bottom:18px">
+          <div class="search-box" style="flex:1;max-width:320px">
+            <i class="fas fa-search" style="color:var(--text3)"></i>
+            <input type="text" placeholder="Buscar membro…">
+          </div>
+          <div style="display:flex;gap:10px;margin-left:12px">
+            <select class="form-select" style="width:auto;padding:8px 12px">
+              <option>Todos os setores</option>
+              <option>Pesquisa</option><option>Marketing</option>
+              <option>Tesouraria</option><option>Extensão</option><option>Ensino</option>
+            </select>
+            <button class="btn btn-primary admin-only" onclick="openModal('modal-add-membro')"><i class="fas fa-user-plus"></i> Adicionar</button>
+          </div>
+        </div>
+        <div class="card" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nome</th><th>Matrícula</th><th>Período</th><th>Setor</th><th>Ingresso</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody>
+                <!-- Dados carregados via API -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA CORRESPONDÊNCIAS -->
+      <div class="inner-panel" id="sec-correspondencia">
+        <div style="display:flex;gap:12px;margin-bottom:18px;justify-content:flex-end">
+          <button class="btn btn-primary admin-only" onclick="openModal('modal-nova-corr')"><i class="fas fa-envelope"></i> Nova Correspondência</button>
+        </div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-inbox" style="color:var(--teal)"></i> Recebidas</div><span class="badge teal">3 novas</span></div>
+            <div class="ata-card"><div class="ata-title">Convite — COBRAMFA 2026</div><div class="ata-meta"><span>COMLAM Nacional</span><span>04 Abr</span></div></div>
+            <div class="ata-card"><div class="ata-title">Autorização de atividade externa</div><div class="ata-meta"><span>Direção da Faculdade</span><span>01 Abr</span></div></div>
+            <div class="ata-card"><div class="ata-title">Parceria UNS × LAPA</div><div class="ata-meta"><span>UNS Psicologia</span><span>28 Mar</span></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-paper-plane" style="color:var(--lavender)"></i> Enviadas</div></div>
+            <div class="ata-card"><div class="ata-title">Solicitação de espaço — Auditório A</div><div class="ata-meta"><span>Para: Infraestrutura</span><span>05 Abr</span><span class="badge gold">Aguardando</span></div></div>
+            <div class="ata-card"><div class="ata-title">Proposta de parceria — CAPS</div><div class="ata-meta"><span>Para: Prefeitura</span><span>03 Abr</span><span class="badge sage">Confirmado</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA ESTATUTO -->
+      <div class="inner-panel" id="sec-estatuto">
+        <div class="grid grid-3">
+          <div class="card" style="text-align:center;cursor:pointer" onclick="openModal('modal-doc')">
+            <i class="fas fa-scroll" style="font-size:40px;color:var(--teal);margin-bottom:14px"></i>
+            <div style="font-weight:600;margin-bottom:6px">Estatuto Social</div>
+            <div style="font-size:12px;color:var(--text3)">Versão 2025 • PDF</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer">
+            <i class="fas fa-gavel" style="font-size:40px;color:var(--lavender);margin-bottom:14px"></i>
+            <div style="font-weight:600;margin-bottom:6px">Regimento Interno</div>
+            <div style="font-size:12px;color:var(--text3)">Versão 2025 • PDF</div>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer">
+            <i class="fas fa-certificate" style="font-size:40px;color:var(--gold);margin-bottom:14px"></i>
+            <div style="font-weight:600;margin-bottom:6px">Registro de Fundação</div>
+            <div style="font-size:12px;color:var(--text3)">Cartório • PDF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: TESOURARIA
+    ══════════════════════════════ -->
+    <div class="page" id="page-tesouraria">
+      <div class="section-title">Tesouraria</div>
+      <div class="section-sub">Controle financeiro, caixa, receitas, despesas e prestação de contas da LAPA.</div>
+
+      <div class="grid grid-4 gap-20">
+        <div class="stat-card" style="--accent-color:var(--sage)">
+          <div class="stat-label">Saldo atual</div>
+          <div class="stat-value" style="color:var(--sage)">R$ 1.240</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>Atualizado hoje</div>
+          <i class="fas fa-piggy-bank stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--teal)">
+          <div class="stat-label">Receitas (mês)</div>
+          <div class="stat-value">R$ 850</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+R$ 200 vs mês ant.</div>
+          <i class="fas fa-arrow-down stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--coral)">
+          <div class="stat-label">Despesas (mês)</div>
+          <div class="stat-value">R$ 550</div>
+          <div class="stat-change down"><i class="fas fa-arrow-up"></i>+R$ 80 vs mês ant.</div>
+          <i class="fas fa-arrow-up stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--gold)">
+          <div class="stat-label">Inadimplência</div>
+          <div class="stat-value">6</div>
+          <div class="stat-change down"><i class="fas fa-exclamation-triangle"></i>Membros em atraso</div>
+          <i class="fas fa-exclamation-circle stat-icon"></i>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Movimentações recentes</div>
+            <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-lancamento')"><i class="fas fa-plus"></i> Lançamento</button>
+          </div>
+          <div id="finance-movimentacoes" style="min-height:60px"><div style="text-align:center;padding:24px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Distribuição de despesas</div></div>
+          <div class="donut-wrap" style="flex-direction:column;gap:14px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Eventos</span><strong>45%</strong></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--teal)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Material gráfico</span><strong>25%</strong></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--lavender)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Administrativo</span><strong>15%</strong></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--gold)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Pesquisa</span><strong>15%</strong></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--sage)"></div></div>
+            </div>
+          </div>
+          <div class="divider" style="margin:20px 0"></div>
+          <div style="font-size:12px;color:var(--text3);text-align:center">
+            <i class="fas fa-info-circle"></i> Próximo prazo de prestação de contas: <strong style="color:var(--gold)">30 Abr 2026</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: MARKETING
+    ══════════════════════════════ -->
+    <div class="page" id="page-marketing">
+      <div class="section-title">Marketing & Comunicação</div>
+      <div class="section-sub">Gerenciamento de conteúdo, redes sociais, campanhas e identidade visual da LAPA.</div>
+
+      <div class="grid grid-4 gap-20">
+        <div class="stat-card" style="--accent-color:var(--lavender)">
+          <div class="stat-label">Seguidores (Instagram)</div>
+          <div class="stat-value">1.2k</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+87 este mês</div>
+          <i class="fab fa-instagram stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--sky)">
+          <div class="stat-label">Engajamento médio</div>
+          <div class="stat-value">8.4%</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+1.2pp</div>
+          <i class="fas fa-chart-line stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--teal)">
+          <div class="stat-label">Posts publicados</div>
+          <div class="stat-value">38</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-calendar"></i>Semestre atual</div>
+          <i class="fas fa-images stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--gold)">
+          <div class="stat-label">Campanhas ativas</div>
+          <div class="stat-value">3</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-rocket"></i>Em andamento</div>
+          <i class="fas fa-bullhorn stat-icon"></i>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card gap-20">
+        <div class="card-header">
+          <div class="card-title">Kanban de Conteúdo</div>
+          <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-new-task')"><i class="fas fa-plus"></i> Nova tarefa</button>
+        </div>
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-col-title">📋 Backlog <span class="badge teal">4</span></div>
+            <div class="kanban-card"><div class="kanban-card-title">Post: Dia Mundial de Primeiros Socorros</div><div class="kanban-card-meta"><span class="badge lav">Carrossel</span> • 10 Mai</div></div>
+            <div class="kanban-card"><div class="kanban-card-title">Reels: Depoimentos membros</div><div class="kanban-card-meta"><span class="badge sky">Reels</span> • Sem data</div></div>
+            <div class="kanban-card"><div class="kanban-card-title">Story quiz: RCP na prática</div><div class="kanban-card-meta"><span class="badge teal">Stories</span> • Sem data</div></div>
+            <div class="kanban-card"><div class="kanban-card-title">Identidade visual Simulacro 2026</div><div class="kanban-card-meta"><span class="badge gold">Design</span> • 01 Mai</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title">🛠 Em Produção <span class="badge gold">2</span></div>
+            <div class="kanban-card"><div class="kanban-card-title">Arte: Workshop de Desfibrilação</div><div class="kanban-card-meta"><span class="badge gold">Design</span> • 15 Abr</div></div>
+            <div class="kanban-card"><div class="kanban-card-title">Legenda: Curso de Trauma</div><div class="kanban-card-meta"><span class="badge lav">Copy</span> • 14 Abr</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title">🔍 Revisão <span class="badge coral">1</span></div>
+            <div class="kanban-card"><div class="kanban-card-title">Post: Semana de Primeiros Socorros</div><div class="kanban-card-meta"><span class="badge teal">Carrossel</span> • 18 Abr</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title">✅ Publicado <span class="badge sage">6</span></div>
+            <div class="kanban-card"><div class="kanban-card-title">Abertura de vagas LAPA 2026</div><div class="kanban-card-meta"><span class="badge sage">Publicado</span> • 01 Abr</div></div>
+            <div class="kanban-card"><div class="kanban-card-title">Apresentação da nova diretoria LAPA</div><div class="kanban-card-meta"><span class="badge sage">Publicado</span> • 28 Mar</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Campanhas ativas</div></div>
+          <div class="finance-row"><div><div class="finance-desc">Semana de Primeiros Socorros 2026</div><div class="finance-cat">Instagram • 20 Abr – 05 Mai</div></div><span class="badge sage">Ativa</span></div>
+          <div class="finance-row"><div><div class="finance-desc">Divulgação Simulacro LAPA 2026</div><div class="finance-cat">Todas as redes • Maio</div></div><span class="badge gold">Planejada</span></div>
+          <div class="finance-row"><div><div class="finance-desc">Seleção de Novos Membros 2026.2</div><div class="finance-cat">Instagram + WhatsApp</div></div><span class="badge sage">Ativa</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Paleta & Identidade Visual</div></div>
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <div style="flex:1;height:48px;border-radius:8px;background:#ef4444;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">#ef4444</div>
+            <div style="flex:1;height:48px;border-radius:8px;background:#f97316;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">#f97316</div>
+            <div style="flex:1;height:48px;border-radius:8px;background:#6bbfa0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0d1117">#6bbfa0</div>
+            <div style="flex:1;height:48px;border-radius:8px;background:#e8c46a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0d1117">#e8c46a</div>
+          </div>
+          <div class="tag-list">
+            <span class="tag">Playfair Display</span>
+            <span class="tag">DM Sans</span>
+            <span class="tag">Logo principal</span>
+            <span class="tag">Logo reduzida</span>
+            <span class="tag">Manual de Marca v1.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: PESQUISA
+    ══════════════════════════════ -->
+    <div class="page" id="page-pesquisa">
+      <div class="section-title">Pesquisa Científica</div>
+      <div class="section-sub">Estudos, publicações, banco de dados e gestão do conhecimento em emergências e primeiros socorros.</div>
+
+      <div class="grid grid-3 gap-20">
+        <div class="stat-card" style="--accent-color:var(--teal)">
+          <div class="stat-label">Projetos ativos</div>
+          <div class="stat-value">5</div>
+          <div class="stat-change up"><i class="fas fa-flask"></i>3 em coleta de dados</div>
+          <i class="fas fa-microscope stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--lavender)">
+          <div class="stat-label">Publicações 2026</div>
+          <div class="stat-value">7</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-book"></i>2 em revisão</div>
+          <i class="fas fa-file-alt stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--gold)">
+          <div class="stat-label">Congressos inscritos</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-trophy"></i>1 premiação</div>
+          <i class="fas fa-award stat-icon"></i>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div style="font-weight:600;font-size:16px">Projetos em andamento</div>
+        <button class="btn btn-primary admin-only" onclick="openModal('modal-novo-projeto')"><i class="fas fa-plus"></i> Novo projeto</button>
+      </div>
+
+      <div class="grid grid-2" id="pesquisa-grid"><div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+    </div>
+    <!-- AGENDA
+    ══════════════════════════════ -->
+    <div class="page" id="page-agenda">
+      <div class="section-title">Agenda & Eventos</div>
+      <div class="section-sub">Calendário de reuniões, simulacros, treinamentos e eventos da LAPA.</div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <div class="inner-tabs" style="margin-bottom:0">
+          <div class="inner-tab active" onclick="switchTab(this,'ag-lista')">📋 Lista</div>
+          <div class="inner-tab" onclick="switchTab(this,'ag-cal')">📅 Calendário</div>
+        </div>
+        <button class="btn btn-primary admin-only" onclick="openModal('modal-novo-evento')"><i class="fas fa-plus"></i> Novo evento</button>
+      </div>
+
+      <div class="inner-panel active" id="ag-lista">
+        <div id="agenda-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+      </div>
+
+      <div class="inner-panel" id="ag-cal">
+        <div class="card" style="text-align:center;padding:60px">
+          <i class="fas fa-calendar-alt" style="font-size:48px;color:var(--teal);margin-bottom:16px;opacity:.5"></i>
+          <div style="font-size:16px;color:var(--text2)">Visualização de calendário em desenvolvimento</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:8px">Integração com Google Calendar em breve</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: EXTENSÃO
+    ══════════════════════════════ -->
+    <div class="page" id="page-extensao">
+      <div class="section-title">Extensão Universitária</div>
+      <div class="section-sub">Ações comunitárias, treinamentos externos e impacto social da liga.</div>
+      <div class="grid grid-3 gap-20">
+        <div class="stat-card" style="--accent-color:var(--sage)">
+          <div class="stat-label">Ações realizadas</div>
+          <div class="stat-value">12</div>
+          <div class="stat-change up"><i class="fas fa-check"></i>Semestre atual</div>
+          <i class="fas fa-hands-helping stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--sky)">
+          <div class="stat-label">Pessoas impactadas</div>
+          <div class="stat-value">430</div>
+          <div class="stat-change up"><i class="fas fa-arrow-up"></i>+120 vs semestre ant.</div>
+          <i class="fas fa-heart stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--teal)">
+          <div class="stat-label">Parcerias ativas</div>
+          <div class="stat-value">6</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-handshake"></i>Instituições</div>
+          <i class="fas fa-building stat-icon"></i>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Ações recentes</div><button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-nova-acao')"><i class="fas fa-plus"></i> Nova ação</button></div>
+          <div id="extensao-acoes"><div style="text-align:center;padding:20px;color:var(--text3)">Nenhuma ação registrada.</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Parceiros</div></div>
+          <div class="finance-row"><div><div class="finance-desc">SAMU — Regional</div><div class="finance-cat">Treinamentos de suporte básico</div></div><span class="badge sage">Ativo</span></div>
+          <div class="finance-row"><div><div class="finance-desc">Corpo de Bombeiros</div><div class="finance-cat">Simulações e treinamentos</div></div><span class="badge sage">Ativo</span></div>
+          <div class="finance-row"><div><div class="finance-desc">Cruz Vermelha — Regional</div><div class="finance-cat">Primeiros socorros em escolas</div></div><span class="badge teal">Em negociação</span></div>
+          <div class="finance-row"><div><div class="finance-desc">Defesa Civil Municipal</div><div class="finance-cat">Gestão de desastres e emergências</div></div><span class="badge sage">Ativo</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: ENSINO
+    ══════════════════════════════ -->
+    <div class="page" id="page-ensino">
+      <div class="section-title">Ensino</div>
+      <div class="section-sub">Cursos de suporte básico à vida, treinamentos, simulações e capacitações internas da LAPA.</div>
+      <div class="grid grid-3 gap-20">
+        <div class="stat-card" style="--accent-color:var(--lavender)">
+          <div class="stat-label">Cursos ativos</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-book-open"></i>Semestre 2026.1</div>
+          <i class="fas fa-graduation-cap stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--teal)">
+          <div class="stat-label">Certificados emitidos</div>
+          <div class="stat-value">87</div>
+          <div class="stat-change up"><i class="fas fa-award"></i>Total acumulado</div>
+          <i class="fas fa-certificate stat-icon"></i>
+        </div>
+        <div class="stat-card" style="--accent-color:var(--gold)">
+          <div class="stat-label">Carga horária ofertada</div>
+          <div class="stat-value">64h</div>
+          <div class="stat-change" style="color:var(--text2)"><i class="fas fa-clock"></i>Semestre atual</div>
+          <i class="fas fa-clock stat-icon"></i>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:18px;align-items:center">
+        <div style="font-weight:600">Cursos & Capacitações</div>
+        <button class="btn btn-primary admin-only" onclick="openModal('modal-novo-curso')"><i class="fas fa-plus"></i> Novo curso</button>
+      </div>
+      <div class="grid grid-2">
+        <div id="ensino-cursos-grid" style="display:contents"><div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1">Nenhum curso cadastrado.</div></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: OUVIDORIA
+    ══════════════════════════════ -->
+    <div class="page" id="page-ouvidoria">
+      <div class="section-title">Ouvidoria</div>
+      <div class="section-sub">Canal de comunicação, sugestões, reclamações e feedback dos membros da LAPA.</div>
+      <div class="grid grid-4 gap-20">
+        <div class="stat-card" style="--accent-color:var(--coral)"><div class="stat-label">Pendentes</div><div class="stat-value" style="color:var(--coral)">2</div><i class="fas fa-inbox stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--gold)"><div class="stat-label">Em análise</div><div class="stat-value">1</div><i class="fas fa-search stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--sage)"><div class="stat-label">Resolvidos</div><div class="stat-value">8</div><i class="fas fa-check-circle stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--teal)"><div class="stat-label">Total 2026</div><div class="stat-value">11</div><i class="fas fa-comment-dots stat-icon"></i></div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Solicitações abertas</div></div>
+        <div class="finance-row">
+          <div><div class="finance-desc">Sugestão: Criar canal de comunicação no WhatsApp</div><div class="finance-cat">#002 • Anônimo • 05 Abr • Sugestão</div></div>
+          <span class="badge coral">Pendente</span>
+        </div>
+        <div class="finance-row">
+          <div><div class="finance-desc">Sugestão: Ampliar os treinamentos de RCP abertos</div><div class="finance-cat">#001 • Anônimo • 02 Abr • Reclamação</div></div>
+          <span class="badge gold">Em análise</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Enviar manifestação anônima</div></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Sugestão</option><option>Reclamação</option><option>Elogio</option><option>Denúncia</option></select></div>
+          <div class="form-group"><label class="form-label">Assunto</label><input class="form-input" type="text" placeholder="Assunto da manifestação"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Mensagem</label><textarea class="form-textarea" placeholder="Descreva sua manifestação de forma clara e objetiva…"></textarea></div>
+        <div style="text-align:right"><button class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar anonimamente</button></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: RELATÓRIOS
+    ══════════════════════════════ -->
+    <div class="page" id="page-relatorios">
+      <div class="section-title">Relatórios & Indicadores</div>
+      <div class="section-sub">Visão consolidada do desempenho da liga por período.</div>
+      <div class="grid grid-2 gap-20">
+        <div class="card"><div class="card-header"><div class="card-title">Eventos por mês (2026)</div></div>
+          <div class="chart-placeholder" style="padding-bottom:28px">
+            <div class="bar" style="height:40%" data-label="Jan"></div>
+            <div class="bar" style="height:60%" data-label="Fev"></div>
+            <div class="bar" style="height:55%" data-label="Mar"></div>
+            <div class="bar" style="height:80%" data-label="Abr"></div>
+            <div class="bar" style="height:70%;opacity:.4" data-label="Mai"></div>
+            <div class="bar" style="height:50%;opacity:.3" data-label="Jun"></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">Crescimento de membros</div></div>
+          <div class="chart-placeholder" style="padding-bottom:28px">
+            <div class="bar" style="height:50%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2023"></div>
+            <div class="bar" style="height:70%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2024.1"></div>
+            <div class="bar" style="height:65%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2024.2"></div>
+            <div class="bar" style="height:90%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2025.1"></div>
+            <div class="bar" style="height:85%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2025.2"></div>
+            <div class="bar" style="height:100%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2026.1"></div>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Exportar relatórios</div></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="exportarRelatorio('Relatório semestral PDF')"><i class="fas fa-file-pdf" style="color:var(--coral)"></i> Relatório semestral (PDF)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('Planilha financeira XLSX')"><i class="fas fa-file-excel" style="color:var(--sage)"></i> Planilha financeira (XLSX)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('Lista de membros CSV')"><i class="fas fa-file-alt" style="color:var(--teal)"></i> Lista de membros (CSV)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('Indicadores gerais')"><i class="fas fa-chart-bar" style="color:var(--lavender)"></i> Indicadores gerais</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: MEMBROS
+    ══════════════════════════════ -->
+    <div class="page" id="page-membros">
+      <div class="section-title">Membros da Liga</div>
+      <div class="section-sub">Diretório completo de todos os integrantes ativos e inativos.</div>
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+        <div class="search-box" style="flex:1;min-width:200px"><i class="fas fa-search" style="color:var(--text3)"></i><input type="text" placeholder="Buscar membro…"></div>
+        <select class="form-select" style="width:auto;padding:8px 12px"><option>Todos os setores</option><option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option><option>Extensão</option><option>Ensino</option></select>
+        <select class="form-select" style="width:auto;padding:8px 12px"><option>Todos os status</option><option>Ativo</option><option>Afastado</option><option>Desligado</option></select>
+        <button class="btn btn-primary admin-only" onclick="openModal('modal-add-membro')"><i class="fas fa-user-plus"></i> Adicionar membro</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Matrícula</th><th>Período</th><th>Setor</th><th>Cargo</th><th>Ingresso</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="members-table">
+                <tr id="members-empty"><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-users" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>Nenhum membro cadastrado ainda.</td></tr>
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PÁGINA: DOCUMENTOS
+    ══════════════════════════════ -->
+    <div class="page" id="page-documentos">
+      <div class="section-title">Documentos</div>
+      <div class="section-sub">Repositório central de arquivos, formulários e materiais da liga.</div>
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <div class="search-box" style="flex:1"><i class="fas fa-search" style="color:var(--text3)"></i><input type="text" placeholder="Buscar documento…"></div>
+        <button class="btn btn-primary admin-only" onclick="uploadDocumento()"><i class="fas fa-upload"></i> Enviar arquivo</button>
+      </div>
+      <div class="grid grid-4">
+        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px"></i>
+          <div style="font-size:13px;font-weight:600">Estatuto 2025</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 2.1 MB</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-file-excel" style="font-size:36px;color:var(--sage);margin-bottom:12px"></i>
+          <div style="font-size:13px;font-weight:600">Planilha Financeira 2026</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">XLSX • 540 KB</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-file-word" style="font-size:36px;color:var(--sky);margin-bottom:12px"></i>
+          <div style="font-size:13px;font-weight:600">Ata Abril 2026</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">DOCX • 180 KB</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-file-image" style="font-size:36px;color:var(--lavender);margin-bottom:12px"></i>
+          <div style="font-size:13px;font-weight:600">Manual de Marca</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 8.4 MB</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-file-alt" style="font-size:36px;color:var(--gold);margin-bottom:12px"></i>
+          <div style="font-size:13px;font-weight:600">Regimento Interno</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 1.3 MB</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-file-pdf" style="font-size:36px;color:var(--coral);margin-bottom:12px"></i>
+          <div style="font-size:13px;font-weight:600">Rel. Semestral 2025.2</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF • 3.7 MB</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end .main -->
+
+<!-- ═══════════ MODAIS ═══════════ -->
+
+<!-- MODAL: Nova Ata -->
+<div class="modal-overlay" id="modal-nova-ata">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nova Ata de Reunião</div>
+      <button class="modal-close" onclick="closeModal('modal-nova-ata')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo de reunião</label><select class="form-select"><option>Ordinária</option><option>Extraordinária</option><option>Diretoria</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Horário</label><input class="form-input" type="time"></div>
+      <div class="form-group"><label class="form-label">Nº de presentes</label><input class="form-input" type="number" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Pauta</label><textarea class="form-textarea" placeholder="Liste os pontos de pauta da reunião…"></textarea></div>
+    <div class="form-group"><label class="form-label">Deliberações</label><textarea class="form-textarea" placeholder="Registre as decisões tomadas…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nova-ata')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-save"></i> Salvar ata</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Ver Ata -->
+<div class="modal-overlay" id="modal-ver-ata">
+  <div class="modal" style="width:600px">
+    <div class="modal-header">
+      <div class="modal-title">Reunião Ordinária #04 — Abril 2026</div>
+      <button class="modal-close" onclick="closeModal('modal-ver-ata')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px"><i class="fas fa-calendar"></i> 08 Abr 2026 &nbsp;|&nbsp; <i class="fas fa-clock"></i> 18h00 &nbsp;|&nbsp; <i class="fas fa-users"></i> 22 presentes</div>
+    <div style="font-weight:600;margin-bottom:8px">Pauta</div>
+    <ul style="padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8">
+      <li>Relatório de atividades — Março 2026</li>
+      <li>Planejamento Simulacro de Emergência — Maio</li>
+      <li>Atualização financeira — Tesouraria</li>
+      <li>Abertura de vagas para novos membros</li>
+    </ul>
+    <div style="font-weight:600;margin:14px 0 8px">Deliberações</div>
+    <ul style="padding-left:20px;color:var(--text2);font-size:14px;line-height:1.8">
+      <li>Aprovado: Realizar simulacro em 10/05 no pátio da faculdade</li>
+      <li>Aprovado: Abrir 10 vagas para processo seletivo 2026.2</li>
+      <li>Postergado: Discussão sobre novo regimento para próxima reunião</li>
+    </ul>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="showToast('Download integrado ao Google Drive em breve.','info')"><i class="fas fa-download"></i> Baixar PDF</button>
+      <button class="btn btn-primary admin-only" onclick="showToast('Edição de ata em breve.','info')"><i class="fas fa-edit"></i> Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Adicionar Membro -->
+<div class="modal-overlay" id="modal-add-membro">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Adicionar Membro</div>
+      <button class="modal-close" onclick="closeModal('modal-add-membro')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" placeholder="Nome do membro"></div>
+      <div class="form-group"><label class="form-label">Matrícula</label><input class="form-input" type="text" placeholder="Ex: 2023001"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Período</label><select class="form-select"><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option><option>7º</option><option>8º</option></select></div>
+      <div class="form-group"><label class="form-label">Setor</label><select class="form-select"><option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option><option>Extensão</option><option>Ensino</option><option>Secretaria</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Cargo</label><select class="form-select"><option>Membro</option><option>Coordenador(a)</option><option>Diretor(a)</option><option>Presidente</option><option>Vice-Presidente</option><option>Tesoureiro(a)</option><option>Secretário(a)</option></select></div>
+      <div class="form-group"><label class="form-label">Data de ingresso</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Email institucional</label><input class="form-input" type="email" placeholder="nome@faculdade.edu.br"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-membro')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-user-plus"></i> Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Lançamento Financeiro -->
+<div class="modal-overlay" id="modal-lancamento">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Lançamento</div>
+      <button class="modal-close" onclick="closeModal('modal-lancamento')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Receita</option><option>Despesa</option></select></div>
+      <div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" type="number" placeholder="0,00" step="0.01"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" type="text" placeholder="Descreva o lançamento"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Categoria</label><select class="form-select"><option>Mensalidades</option><option>Eventos</option><option>Material</option><option>Patrocínio</option><option>Administrativo</option><option>Pesquisa</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Comprovante (opcional)</label><input class="form-input" type="file" style="padding:8px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-lancamento')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-save"></i> Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Evento -->
+<div class="modal-overlay" id="modal-novo-evento">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Evento</div>
+      <button class="modal-close" onclick="closeModal('modal-novo-evento')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Título do evento</label><input class="form-input" type="text" placeholder="Nome do evento"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Palestra</option><option>Workshop</option><option>Reunião</option><option>Jornada</option><option>Ação de extensão</option><option>Congresso</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Horário início</label><input class="form-input" type="time"></div>
+      <div class="form-group"><label class="form-label">Horário fim</label><input class="form-input" type="time"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Local</label><input class="form-input" type="text" placeholder="Ex: Auditório A, Sala 204"></div>
+    <div class="form-group"><label class="form-label">Palestrante / Responsável</label><input class="form-input" type="text" placeholder="Nome e cargo"></div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" placeholder="Descreva o evento…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-novo-evento')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-calendar-plus"></i> Criar evento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Projeto de Pesquisa -->
+<div class="modal-overlay" id="modal-novo-projeto">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Projeto de Pesquisa</div>
+      <button class="modal-close" onclick="closeModal('modal-novo-projeto')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Título do projeto</label><input class="form-input" type="text" placeholder="Título completo"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo de estudo</label><select class="form-select"><option>Transversal</option><option>Longitudinal</option><option>Ensaio clínico</option><option>Revisão sistemática</option><option>Observacional</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-select"><option>Planejamento</option><option>Aguardando CEP</option><option>Coleta de dados</option><option>Análise</option><option>Escrita</option><option>Publicado</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">CAAE (se houver)</label><input class="form-input" type="text" placeholder="Nº CAAE"></div>
+      <div class="form-group"><label class="form-label">Nº de pesquisadores</label><input class="form-input" type="number" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição / Objetivos</label><textarea class="form-textarea" placeholder="Descreva o projeto e seus objetivos…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-novo-projeto')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-flask"></i> Cadastrar projeto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nova Tarefa Kanban -->
+<div class="modal-overlay" id="modal-new-task">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nova Tarefa de Conteúdo</div>
+      <button class="modal-close" onclick="closeModal('modal-new-task')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Título</label><input class="form-input" type="text" placeholder="Ex: Post: Dia Mundial de SM"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Formato</label><select class="form-select"><option>Carrossel</option><option>Reels</option><option>Stories</option><option>Feed estático</option><option>Design</option><option>Copy</option></select></div>
+      <div class="form-group"><label class="form-label">Prazo</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Responsável</label><input class="form-input" type="text" placeholder="Nome do responsável"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-new-task')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar tarefa</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Curso -->
+<div class="modal-overlay" id="modal-novo-curso">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Curso / Capacitação</div>
+      <button class="modal-close" onclick="closeModal('modal-novo-curso')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Título</label><input class="form-input" type="text" placeholder="Nome do curso"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Modalidade</label><select class="form-select"><option>Presencial</option><option>Online</option><option>Híbrido</option></select></div>
+      <div class="form-group"><label class="form-label">Carga horária (h)</label><input class="form-input" type="number" placeholder="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Vagas</label><input class="form-input" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Data início</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" placeholder="Descreva os objetivos do curso…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-novo-curso')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-graduation-cap"></i> Criar curso</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nova Ação de Extensão -->
+<div class="modal-overlay" id="modal-nova-acao">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nova Ação de Extensão</div>
+      <button class="modal-close" onclick="closeModal('modal-nova-acao')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Nome da ação</label><input class="form-input" type="text" placeholder="Ex: Treinamento de RCP na Praça"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Treinamento prático</option><option>Palestra</option><option>Simulação de emergência</option><option>Campanha</option><option>Triagem</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Local / Parceiro</label><input class="form-input" type="text" placeholder="Ex: CAPS II Centro"></div>
+      <div class="form-group"><label class="form-label">Pessoas impactadas</label><input class="form-input" type="number" placeholder="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nova-acao')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-hands-helping"></i> Registrar ação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Correspondência -->
+<div class="modal-overlay" id="modal-nova-corr">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nova Correspondência</div>
+      <button class="modal-close" onclick="closeModal('modal-nova-corr')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Ofício</option><option>Carta</option><option>Email institucional</option><option>Memorando</option></select></div>
+      <div class="form-group"><label class="form-label">Destinatário</label><input class="form-input" type="text" placeholder="Para quem é enviado"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Assunto</label><input class="form-input" type="text" placeholder="Assunto da correspondência"></div>
+    <div class="form-group"><label class="form-label">Corpo</label><textarea class="form-textarea" style="min-height:120px" placeholder="Conteúdo da correspondência…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nova-corr')">Cancelar</button>
+      <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> Registrar envio</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Documento -->
+<div class="modal-overlay" id="modal-doc">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Estatuto Social — LAPA</div>
+      <button class="modal-close" onclick="closeModal('modal-doc')">✕</button>
+    </div>
+    <div style="text-align:center;padding:32px 0">
+      <i class="fas fa-scroll" style="font-size:64px;color:var(--teal);margin-bottom:20px"></i>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px">Estatuto Social da LAPA</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px">Versão 2025 • Aprovado em Assembleia • 24 páginas</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-doc')">Fechar</button>
+      <button class="btn btn-primary"><i class="fas fa-download"></i> Baixar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════
+//  LAPA Dashboard v1.0 — JavaScript Principal
+// ═══════════════════════════════════════════════════════════════
+
+// ── API URL (Google Apps Script) ──────────────────────────────
+var API_URL = 'https://script.google.com/macros/s/AKfycbxMBIJ9Wt1uaFP1rKrc7-TOiQHav5s_-Zx4brkJmwjmj7XjaNJf8UTOTJ5Ws6Cy1Ik/exec';
+
+// ── Credenciais de acesso ─────────────────────────────────────
+const CREDENTIALS = {
+  admin:  'lapapaux2026',
+  membro: 'lapa2026'
+};
+
+// ══════════════════════════════════════════════════════════════
+//  SISTEMA DE LOGIN
+// ══════════════════════════════════════════════════════════════
+
+let currentRole = null;  // 'admin' | 'membro' | null
+let selectedRole = 'admin';
+
+function selectRole(role) {
+  selectedRole = role;
+  document.getElementById('tab-admin').classList.toggle('active', role === 'admin');
+  document.getElementById('tab-membro').classList.toggle('active', role === 'membro');
+  clearLoginError();
+  document.getElementById('login-senha').focus();
+}
+
+function doLogin() {
+  const senha = document.getElementById('login-senha').value.trim();
+  const btn   = document.getElementById('login-btn');
+
+  if (!senha) { showLoginError('Digite sua senha para continuar.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando…';
+
+  // Simula verificação (pode-se adicionar delay para UX)
+  setTimeout(() => {
+    if (senha === CREDENTIALS[selectedRole]) {
+      loginSuccess(selectedRole);
+    } else {
+      showLoginError(
+        selectedRole === 'admin'
+          ? 'Senha de administrador incorreta.'
+          : 'Senha de membro incorreta.'
+      );
+      document.getElementById('login-senha').classList.add('error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+    }
+  }, 500);
+}
+
+function loginSuccess(role) {
+  currentRole = role;
+  sessionStorage.setItem('lapa-role', role);
+
+  // Atualiza UI de acordo com o papel
+  document.body.classList.toggle('is-admin', role === 'admin');
+
+  // Atualiza badge na topbar
+  const badge = document.getElementById('topbar-role-badge');
+  if (badge) {
+    badge.className = 'role-badge ' + role;
+    badge.innerHTML = role === 'admin'
+      ? '<i class="fas fa-shield-alt"></i> Admin'
+      : '<i class="fas fa-user"></i> Membro';
+  }
+
+  // Atualiza user card na sidebar
+  const nameEl = document.querySelector('.user-info .name');
+  const roleEl = document.querySelector('.user-info .role');
+  const avatarEl = document.querySelector('.sidebar-footer .avatar');
+  if (nameEl) nameEl.textContent = role === 'admin' ? 'Diretoria' : 'Membro';
+  if (roleEl) roleEl.textContent = role === 'admin' ? 'Administrador' : 'Membro LAPA';
+  if (avatarEl) avatarEl.textContent = role === 'admin' ? 'D' : 'M';
+
+  // Esconde tela de login
+  const screen = document.getElementById('login-screen');
+  screen.style.transition = 'opacity .4s ease';
+  screen.style.opacity = '0';
+  setTimeout(() => { screen.style.display = 'none'; }, 400);
+
+  // Inicializa dashboard
+  applyTheme();
+  setupSearch();
+  setupFilters();
+  bindModalButtons();
+  loadHomeStats();
+
+  showToast('Bem-vindo' + (role === 'admin' ? ', Administrador!' : ' à LAPA!'), 'success');
+}
+
+function doLogout() {
+  if (!confirm('Deseja realmente sair do sistema?')) return;
+  currentRole = null;
+  sessionStorage.removeItem('lapa-role');
+  document.body.classList.remove('is-admin');
+
+  // Limpa senha e reseta login screen
+  document.getElementById('login-senha').value = '';
+  document.getElementById('login-senha').classList.remove('error');
+  clearLoginError();
+  selectRole('admin');
+
+  const screen = document.getElementById('login-screen');
+  screen.style.display = 'flex';
+  screen.style.opacity = '0';
+  setTimeout(() => { screen.style.transition = 'opacity .4s ease'; screen.style.opacity = '1'; }, 10);
+}
+
+function showLoginError(msg) {
+  document.getElementById('login-error-msg').textContent = msg;
+  document.getElementById('login-error').classList.add('show');
+}
+
+function clearLoginError() {
+  document.getElementById('login-error').classList.remove('show');
+  const inp = document.getElementById('login-senha');
+  if (inp) inp.classList.remove('error');
+}
+
+function togglePassVisibility() {
+  const inp  = document.getElementById('login-senha');
+  const icon = document.getElementById('toggle-pass-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.className = 'fas fa-eye-slash toggle-pass';
+  } else {
+    inp.type = 'password';
+    icon.className = 'fas fa-eye toggle-pass';
+  }
+}
+
+function showToastLogin() {
+  showToast('Entre em contato com a Secretaria da LAPA para redefinir sua senha.', 'info');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CONTROLE DE PERMISSÕES (admin x membro)
+// ══════════════════════════════════════════════════════════════
+
+function isAdmin() { return currentRole === 'admin'; }
+
+/**
+ * Verifica se o usuário é admin antes de executar uma ação.
+ * Se não for, exibe toast e retorna false.
+ */
+function requireAdmin(action) {
+  if (isAdmin()) return true;
+  showToast('Apenas administradores podem ' + (action || 'realizar esta ação') + '.', 'warning');
+  return false;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAPEAMENTO DE PÁGINAS
+// ══════════════════════════════════════════════════════════════
+
+const pageMap = {
+  home:       'Início',
+  agenda:     'Agenda & Eventos',
+  membros:    'Membros',
+  documentos: 'Documentos',
+  secretaria: 'Secretaria',
+  tesouraria: 'Tesouraria',
+  marketing:  'Marketing & Comunicação',
+  pesquisa:   'Pesquisa Científica',
+  extensao:   'Extensão Universitária',
+  ensino:     'Ensino',
+  ouvidoria:  'Ouvidoria',
+  relatorios: 'Relatórios & Indicadores',
+};
+
+// ══════════════════════════════════════════════════════════════
+//  NAVEGAÇÃO
+// ══════════════════════════════════════════════════════════════
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + id);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+    const oc = item.getAttribute('onclick') || '';
+    if (oc.includes("'" + id + "'")) item.classList.add('active');
+  });
+
+  document.getElementById('page-title').textContent = pageMap[id] || id;
+  document.querySelector('.content').scrollTop = 0;
+
+  const loaders = {
+    home:       loadHomeStats,
+    membros:    loadMembros,
+    secretaria: loadSecretaria,
+    tesouraria: loadTesouraria,
+    agenda:     loadAgenda,
+    pesquisa:   loadPesquisa,
+    extensao:   loadExtensao,
+    ensino:     loadEnsino,
+    ouvidoria:  loadOuvidoria,
+    marketing:  loadMarketing,
+  };
+  if (loaders[id]) loaders[id]();
+}
+
+function switchTab(el, panelId) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const contentArea = parent.parentElement;
+  contentArea.querySelectorAll('.inner-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MODAIS
+// ══════════════════════════════════════════════════════════════
+
+function openModal(id) {
+  // Modais de edição/criação exigem admin
+  const adminModals = ['modal-add-membro','modal-nova-ata','modal-lancamento',
+    'modal-novo-evento','modal-novo-projeto','modal-novo-curso',
+    'modal-nova-acao','modal-nova-corr','modal-new-task'];
+  if (adminModals.includes(id) && !isAdmin()) {
+    showToast('Apenas administradores podem adicionar ou editar dados.', 'warning');
+    return;
+  }
+  const m = document.getElementById(id);
+  if (m) { m.classList.add('open'); m.querySelector('input,textarea,select')?.focus(); }
+}
+
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.classList.remove('open'); clearModalForm(id); }
+}
+
+function clearModalForm(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.querySelectorAll('input:not([type=file])').forEach(i => { if(i.type !== 'button') i.value = ''; });
+  m.querySelectorAll('textarea').forEach(t => t.value = '');
+  m.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+  // Reset btn state
+  const btn = m.querySelector('.btn-primary');
+  if (btn) btn.disabled = false;
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(this.id);
+  });
+});
+
+// ESC fecha modal aberto
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+  }
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none'
+      && document.getElementById('login-screen').style.opacity !== '0') {
+    doLogin();
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+//  TEMA CLARO / ESCURO
+// ══════════════════════════════════════════════════════════════
+
+let lightMode = localStorage.getItem('lapa-theme') === 'light';
+
+function toggleTheme() {
+  lightMode = !lightMode;
+  localStorage.setItem('lapa-theme', lightMode ? 'light' : 'dark');
+  applyTheme();
+}
+
+function applyTheme() {
+  const r = document.documentElement;
+  if (lightMode) {
+    r.style.setProperty('--bg',     '#f0f4f8');
+    r.style.setProperty('--bg2',    '#e4ecf5');
+    r.style.setProperty('--bg3',    '#d8e4f0');
+    r.style.setProperty('--card',   '#ffffff');
+    r.style.setProperty('--card2',  '#f0f4f8');
+    r.style.setProperty('--text',   '#1a2330');
+    r.style.setProperty('--text2',  '#3a5068');
+    r.style.setProperty('--text3',  '#6a8aaa');
+    r.style.setProperty('--border',  'rgba(30,80,130,.15)');
+    r.style.setProperty('--border2', 'rgba(30,80,130,.25)');
+  } else {
+    r.style.setProperty('--bg',     '#0d1117');
+    r.style.setProperty('--bg2',    '#131920');
+    r.style.setProperty('--bg3',    '#1a2330');
+    r.style.setProperty('--card',   '#1e2a38');
+    r.style.setProperty('--card2',  '#243041');
+    r.style.setProperty('--text',   '#e8eff8');
+    r.style.setProperty('--text2',  '#8fa8c8');
+    r.style.setProperty('--text3',  '#556880');
+    r.style.setProperty('--border',  'rgba(100,160,220,.12)');
+    r.style.setProperty('--border2', 'rgba(100,160,220,.22)');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════════
+
+function showToast(message, type = 'success') {
+  const colors = { success:'var(--sage)', error:'var(--coral)', info:'var(--teal)', warning:'var(--gold)' };
+  const icons  = { success:'fa-check-circle', error:'fa-exclamation-circle', info:'fa-info-circle', warning:'fa-exclamation-triangle' };
+
+  // Remove toasts anteriores do mesmo tipo para não acumular
+  document.querySelectorAll('.lasm-toast').forEach(t => t.remove());
+
+  const toast = document.createElement('div');
+  toast.className = 'lasm-toast';
+  toast.style.cssText = `
+    position:fixed; bottom:24px; right:24px; z-index:99999;
+    background:var(--card); border:1px solid ${colors[type]};
+    border-left:4px solid ${colors[type]};
+    color:var(--text); padding:14px 20px;
+    border-radius:10px; font-size:14px;
+    display:flex; align-items:center; gap:10px;
+    box-shadow:0 8px 32px rgba(0,0,0,.45);
+    animation:slideInToast .3s ease;
+    max-width:380px; font-family:'DM Sans',sans-serif;
+  `;
+  toast.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]};font-size:16px;flex-shrink:0"></i><span>${message}</span>`;
+
+  if (!document.querySelector('#toast-anim-style')) {
+    const s = document.createElement('style');
+    s.id = 'toast-anim-style';
+    s.textContent = '@keyframes slideInToast{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}';
+    document.head.appendChild(s);
+  }
+
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity .35s';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 350);
+  }, 3800);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CONTADOR ANIMADO
+// ══════════════════════════════════════════════════════════════
+
+function animateCounter(el, target, prefix = '', suffix = '') {
+  if (!el) return;
+  let cur = 0;
+  const step = Math.max(1, Math.floor(target / 50));
+  const timer = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = prefix + cur + suffix;
+    if (cur >= target) clearInterval(timer);
+  }, 25);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  API
+// ══════════════════════════════════════════════════════════════
+
+async function apiGet(params) {
+  if (!API_URL || API_URL.includes('COLE_A_URL')) return null;
+  try {
+    const url  = API_URL + '?' + new URLSearchParams(params).toString();
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error || 'Erro desconhecido');
+    return data.data;
+  } catch (e) {
+    console.warn('API GET falhou:', e.message);
+    return null;
+  }
+}
+
+async function apiPost(payload) {
+  if (!API_URL || API_URL.includes('COLE_A_URL')) return null;
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error || 'Erro desconhecido');
+    return data.data;
+  } catch (e) {
+    throw e;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BUSCA GLOBAL
+// ══════════════════════════════════════════════════════════════
+
+function setupSearch() {
+  document.querySelectorAll('.search-box input').forEach(input => {
+    input.addEventListener('input', function () {
+      const val = this.value.toLowerCase().trim();
+
+      // Busca na tabela de membros
+      const memberRows = document.querySelectorAll('#members-table tr:not(#members-empty)');
+      memberRows.forEach(r => {
+        r.style.display = (!val || r.textContent.toLowerCase().includes(val)) ? '' : 'none';
+      });
+
+      // Busca em atas
+      document.querySelectorAll('.ata-card').forEach(c => {
+        c.style.display = (!val || c.textContent.toLowerCase().includes(val)) ? '' : 'none';
+      });
+
+      // Busca em linhas financeiras
+      document.querySelectorAll('#finance-movimentacoes .finance-row').forEach(r => {
+        r.style.display = (!val || r.textContent.toLowerCase().includes(val)) ? '' : 'none';
+      });
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  FILTROS DE MEMBROS
+// ══════════════════════════════════════════════════════════════
+
+function setupFilters() {
+  // Filtro de setor na página membros
+  document.querySelectorAll('#page-membros select').forEach(sel => {
+    sel.addEventListener('change', filterMembros);
+  });
+}
+
+function filterMembros() {
+  const sels   = document.querySelectorAll('#page-membros select');
+  const setor  = sels[0]?.value || 'Todos os setores';
+  const status = sels[1]?.value || 'Todos os status';
+
+  document.querySelectorAll('#members-table tr:not(#members-empty)').forEach(row => {
+    const rowText = row.textContent;
+    const setorOk  = setor  === 'Todos os setores'  || rowText.includes(setor);
+    const statusOk = status === 'Todos os status'   || rowText.includes(status);
+    row.style.display = (setorOk && statusOk) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════════
+
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(val) {
+  if (!val) return '—';
+  const d = new Date(val + 'T00:00:00');
+  return isNaN(d) ? String(val) : d.toLocaleDateString('pt-BR');
+}
+
+function setorCor(setor) {
+  const map = {
+    'Pesquisa':   {bg:'rgba(239,68,68,.15)',  fg:'var(--teal)',    bd:'rgba(239,68,68,.3)',  badge:'teal'},
+    'Marketing':  {bg:'rgba(249,115,22,.15)', fg:'var(--lavender)',bd:'rgba(249,115,22,.3)', badge:'lav'},
+    'Tesouraria': {bg:'rgba(232,196,106,.15)', fg:'var(--gold)',    bd:'rgba(232,196,106,.3)', badge:'gold'},
+    'Extensão':   {bg:'rgba(106,179,232,.15)', fg:'var(--sky)',     bd:'rgba(106,179,232,.3)', badge:'sky'},
+    'Ensino':     {bg:'rgba(107,191,160,.15)', fg:'var(--sage)',    bd:'rgba(107,191,160,.3)', badge:'sage'},
+    'Secretaria': {bg:'rgba(224,122,122,.15)', fg:'var(--coral)',   bd:'rgba(224,122,122,.3)', badge:'coral'},
+    'Palestra':   {bg:'rgba(239,68,68,.15)',  fg:'var(--teal)',    bd:'rgba(239,68,68,.3)',  badge:'teal'},
+    'Workshop':   {bg:'rgba(232,196,106,.15)', fg:'var(--gold)',    bd:'rgba(232,196,106,.3)', badge:'gold'},
+    'Reunião':    {bg:'rgba(249,115,22,.15)', fg:'var(--lavender)',bd:'rgba(249,115,22,.3)', badge:'lav'},
+    'Jornada':    {bg:'rgba(107,191,160,.15)', fg:'var(--sage)',    bd:'rgba(107,191,160,.3)', badge:'sage'},
+  };
+  return map[setor] || {bg:'rgba(239,68,68,.15)',fg:'var(--teal)',bd:'rgba(239,68,68,.3)',badge:'teal'};
+}
+
+function statusBadge(s) {
+  const map = {
+    'Ativo':'sage','Ativa':'sage','Aprovada':'teal','Realizado':'sage',
+    'Confirmado':'teal','Publicado':'sage','Em andamento':'lav',
+    'Planejado':'gold','Planejada':'gold','Aguardando':'gold',
+    'Pendente assinatura':'gold','Pendente':'coral','Afastado':'coral','Encerrado':'coral',
+  };
+  return map[s] || 'teal';
+}
+
+function setLoadingMsg(containerId, msg = 'Carregando…') {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = `<div style="text-align:center;padding:28px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>${msg}</div>`;
+}
+
+function setEmptyMsg(containerId, icon, msg) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas ${icon}" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>${msg}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — HOME
+// ══════════════════════════════════════════════════════════════
+
+async function loadHomeStats() {
+  try {
+    const stats = await apiGet({ action: 'getStats' });
+    if (stats) {
+      animateCounter(document.getElementById('cnt-membros'),  stats.membros_ativos   || 0);
+      animateCounter(document.getElementById('cnt-eventos'),  stats.eventos_semestre || 0);
+      animateCounter(document.getElementById('cnt-projetos'), stats.projetos_ativos  || 0);
+      animateCounter(document.getElementById('cnt-anos'),     3);
+    } else {
+      // Modo offline: valores zerados
+      ['cnt-membros','cnt-eventos','cnt-projetos','cnt-anos'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = id === 'cnt-anos' ? '3' : '0';
+      });
+    }
+
+    // Carrega membros recentes na home
+    const membros = await apiGet({ action: 'getAll', sheet: 'Membros' });
+    renderHomeMembros(membros);
+
+  } catch(e) { console.warn('loadHomeStats:', e); }
+}
+
+function renderHomeMembros(data) {
+  const tbody = document.getElementById('home-membros-tbody');
+  if (!tbody) return;
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Nenhum membro cadastrado ainda.</td></tr>';
+    return;
+  }
+
+  const recent = data.slice(-5).reverse();
+  tbody.innerHTML = recent.map(m => {
+    const cor = setorCor(m.Setor);
+    const ini = (m.Nome || '?')[0].toUpperCase();
+    return `<tr>
+      <td><div class="td-name"><div class="td-avatar" style="background:${cor.bg};color:${cor.fg}">${ini}</div>${esc(m.Nome)}</div></td>
+      <td><span class="badge ${cor.badge}">${esc(m.Setor)}</span></td>
+      <td>${esc(m.Periodo)}º</td>
+      <td><span class="badge ${statusBadge(m.Status)}">${esc(m.Status)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — MEMBROS
+// ══════════════════════════════════════════════════════════════
+
+async function loadMembros() {
+  const tbody = document.getElementById('members-table');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Carregando membros…</td></tr>';
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Membros' });
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr id="members-empty"><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)">
+        <i class="fas fa-users" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>
+        Nenhum membro cadastrado. ${isAdmin() ? 'Clique em <strong style="color:var(--teal)">Adicionar membro</strong> para começar.' : ''}
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(m => {
+      const cor = setorCor(m.Setor);
+      const ini = (m.Nome || '?')[0].toUpperCase();
+      const actionBtns = isAdmin()
+        ? `<td style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" title="Editar" onclick="editMembro('${esc(m.ID)}')"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-outline btn-sm" style="color:var(--coral)" title="Remover" onclick="deleteMembro('${esc(m.ID)}','${esc(m.Nome)}')"><i class="fas fa-trash"></i></button>
+           </td>`
+        : `<td><span style="font-size:11px;color:var(--text3)">—</span></td>`;
+      return `<tr>
+        <td><div class="td-name"><div class="td-avatar" style="background:${cor.bg};color:${cor.fg}">${ini}</div>${esc(m.Nome)}</div></td>
+        <td><code style="font-family:'DM Mono';font-size:12px;color:var(--text3)">${esc(m.Matricula)}</code></td>
+        <td>${esc(m.Periodo)}º</td>
+        <td><span class="badge ${cor.badge}">${esc(m.Setor)}</span></td>
+        <td>${esc(m.Cargo)}</td>
+        <td>${formatDate(m.DataIngresso)}</td>
+        <td><span class="badge ${statusBadge(m.Status)}">${esc(m.Status)}</span></td>
+        ${actionBtns}
+      </tr>`;
+    }).join('');
+
+    // Também atualiza tabela da secretaria
+    renderSecMembros(data);
+    // Atualiza home
+    renderHomeMembros(data);
+
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--coral)"><i class="fas fa-exclamation-circle"></i> Erro ao carregar: ${esc(e.message)}</td></tr>`;
+  }
+}
+
+function renderSecMembros(data) {
+  const tbody = document.querySelector('#sec-membros-ctrl tbody');
+  if (!tbody) return;
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">Nenhum membro cadastrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(m => {
+    const cor = setorCor(m.Setor);
+    const ini = (m.Nome || '?')[0].toUpperCase();
+    const editBtn = isAdmin()
+      ? `<button class="btn btn-outline btn-sm" onclick="editMembro('${esc(m.ID)}')"><i class="fas fa-edit"></i></button>`
+      : `<span style="font-size:11px;color:var(--text3)">—</span>`;
+    return `<tr>
+      <td><div class="td-name"><div class="td-avatar" style="background:${cor.bg};color:${cor.fg}">${ini}</div>${esc(m.Nome)}</div></td>
+      <td><code style="font-family:'DM Mono';font-size:12px;color:var(--text3)">${esc(m.Matricula)}</code></td>
+      <td>${esc(m.Periodo)}º</td>
+      <td><span class="badge ${cor.badge}">${esc(m.Setor)}</span></td>
+      <td>${formatDate(m.DataIngresso)}</td>
+      <td><span class="badge ${statusBadge(m.Status)}">${esc(m.Status)}</span></td>
+      <td>${editBtn}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — SECRETARIA
+// ══════════════════════════════════════════════════════════════
+
+async function loadSecretaria() {
+  loadMembros(); // Recarrega tabela de membros (usada nas sub-abas)
+  loadAtas();
+}
+
+async function loadAtas() {
+  const container = document.getElementById('atas-list-container');
+  if (!container) return;
+  setLoadingMsg('atas-list-container', 'Carregando atas…');
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Atas' });
+
+    if (!data || data.length === 0) {
+      setEmptyMsg('atas-list-container', 'fa-file-alt', 'Nenhuma ata registrada ainda.');
+      return;
+    }
+
+    container.innerHTML = data
+      .sort((a,b) => new Date(b.Data) - new Date(a.Data))
+      .map(ata => {
+        const editBtn = isAdmin()
+          ? `<button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="editAta('${esc(ata.ID)}')"><i class="fas fa-edit"></i></button>`
+          : '';
+        return `<div class="ata-card" onclick="verAta('${esc(ata.ID)}','${esc(ata.Titulo)}')">
+          <div class="ata-title">${esc(ata.Titulo)}</div>
+          <div class="ata-meta">
+            <span><i class="fas fa-calendar"></i> ${formatDate(ata.Data)}</span>
+            <span><i class="fas fa-users"></i> ${esc(ata.Presentes)} presentes</span>
+            <span><i class="fas fa-clock"></i> ${esc(ata.Duracao)}</span>
+            <span class="badge ${statusBadge(ata.Status)}">${esc(ata.Status)}</span>
+            ${editBtn}
+          </div>
+        </div>`;
+      }).join('');
+  } catch(e) {
+    setEmptyMsg('atas-list-container', 'fa-exclamation-circle', 'Erro ao carregar atas.');
+  }
+}
+
+function verAta(id, titulo) {
+  document.querySelector('#modal-ver-ata .modal-title').textContent = titulo || 'Ata';
+  openModal('modal-ver-ata');
+}
+
+function editAta(id) { showToast('Edição de ata em breve.', 'info'); }
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — TESOURARIA
+// ══════════════════════════════════════════════════════════════
+
+async function loadTesouraria() {
+  const container = document.getElementById('finance-movimentacoes');
+  if (!container) return;
+  setLoadingMsg('finance-movimentacoes', 'Carregando movimentações…');
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Financeiro' });
+
+    if (!data || data.length === 0) {
+      setEmptyMsg('finance-movimentacoes', 'fa-receipt', 'Nenhum lançamento registrado ainda.');
+      return;
+    }
+
+    let saldo = 0, recMes = 0, despMes = 0;
+    const hoje = new Date();
+
+    data.forEach(mov => {
+      const v = parseFloat(mov.Valor) || 0;
+      const isRec = String(mov.Tipo).toLowerCase() === 'receita';
+      saldo += isRec ? v : -v;
+      const d = new Date(mov.Data + 'T00:00:00');
+      if (d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear()) {
+        if (isRec) recMes += v; else despMes += v;
+      }
+    });
+
+    // Atualiza stat cards
+    const fmt = v => 'R$ ' + Math.abs(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    const saldoEl = document.querySelector('#page-tesouraria .stat-value');
+    if (saldoEl) saldoEl.textContent = fmt(saldo);
+
+    container.innerHTML = data
+      .sort((a,b) => new Date(b.Data) - new Date(a.Data))
+      .slice(0, 12)
+      .map(mov => {
+        const isRec = String(mov.Tipo).toLowerCase() === 'receita';
+        const v = parseFloat(mov.Valor) || 0;
+        return `<div class="finance-row">
+          <div>
+            <div class="finance-desc">${esc(mov.Descricao)}</div>
+            <div class="finance-cat">${esc(mov.Tipo)} • ${esc(mov.Categoria)} • ${formatDate(mov.Data)}</div>
+          </div>
+          <div class="finance-val ${isRec?'pos':'neg'}">${isRec?'+':'−'} R$ ${v.toFixed(2).replace('.',',')}</div>
+        </div>`;
+      }).join('');
+  } catch(e) {
+    setEmptyMsg('finance-movimentacoes', 'fa-exclamation-circle', 'Erro ao carregar movimentações.');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — AGENDA
+// ══════════════════════════════════════════════════════════════
+
+async function loadAgenda() {
+  const container = document.getElementById('agenda-list-container');
+  if (!container) return;
+  setLoadingMsg('agenda-list-container', 'Carregando eventos…');
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Eventos' });
+
+    if (!data || data.length === 0) {
+      setEmptyMsg('agenda-list-container', 'fa-calendar-alt', 'Nenhum evento cadastrado ainda.');
+      return;
+    }
+
+    container.innerHTML = data
+      .sort((a,b) => new Date(a.Data) - new Date(b.Data))
+      .map(ev => {
+        const d = new Date((ev.Data || '2026-01-01') + 'T00:00:00');
+        const mes = d.toLocaleString('pt-BR',{month:'short'}).toUpperCase().replace('.','');
+        const dia = d.getDate();
+        const cor = setorCor(ev.Tipo);
+        const editBtn = isAdmin()
+          ? `<button class="btn btn-outline btn-sm" onclick="editEvento('${esc(ev.ID)}')"><i class="fas fa-edit"></i></button>
+             <button class="btn btn-outline btn-sm" style="color:var(--coral)" onclick="deleteEvento('${esc(ev.ID)}','${esc(ev.Titulo)}')"><i class="fas fa-trash"></i></button>`
+          : '';
+        return `<div class="card gap-20" style="margin-bottom:16px">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="background:${cor.bg};border:1px solid ${cor.bd};border-radius:12px;padding:10px 20px;text-align:center;flex-shrink:0">
+              <div style="font-size:10px;color:${cor.fg};text-transform:uppercase;letter-spacing:1px">${mes}</div>
+              <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:${cor.fg}">${dia}</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:16px;font-weight:700;margin-bottom:4px">${esc(ev.Titulo)}</div>
+              <div style="font-size:13px;color:var(--text2)">
+                <i class="fas fa-clock"></i> ${esc(ev.HoraInicio)}–${esc(ev.HoraFim)}
+                &nbsp;|&nbsp;<i class="fas fa-map-marker-alt"></i> ${esc(ev.Local)}
+                ${ev.Responsavel ? `&nbsp;|&nbsp;<i class="fas fa-user"></i> ${esc(ev.Responsavel)}` : ''}
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="badge ${cor.badge}">${esc(ev.Tipo)}</span>
+              ${editBtn}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+  } catch(e) {
+    setEmptyMsg('agenda-list-container', 'fa-exclamation-circle', 'Erro ao carregar agenda.');
+  }
+}
+
+function editEvento(id) { showToast('Edição de evento em breve.', 'info'); }
+
+async function deleteEvento(id, nome) {
+  if (!requireAdmin('excluir eventos')) return;
+  if (!confirm(`Excluir o evento "${nome}"?\nEsta ação não pode ser desfeita.`)) return;
+  try {
+    await apiPost({ action: 'delete', sheet: 'Eventos', id });
+    showToast('Evento excluído.', 'success');
+    loadAgenda();
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — PESQUISA
+// ══════════════════════════════════════════════════════════════
+
+async function loadPesquisa() {
+  const grid = document.getElementById('pesquisa-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Carregando projetos…</div>';
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Pesquisas' });
+
+    if (!data || data.length === 0) {
+      grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-flask" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>Nenhum projeto cadastrado ainda.</div>';
+      return;
+    }
+
+    grid.innerHTML = data.map(p => {
+      const prog = parseInt(p.Progresso) || 0;
+      const editBtn = isAdmin()
+        ? `<button class="btn btn-outline btn-sm" onclick="editProjeto('${esc(p.ID)}')"><i class="fas fa-edit"></i></button>`
+        : '';
+      return `<div class="research-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="badge ${statusBadge(p.Status)}">${esc(p.Status)}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;color:var(--text3)">${p.CAAE ? 'CAAE: '+esc(p.CAAE) : 'CEP pendente'}</span>
+            ${editBtn}
+          </div>
+        </div>
+        <div class="research-title">${esc(p.Titulo)}</div>
+        <div class="research-desc">${esc(p.Descricao)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">
+          <i class="fas fa-users"></i> ${esc(p.Pesquisadores)} pesquisadores &nbsp;•&nbsp;
+          <i class="fas fa-tag"></i> ${esc(p.TipoEstudo)}
+        </div>
+        <div style="font-size:12px;margin-bottom:4px;display:flex;justify-content:space-between">
+          <span>Progresso</span><strong>${prog}%</strong>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${prog}%;${prog===100?'background:var(--sage)':''}"></div></div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--coral);grid-column:1/-1">Erro ao carregar projetos.</div>';
+  }
+}
+
+function editProjeto(id) { showToast('Edição de projeto em breve.', 'info'); }
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — EXTENSÃO
+// ══════════════════════════════════════════════════════════════
+
+async function loadExtensao() {
+  const container = document.getElementById('extensao-acoes');
+  if (!container) return;
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Extensao' });
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Nenhuma ação registrada ainda.</div>';
+      return;
+    }
+    container.innerHTML = data
+      .sort((a,b) => new Date(b.Data) - new Date(a.Data))
+      .slice(0, 8)
+      .map(ac => `<div class="finance-row">
+        <div>
+          <div class="finance-desc">${esc(ac.Nome)}</div>
+          <div class="finance-cat">${formatDate(ac.Data)} • ${esc(ac.Participantes)} participantes • ${esc(ac.Local)}</div>
+        </div>
+        <span class="badge ${statusBadge(ac.Status)}">${esc(ac.Status)}</span>
+      </div>`).join('');
+  } catch(e) { console.warn('loadExtensao:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — ENSINO
+// ══════════════════════════════════════════════════════════════
+
+async function loadEnsino() {
+  const grid = document.getElementById('ensino-cursos-grid');
+  if (!grid) return;
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Cursos' });
+    if (!data || data.length === 0) {
+      grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1">Nenhum curso cadastrado ainda.</div>';
+      return;
+    }
+    grid.innerHTML = data.map(c => {
+      const prog = parseInt(c.Progresso) || 0;
+      return `<div class="research-card">
+        <div class="badge ${statusBadge(c.Status)}" style="margin-bottom:10px">${esc(c.Status)}</div>
+        <div class="research-title">${esc(c.Titulo)}</div>
+        <div class="research-desc">${esc(c.Descricao)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px">
+          <i class="fas fa-clock"></i> ${esc(c.CargaHoraria)}h &nbsp;•&nbsp;
+          <i class="fas fa-users"></i> ${esc(c.Vagas)} vagas &nbsp;•&nbsp;
+          <i class="fas fa-laptop"></i> ${esc(c.Modalidade)}
+        </div>
+        <div style="font-size:12px;margin-bottom:4px;display:flex;justify-content:space-between">
+          <span>Progresso</span><strong>${prog}%</strong>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('loadEnsino:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — OUVIDORIA
+// ══════════════════════════════════════════════════════════════
+
+async function loadOuvidoria() {
+  const container = document.querySelector('#page-ouvidoria .card .card-header + .finance-row')?.parentElement;
+  if (!container) return;
+
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'Ouvidoria' });
+    if (!data || data.length === 0) return;
+
+    // Atualiza lista de solicitações abertas
+    const openItems = data.filter(o => o.Status !== 'Resolvido');
+    if (openItems.length > 0 && isAdmin()) {
+      const listEl = document.querySelector('#page-ouvidoria .card .card-title');
+      if (listEl && listEl.textContent.includes('Solicitações')) {
+        const parentCard = listEl.closest('.card');
+        const header = parentCard.querySelector('.card-header');
+        // Remove old rows
+        parentCard.querySelectorAll('.finance-row').forEach(r => r.remove());
+        openItems.slice(0, 5).forEach(o => {
+          const row = document.createElement('div');
+          row.className = 'finance-row';
+          row.innerHTML = `
+            <div>
+              <div class="finance-desc">${esc(o.Assunto || o.Tipo)}: ${esc(o.Mensagem?.substring(0,60))}…</div>
+              <div class="finance-cat">#${esc(o.ID?.slice(-4) || '?')} • Anônimo • ${formatDate(o.Data)} • ${esc(o.Tipo)}</div>
+            </div>
+            <span class="badge ${statusBadge(o.Status)}">${esc(o.Status)}</span>`;
+          parentCard.appendChild(row);
+        });
+      }
+    }
+  } catch(e) { console.warn('loadOuvidoria:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOADER — MARKETING
+// ══════════════════════════════════════════════════════════════
+
+async function loadMarketing() {
+  try {
+    const data = await apiGet({ action: 'getAll', sheet: 'TarefasMarketing' });
+    if (!data || data.length === 0) return;
+
+    // Organiza por status no Kanban
+    const cols = {
+      'Ideia': 'backlog-col',
+      'Produção': 'producao-col',
+      'Revisão': 'revisao-col',
+      'Publicado': 'publicado-col'
+    };
+
+    // Apenas adiciona novas tarefas da API ao kanban existente
+    data.forEach(t => {
+      const colKey = Object.keys(cols).find(k =>
+        String(t.Status).toLowerCase().includes(k.toLowerCase())
+      ) || 'Ideia';
+      const colId = cols[colKey];
+      const col   = document.getElementById(colId);
+      if (!col) return;
+
+      // Verifica se já existe
+      if (col.querySelector(`[data-task-id="${esc(t.ID)}"]`)) return;
+
+      const cor = setorCor(t.Formato);
+      const card = document.createElement('div');
+      card.className = 'kanban-card';
+      card.setAttribute('data-task-id', t.ID);
+      card.innerHTML = `
+        <div class="kanban-card-title">${esc(t.Titulo)}</div>
+        <div class="kanban-card-meta">
+          <span class="badge ${cor.badge}">${esc(t.Formato)}</span>
+          ${t.Prazo ? ' • ' + formatDate(t.Prazo) : ''}
+          ${t.Responsavel ? `<span style="font-size:10px;color:var(--text3);display:block;margin-top:3px"><i class="fas fa-user"></i> ${esc(t.Responsavel)}</span>` : ''}
+        </div>`;
+      col.appendChild(card);
+    });
+  } catch(e) { console.warn('loadMarketing:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  AÇÕES EM REGISTROS
+// ══════════════════════════════════════════════════════════════
+
+function editMembro(id) {
+  if (!requireAdmin('editar membros')) return;
+  showToast('Modal de edição de membro em breve.', 'info');
+}
+
+async function deleteMembro(id, nome) {
+  if (!requireAdmin('remover membros')) return;
+  if (!confirm(`Remover o membro "${nome}"?\nEsta ação não pode ser desfeita.`)) return;
+  try {
+    await apiPost({ action: 'delete', sheet: 'Membros', id });
+    showToast('Membro removido com sucesso.', 'success');
+    loadMembros();
+  } catch(e) { showToast('Erro ao remover: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — MEMBRO
+// ══════════════════════════════════════════════════════════════
+
+async function salvarMembro() {
+  if (!requireAdmin('adicionar membros')) return;
+  const modal = document.getElementById('modal-add-membro');
+  const inputs   = modal.querySelectorAll('input');
+  const selects  = modal.querySelectorAll('select');
+
+  const row = {
+    Nome:         inputs[0]?.value.trim() || '',
+    Matricula:    inputs[1]?.value.trim() || '',
+    Periodo:      selects[0]?.value || '',
+    Setor:        selects[1]?.value || '',
+    Cargo:        selects[2]?.value || '',
+    DataIngresso: inputs[2]?.value || new Date().toISOString().split('T')[0],
+    Email:        inputs[3]?.value.trim() || '',
+    Status:       'Ativo'
+  };
+
+  if (!row.Nome) { showToast('Informe o nome completo.', 'warning'); return; }
+  if (!row.Matricula) { showToast('Informe a matrícula.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Membros', row });
+    closeModal('modal-add-membro');
+    showToast(`Membro ${row.Nome} adicionado com sucesso!`, 'success');
+    loadMembros();
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> Adicionar';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — ATA
+// ══════════════════════════════════════════════════════════════
+
+async function salvarAta() {
+  if (!requireAdmin('registrar atas')) return;
+  const modal   = document.getElementById('modal-nova-ata');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+  const textas  = modal.querySelectorAll('textarea');
+
+  const row = {
+    Titulo:    `Reunião ${selects[0]?.value} — ${new Date(inputs[0]?.value + 'T00:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}`,
+    Data:      inputs[0]?.value || '',
+    Duracao:   inputs[1]?.value || '',
+    Presentes: inputs[2]?.value || '0',
+    Status:    'Pendente assinatura',
+    Conteudo:  (textas[0]?.value || '') + '\n\nDeliberações:\n' + (textas[1]?.value || '')
+  };
+
+  if (!row.Data) { showToast('Informe a data da reunião.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Atas', row });
+    closeModal('modal-nova-ata');
+    showToast('Ata registrada com sucesso!', 'success');
+    loadAtas();
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Salvar ata';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — LANÇAMENTO FINANCEIRO
+// ══════════════════════════════════════════════════════════════
+
+async function salvarLancamento() {
+  if (!requireAdmin('registrar lançamentos')) return;
+  const modal   = document.getElementById('modal-lancamento');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Tipo:      selects[0]?.value || 'Receita',
+    Valor:     inputs[0]?.value || '0',
+    Descricao: inputs[1]?.value.trim() || '',
+    Categoria: selects[1]?.value || '',
+    Data:      inputs[2]?.value || new Date().toISOString().split('T')[0]
+  };
+
+  if (!row.Descricao) { showToast('Informe a descrição do lançamento.', 'warning'); return; }
+  if (!row.Valor || parseFloat(row.Valor) <= 0) { showToast('Informe um valor válido.', 'warning'); return; }
+  if (!row.Data) { showToast('Informe a data.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Financeiro', row });
+    closeModal('modal-lancamento');
+    showToast(`Lançamento de R$ ${parseFloat(row.Valor).toFixed(2)} registrado!`, 'success');
+    loadTesouraria();
+  } catch(e) {
+    showToast('Erro ao registrar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save"></i> Registrar';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — EVENTO
+// ══════════════════════════════════════════════════════════════
+
+async function salvarEvento() {
+  if (!requireAdmin('criar eventos')) return;
+  const modal   = document.getElementById('modal-novo-evento');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Titulo:      inputs[0]?.value.trim() || '',
+    Tipo:        selects[0]?.value || '',
+    Data:        inputs[1]?.value || '',
+    HoraInicio:  inputs[2]?.value || '',
+    HoraFim:     inputs[3]?.value || '',
+    Local:       inputs[4]?.value.trim() || '',
+    Responsavel: inputs[5]?.value.trim() || '',
+    Descricao:   modal.querySelector('textarea')?.value || '',
+    Status:      'Confirmado'
+  };
+
+  if (!row.Titulo) { showToast('Informe o título do evento.', 'warning'); return; }
+  if (!row.Data)   { showToast('Informe a data do evento.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Eventos', row });
+    closeModal('modal-novo-evento');
+    showToast(`Evento "${row.Titulo}" criado com sucesso!`, 'success');
+    loadAgenda();
+  } catch(e) {
+    showToast('Erro ao criar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-calendar-plus"></i> Criar evento';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — PROJETO DE PESQUISA
+// ══════════════════════════════════════════════════════════════
+
+async function salvarProjeto() {
+  if (!requireAdmin('cadastrar projetos')) return;
+  const modal   = document.getElementById('modal-novo-projeto');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Titulo:        inputs[0]?.value.trim() || '',
+    TipoEstudo:    selects[0]?.value || '',
+    Status:        selects[1]?.value || '',
+    CAAE:          inputs[1]?.value.trim() || '',
+    Pesquisadores: inputs[2]?.value || '0',
+    Descricao:     modal.querySelector('textarea')?.value || '',
+    Progresso:     '0'
+  };
+
+  if (!row.Titulo) { showToast('Informe o título do projeto.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cadastrando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Pesquisas', row });
+    closeModal('modal-novo-projeto');
+    showToast('Projeto cadastrado com sucesso!', 'success');
+    loadPesquisa();
+  } catch(e) {
+    showToast('Erro ao cadastrar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-flask"></i> Cadastrar projeto';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — CURSO
+// ══════════════════════════════════════════════════════════════
+
+async function salvarCurso() {
+  if (!requireAdmin('criar cursos')) return;
+  const modal   = document.getElementById('modal-novo-curso');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Titulo:       inputs[0]?.value.trim() || '',
+    Modalidade:   selects[0]?.value || '',
+    CargaHoraria: inputs[1]?.value || '0',
+    Vagas:        inputs[2]?.value || '0',
+    DataInicio:   inputs[3]?.value || '',
+    Descricao:    modal.querySelector('textarea')?.value || '',
+    Progresso:    '0',
+    Status:       'Planejado'
+  };
+
+  if (!row.Titulo) { showToast('Informe o título do curso.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Cursos', row });
+    closeModal('modal-novo-curso');
+    showToast(`Curso "${row.Titulo}" criado com sucesso!`, 'success');
+    loadEnsino();
+  } catch(e) {
+    showToast('Erro ao criar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-graduation-cap"></i> Criar curso';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — AÇÃO DE EXTENSÃO
+// ══════════════════════════════════════════════════════════════
+
+async function salvarAcao() {
+  if (!requireAdmin('registrar ações')) return;
+  const modal   = document.getElementById('modal-nova-acao');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Nome:          inputs[0]?.value.trim() || '',
+    Tipo:          selects[0]?.value || '',
+    Data:          inputs[1]?.value || '',
+    Local:         inputs[2]?.value.trim() || '',
+    Participantes: inputs[3]?.value || '0',
+    Status:        'Realizado'
+  };
+
+  if (!row.Nome) { showToast('Informe o nome da ação.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Extensao', row });
+    closeModal('modal-nova-acao');
+    showToast('Ação de extensão registrada!', 'success');
+    loadExtensao();
+  } catch(e) {
+    showToast('Erro ao registrar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-hands-helping"></i> Registrar ação';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — CORRESPONDÊNCIA
+// ══════════════════════════════════════════════════════════════
+
+async function salvarCorrespondencia() {
+  if (!requireAdmin('registrar correspondências')) return;
+  const modal   = document.getElementById('modal-nova-corr');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Tipo:         selects[0]?.value || '',
+    Direcao:      'Enviada',
+    Destinatario: inputs[0]?.value.trim() || '',
+    Assunto:      inputs[1]?.value.trim() || '',
+    Corpo:        modal.querySelector('textarea')?.value || '',
+    Data:         new Date().toISOString().split('T')[0],
+    Status:       'Enviada'
+  };
+
+  if (!row.Destinatario) { showToast('Informe o destinatário.', 'warning'); return; }
+  if (!row.Assunto)      { showToast('Informe o assunto.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Correspondencias', row });
+    closeModal('modal-nova-corr');
+    showToast('Correspondência registrada com sucesso!', 'success');
+  } catch(e) {
+    showToast('Erro ao registrar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Registrar envio';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — TAREFA MARKETING
+// ══════════════════════════════════════════════════════════════
+
+async function salvarTarefaMkt() {
+  if (!requireAdmin('adicionar tarefas')) return;
+  const modal   = document.getElementById('modal-new-task');
+  const selects = modal.querySelectorAll('select');
+  const inputs  = modal.querySelectorAll('input');
+
+  const row = {
+    Titulo:      inputs[0]?.value.trim() || '',
+    Formato:     selects[0]?.value || '',
+    Prazo:       inputs[1]?.value || '',
+    Responsavel: inputs[2]?.value.trim() || '',
+    Status:      'Ideia'
+  };
+
+  if (!row.Titulo) { showToast('Informe o título da tarefa.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adicionando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'TarefasMarketing', row });
+    closeModal('modal-new-task');
+    showToast('Tarefa adicionada ao Kanban!', 'success');
+    loadMarketing();
+  } catch(e) {
+    showToast('Erro ao adicionar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-plus"></i> Adicionar tarefa';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR — OUVIDORIA (não exige admin)
+// ══════════════════════════════════════════════════════════════
+
+async function salvarOuvidoria() {
+  const form    = document.querySelector('#page-ouvidoria .card:last-child');
+  if (!form) return;
+  const selects = form.querySelectorAll('select');
+  const inputs  = form.querySelectorAll('input');
+
+  const row = {
+    Tipo:     selects[0]?.value || '',
+    Assunto:  inputs[0]?.value.trim() || '',
+    Mensagem: form.querySelector('textarea')?.value.trim() || '',
+    Data:     new Date().toISOString().split('T')[0],
+    Status:   'Pendente'
+  };
+
+  if (!row.Mensagem) { showToast('Escreva sua mensagem antes de enviar.', 'warning'); return; }
+
+  const btn = form.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Ouvidoria', row });
+    showToast('Manifestação enviada anonimamente!', 'success');
+    form.querySelector('textarea').value = '';
+    if (inputs[0]) inputs[0].value = '';
+  } catch(e) {
+    showToast('Erro ao enviar: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar anonimamente';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BOTÕES DE RELATÓRIOS (exportar)
+// ══════════════════════════════════════════════════════════════
+
+function exportarRelatorio(tipo) {
+  if (!requireAdmin('exportar relatórios')) return;
+  showToast(`Exportação de ${tipo} em breve. Funcionalidade sendo desenvolvida.`, 'info');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BOTÃO UPLOAD DE DOCUMENTO
+// ══════════════════════════════════════════════════════════════
+
+function uploadDocumento() {
+  if (!requireAdmin('enviar documentos')) return;
+  showToast('Upload de documentos integrado ao Google Drive em breve.', 'info');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BIND — CONECTA BOTÕES AOS HANDLERS
+// ══════════════════════════════════════════════════════════════
+
+function bindModalButtons() {
+  const bindings = [
+    { modal:'modal-add-membro',   fn: salvarMembro         },
+    { modal:'modal-nova-ata',     fn: salvarAta            },
+    { modal:'modal-lancamento',   fn: salvarLancamento     },
+    { modal:'modal-novo-evento',  fn: salvarEvento         },
+    { modal:'modal-novo-projeto', fn: salvarProjeto        },
+    { modal:'modal-novo-curso',   fn: salvarCurso          },
+    { modal:'modal-nova-acao',    fn: salvarAcao           },
+    { modal:'modal-nova-corr',    fn: salvarCorrespondencia},
+    { modal:'modal-new-task',     fn: salvarTarefaMkt      },
+  ];
+
+  bindings.forEach(({ modal, fn }) => {
+    const el = document.getElementById(modal);
+    if (!el) return;
+    const btn = el.querySelector('.btn-primary');
+    if (!btn) return;
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', fn);
+  });
+
+  // Ouvidoria — botão inline (fora de modal)
+  const ouvBtn = document.querySelector('#page-ouvidoria .card:last-child .btn-primary');
+  if (ouvBtn) {
+    const nb = ouvBtn.cloneNode(true);
+    ouvBtn.parentNode.replaceChild(nb, ouvBtn);
+    nb.addEventListener('click', salvarOuvidoria);
+  }
+
+  // Relatórios — botões de exportar
+  document.querySelectorAll('#page-relatorios .btn-outline').forEach(btn => {
+    const txt = btn.textContent;
+    btn.addEventListener('click', () => exportarRelatorio(txt.trim()));
+  });
+
+  // Documentos — botão upload
+  const uploadBtn = document.querySelector('#page-documentos .btn-primary');
+  if (uploadBtn) {
+    const nb = uploadBtn.cloneNode(true);
+    uploadBtn.parentNode.replaceChild(nb, uploadBtn);
+    nb.addEventListener('click', uploadDocumento);
+  }
+
+  // Documentos — cards clicáveis
+  document.querySelectorAll('#page-documentos .card[style*="cursor:pointer"], #page-documentos .card').forEach(card => {
+    if (!card.hasAttribute('onclick')) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => {
+        const nome = card.querySelector('div:nth-child(2)')?.textContent || 'arquivo';
+        showToast(`Acesso ao "${nome.trim()}" integrado ao Google Drive em breve.`, 'info');
+      });
+    }
+  });
+
+  // Agenda edit buttons (static ones)
+  document.querySelectorAll('#ag-lista .btn-outline.btn-sm').forEach(btn => {
+    if (!btn.getAttribute('onclick')) {
+      btn.addEventListener('click', () => {
+        if (!requireAdmin('editar eventos')) return;
+        showToast('Edição de evento em breve.', 'info');
+      });
+    }
+  });
+
+  // Atas cards estáticas — modal ver ata
+  document.querySelectorAll('.ata-card:not([onclick])').forEach(card => {
+    card.addEventListener('click', () => openModal('modal-ver-ata'));
+  });
+
+  // Estatuto & Regimento — cards
+  document.querySelectorAll('#sec-estatuto .card').forEach(card => {
+    if (!card.getAttribute('onclick')) {
+      card.addEventListener('click', () => {
+        const nome = card.querySelector('div[style*="font-weight"]')?.textContent || 'documento';
+        showToast(`Acesso ao "${nome.trim()}" via Google Drive em breve.`, 'info');
+      });
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  KANBAN IDs — adiciona IDs às colunas para referência
+// ══════════════════════════════════════════════════════════════
+
+function setupKanbanIds() {
+  const cols = document.querySelectorAll('.kanban-col');
+  const ids  = ['backlog-col','producao-col','revisao-col','publicado-col'];
+  cols.forEach((col, i) => { if (ids[i]) col.id = ids[i]; });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INICIALIZAÇÃO
+// ══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
+  setupKanbanIds();
+
+  // Verifica sessão salva
+  const savedRole = sessionStorage.getItem('lapa-role');
+  if (savedRole && CREDENTIALS[savedRole]) {
+    // Auto-login com sessão existente
+    loginSuccess(savedRole);
+  } else {
+    // Foca no campo de senha
+    setTimeout(() => document.getElementById('login-senha')?.focus(), 300);
+  }
+});
+</script>
+</body>
+</html>
