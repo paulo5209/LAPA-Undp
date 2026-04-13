@@ -554,11 +554,46 @@ tr:hover td { background: rgba(239,68,68,.03); }
   .kanban { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 900px) {
-  .sidebar { width: 72px; }
+  .sidebar {
+    width: 72px;
+    transition: width var(--transition), box-shadow var(--transition);
+  }
+  .sidebar.mobile-open {
+    width: 260px;
+    box-shadow: 6px 0 40px rgba(0,0,0,.55);
+    z-index: 200;
+  }
+  .sidebar.mobile-open .logo-title,
+  .sidebar.mobile-open .logo-sub,
+  .sidebar.mobile-open .nav-item span,
+  .sidebar.mobile-open .nav-section-label,
+  .sidebar.mobile-open .user-info,
+  .sidebar.mobile-open .nav-badge { display: revert; }
   .logo-title, .logo-sub, .nav-item span, .nav-section-label, .user-info, .nav-badge { display: none; }
   .main { margin-left: 72px; }
   .grid-3 { grid-template-columns: 1fr; }
   .grid-1-2, .grid-2-1 { grid-template-columns: 1fr; }
+  /* Overlay para fechar ao clicar fora */
+  #sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 190;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(2px);
+  }
+  #sidebar-overlay.visible { display: block; }
+  /* Botão hambúrguer fixo */
+  #btn-hamburger {
+    display: flex;
+    position: fixed; bottom: 24px; left: 12px; z-index: 210;
+    width: 48px; height: 48px; border-radius: 14px;
+    background: var(--teal); color: var(--bg);
+    border: none; cursor: pointer;
+    align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 20px rgba(239,68,68,.45);
+    transition: transform var(--transition), opacity var(--transition);
+  }
+  #btn-hamburger:active { transform: scale(.92); }
 }
 @media (max-width: 600px) {
   .content { padding: 16px; }
@@ -567,6 +602,10 @@ tr:hover td { background: rgba(239,68,68,.03); }
   .hero-stats { gap: 16px; }
   .hero { padding: 28px 20px; }
 }
+
+/* Hambúrguer oculto em desktop — só aparece via media query acima */
+#btn-hamburger { display: none; }
+#sidebar-overlay { display: none; }
 
 /* ═══════════════════════════════════════════════════
    SCROLLBAR
@@ -867,6 +906,14 @@ body.is-admin .admin-only-block { display: block; }
 <body>
 
 
+<!-- ═══════════ OVERLAY MOBILE (fecha sidebar ao clicar fora) ═══════════ -->
+<div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ═══════════ BOTÃO HAMBÚRGUER MOBILE ═══════════ -->
+<button id="btn-hamburger" aria-label="Abrir menu" onclick="toggleMobileSidebar()">
+  <i class="fas fa-bars" id="hamburger-icon"></i>
+</button>
+
 <!-- ═══════════ TELA DE LOGIN ═══════════ -->
 <div id="login-screen">
   <div class="login-card">
@@ -1138,10 +1185,10 @@ body.is-admin .admin-only-block { display: block; }
         <div style="display:flex;justify-content:space-between;margin-bottom:18px">
           <div class="search-box" style="flex:1;max-width:320px">
             <i class="fas fa-search" style="color:var(--text3)"></i>
-            <input type="text" placeholder="Buscar membro…">
+            <input type="text" id="sec-filter-busca" placeholder="Buscar membro…">
           </div>
           <div style="display:flex;gap:10px;margin-left:12px">
-            <select class="form-select" style="width:auto;padding:8px 12px">
+            <select class="form-select" id="sec-filter-setor" style="width:auto;padding:8px 12px">
               <option>Todos os setores</option>
               <option>Pesquisa</option><option>Marketing</option>
               <option>Tesouraria</option><option>Extensão</option><option>Ensino</option>
@@ -1445,11 +1492,13 @@ body.is-admin .admin-only-block { display: block; }
           <div id="extensao-acoes"><div style="text-align:center;padding:20px;color:var(--text3)">Nenhuma ação registrada.</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title">Parceiros</div></div>
-          <div class="finance-row"><div><div class="finance-desc">SAMU — Regional</div><div class="finance-cat">Treinamentos de suporte básico</div></div><span class="badge sage">Ativo</span></div>
-          <div class="finance-row"><div><div class="finance-desc">Corpo de Bombeiros</div><div class="finance-cat">Simulações e treinamentos</div></div><span class="badge sage">Ativo</span></div>
-          <div class="finance-row"><div><div class="finance-desc">Cruz Vermelha — Regional</div><div class="finance-cat">Primeiros socorros em escolas</div></div><span class="badge teal">Em negociação</span></div>
-          <div class="finance-row"><div><div class="finance-desc">Defesa Civil Municipal</div><div class="finance-cat">Gestão de desastres e emergências</div></div><span class="badge sage">Ativo</span></div>
+          <div class="card-header">
+            <div class="card-title">Parceiros</div>
+            <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-nova-acao')" style="display:none"><i class="fas fa-plus"></i> Parceiro</button>
+          </div>
+          <div id="extensao-parceiros-list">
+            <div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1497,21 +1546,16 @@ body.is-admin .admin-only-block { display: block; }
       <div class="section-title">Ouvidoria</div>
       <div class="section-sub">Canal de comunicação, sugestões, reclamações e feedback dos membros da LAPA.</div>
       <div class="grid grid-4 gap-20">
-        <div class="stat-card" style="--accent-color:var(--coral)"><div class="stat-label">Pendentes</div><div class="stat-value" style="color:var(--coral)">2</div><i class="fas fa-inbox stat-icon"></i></div>
-        <div class="stat-card" style="--accent-color:var(--gold)"><div class="stat-label">Em análise</div><div class="stat-value">1</div><i class="fas fa-search stat-icon"></i></div>
-        <div class="stat-card" style="--accent-color:var(--sage)"><div class="stat-label">Resolvidos</div><div class="stat-value">8</div><i class="fas fa-check-circle stat-icon"></i></div>
-        <div class="stat-card" style="--accent-color:var(--teal)"><div class="stat-label">Total 2026</div><div class="stat-value">11</div><i class="fas fa-comment-dots stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--coral)"><div class="stat-label">Pendentes</div><div class="stat-value" id="ouv-stat-pendentes" style="color:var(--coral)"><span class="skel-inline"></span></div><i class="fas fa-inbox stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--gold)"><div class="stat-label">Em análise</div><div class="stat-value" id="ouv-stat-analise"><span class="skel-inline"></span></div><i class="fas fa-search stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--sage)"><div class="stat-label">Resolvidos</div><div class="stat-value" id="ouv-stat-resolvidos"><span class="skel-inline"></span></div><i class="fas fa-check-circle stat-icon"></i></div>
+        <div class="stat-card" style="--accent-color:var(--teal)"><div class="stat-label">Total</div><div class="stat-value" id="ouv-stat-total"><span class="skel-inline"></span></div><i class="fas fa-comment-dots stat-icon"></i></div>
       </div>
       <div class="divider"></div>
       <div class="card">
         <div class="card-header"><div class="card-title">Solicitações abertas</div></div>
-        <div class="finance-row">
-          <div><div class="finance-desc">Sugestão: Criar canal de comunicação no WhatsApp</div><div class="finance-cat">#002 • Anônimo • 05 Abr • Sugestão</div></div>
-          <span class="badge coral">Pendente</span>
-        </div>
-        <div class="finance-row">
-          <div><div class="finance-desc">Sugestão: Ampliar os treinamentos de RCP abertos</div><div class="finance-cat">#001 • Anônimo • 02 Abr • Reclamação</div></div>
-          <span class="badge gold">Em análise</span>
+        <div id="ouv-solicitacoes-list">
+          <div style="text-align:center;padding:28px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Carregando…</div>
         </div>
       </div>
       <div class="divider"></div>
@@ -1533,24 +1577,20 @@ body.is-admin .admin-only-block { display: block; }
       <div class="section-title">Relatórios & Indicadores</div>
       <div class="section-sub">Visão consolidada do desempenho da liga por período.</div>
       <div class="grid grid-2 gap-20">
-        <div class="card"><div class="card-header"><div class="card-title">Eventos por mês (2026)</div></div>
-          <div class="chart-placeholder" style="padding-bottom:28px">
-            <div class="bar" style="height:40%" data-label="Jan"></div>
-            <div class="bar" style="height:60%" data-label="Fev"></div>
-            <div class="bar" style="height:55%" data-label="Mar"></div>
-            <div class="bar" style="height:80%" data-label="Abr"></div>
-            <div class="bar" style="height:70%;opacity:.4" data-label="Mai"></div>
-            <div class="bar" style="height:50%;opacity:.3" data-label="Jun"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Eventos por mês (ano corrente)</div>
+          </div>
+          <div id="rel-chart-eventos" class="chart-placeholder" style="padding-bottom:28px">
+            <div style="text-align:center;padding:28px;color:var(--text3);width:100%"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
           </div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Crescimento de membros</div></div>
-          <div class="chart-placeholder" style="padding-bottom:28px">
-            <div class="bar" style="height:50%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2023"></div>
-            <div class="bar" style="height:70%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2024.1"></div>
-            <div class="bar" style="height:65%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2024.2"></div>
-            <div class="bar" style="height:90%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2025.1"></div>
-            <div class="bar" style="height:85%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2025.2"></div>
-            <div class="bar" style="height:100%;background:linear-gradient(0deg,var(--lavender),var(--sky))" data-label="2026.1"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Membros por semestre</div>
+          </div>
+          <div id="rel-chart-membros" class="chart-placeholder" style="padding-bottom:28px">
+            <div style="text-align:center;padding:28px;color:var(--text3);width:100%"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
           </div>
         </div>
       </div>
@@ -2606,6 +2646,7 @@ function showPage(id) {
     ouvidoria:  loadOuvidoria,
     marketing:  loadMarketing,
     documentos: loadDocumentos,
+    relatorios: loadRelatorios,
   };
   if (loaders[id]) loaders[id]();
 }
@@ -2851,9 +2892,31 @@ function setupSearch() {
 // ══════════════════════════════════════════════════════════════
 
 function setupFilters() {
-  // Filtro de setor na página membros
+  // Filtro de setor + status na página Membros
   document.querySelectorAll('#page-membros select').forEach(sel => {
     sel.addEventListener('change', filterMembros);
+  });
+
+  // Filtro de setor na Secretaria (sec-membros-ctrl) — select + input de busca
+  const secSetor = document.getElementById('sec-filter-setor');
+  const secBusca = document.getElementById('sec-filter-busca');
+  if (secSetor) secSetor.addEventListener('change', filterSecMembros);
+  if (secBusca) secBusca.addEventListener('input',  filterSecMembros);
+}
+
+/**
+ * Filtra as linhas da tabela em #sec-membros-ctrl
+ * usando o select de setor e o input de busca textual.
+ */
+function filterSecMembros() {
+  const setor = document.getElementById('sec-filter-setor')?.value || 'Todos os setores';
+  const busca = (document.getElementById('sec-filter-busca')?.value || '').toLowerCase().trim();
+
+  document.querySelectorAll('#sec-membros-ctrl tbody tr').forEach(row => {
+    const txt      = row.textContent.toLowerCase();
+    const setorOk  = setor === 'Todos os setores' || txt.includes(setor.toLowerCase());
+    const buscaOk  = !busca || txt.includes(busca);
+    row.style.display = (setorOk && buscaOk) ? '' : 'none';
   });
 }
 
@@ -3656,25 +3719,63 @@ async function loadExtensao() {
   if (!container) return;
 
   try {
-    const data = await apiGet({ action: 'getAll', sheet: 'Extensao' });
+    // Carrega ações e parceiros em paralelo
+    const [data, parceiros] = await Promise.all([
+      apiGet({ action: 'getAll', sheet: 'Extensao' }),
+      apiGet({ action: 'getAll', sheet: 'Parceiros' }),
+    ]);
 
-    // Atualiza stats dinâmicos
+    // ── Atualiza stats dinâmicos ───────────────────────────
     _updateExtensaoStats(data);
 
+    // ── Atualiza stat de parcerias com dado real ───────────
+    const totalParc = parceiros ? parceiros.filter(p => p.Status === 'Ativo').length : 0;
+    const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    setEl('ext-stat-parcerias',    totalParc > 0 ? totalParc : '—');
+    setEl('ext-stat-parcerias-sub', totalParc > 0 ? `${totalParc} parceiro(s) ativo(s)` : 'Nenhum parceiro cadastrado');
+
+    // ── Lista de ações ─────────────────────────────────────
     if (!data || data.length === 0) {
       container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Nenhuma ação registrada ainda.</div>';
-      return;
+    } else {
+      container.innerHTML = data
+        .sort((a,b) => new Date(b.Data) - new Date(a.Data))
+        .slice(0, 8)
+        .map(ac => `<div class="finance-row">
+          <div>
+            <div class="finance-desc">${esc(ac.Nome)}</div>
+            <div class="finance-cat">${formatDate(ac.Data)} • ${esc(ac.Participantes)} participantes • ${esc(ac.Local)}</div>
+          </div>
+          <span class="badge ${statusBadge(ac.Status)}">${esc(ac.Status)}</span>
+        </div>`).join('');
     }
-    container.innerHTML = data
-      .sort((a,b) => new Date(b.Data) - new Date(a.Data))
-      .slice(0, 8)
-      .map(ac => `<div class="finance-row">
-        <div>
-          <div class="finance-desc">${esc(ac.Nome)}</div>
-          <div class="finance-cat">${formatDate(ac.Data)} • ${esc(ac.Participantes)} participantes • ${esc(ac.Local)}</div>
-        </div>
-        <span class="badge ${statusBadge(ac.Status)}">${esc(ac.Status)}</span>
-      </div>`).join('');
+
+    // ── Lista de parceiros (dinâmica) ──────────────────────
+    const parcEl = document.getElementById('extensao-parceiros-list');
+    if (parcEl) {
+      if (!parceiros || parceiros.length === 0) {
+        parcEl.innerHTML =
+          '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">' +
+          '<i class="fas fa-handshake" style="font-size:22px;display:block;margin-bottom:8px;opacity:.3"></i>' +
+          'Nenhum parceiro cadastrado ainda.<br>' +
+          '<span style="font-size:11px">Adicione registros na aba "Parceiros" da planilha.</span></div>';
+      } else {
+        parcEl.innerHTML = parceiros
+          .sort((a, b) => {
+            // Ativos primeiro
+            if (a.Status === 'Ativo' && b.Status !== 'Ativo') return -1;
+            if (b.Status === 'Ativo' && a.Status !== 'Ativo') return 1;
+            return (a.Nome || '').localeCompare(b.Nome || '');
+          })
+          .map(p => `<div class="finance-row">
+            <div>
+              <div class="finance-desc">${esc(p.Nome)}</div>
+              <div class="finance-cat">${esc(p.Descricao || p.Area || '—')}</div>
+            </div>
+            <span class="badge ${statusBadge(p.Status)}">${esc(p.Status || '—')}</span>
+          </div>`).join('');
+      }
+    }
   } catch(e) { console.warn('loadExtensao:', e); }
 }
 
@@ -3732,36 +3833,74 @@ async function loadEnsino() {
 // ══════════════════════════════════════════════════════════════
 
 async function loadOuvidoria() {
-  const container = document.querySelector('#page-ouvidoria .card .card-header + .finance-row')?.parentElement;
-  if (!container) return;
+  // ── helpers de referência ─────────────────────────────────
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const listEl = document.getElementById('ouv-solicitacoes-list');
 
   try {
     const data = await apiGet({ action: 'getAll', sheet: 'Ouvidoria' });
-    if (!data || data.length === 0) return;
 
-    // Atualiza lista de solicitações abertas
-    const openItems = data.filter(o => o.Status !== 'Resolvido');
-    if (openItems.length > 0 && isAdmin()) {
-      const listEl = document.querySelector('#page-ouvidoria .card .card-title');
-      if (listEl && listEl.textContent.includes('Solicitações')) {
-        const parentCard = listEl.closest('.card');
-        const header = parentCard.querySelector('.card-header');
-        // Remove old rows
-        parentCard.querySelectorAll('.finance-row').forEach(r => r.remove());
-        openItems.slice(0, 5).forEach(o => {
-          const row = document.createElement('div');
-          row.className = 'finance-row';
-          row.innerHTML = `
+    if (!data || data.length === 0) {
+      // Zera stat cards
+      setEl('ouv-stat-pendentes',  '0');
+      setEl('ouv-stat-analise',    '0');
+      setEl('ouv-stat-resolvidos', '0');
+      setEl('ouv-stat-total',      '0');
+      if (listEl) listEl.innerHTML =
+        '<div style="text-align:center;padding:28px;color:var(--text3)">' +
+        '<i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:10px;opacity:.3"></i>' +
+        'Nenhuma manifestação registrada ainda.</div>';
+      return;
+    }
+
+    // ── Contagens por status ───────────────────────────────
+    const pendentes  = data.filter(o => o.Status === 'Pendente').length;
+    const emAnalise  = data.filter(o => o.Status === 'Em análise').length;
+    const resolvidos = data.filter(o => o.Status === 'Resolvido').length;
+    const total      = data.length;
+
+    setEl('ouv-stat-pendentes',  pendentes);
+    setEl('ouv-stat-analise',    emAnalise);
+    setEl('ouv-stat-resolvidos', resolvidos);
+    setEl('ouv-stat-total',      total);
+
+    // ── Lista de solicitações abertas (não-resolvidas) ─────
+    if (listEl) {
+      const abertas = data
+        .filter(o => o.Status !== 'Resolvido')
+        .sort((a, b) => new Date(b.Data) - new Date(a.Data))
+        .slice(0, 5);
+
+      if (abertas.length === 0) {
+        listEl.innerHTML =
+          '<div style="text-align:center;padding:24px;color:var(--sage)">' +
+          '<i class="fas fa-check-circle" style="font-size:22px;display:block;margin-bottom:8px"></i>' +
+          'Nenhuma solicitação em aberto.</div>';
+      } else {
+        listEl.innerHTML = abertas.map(o => {
+          const num  = String(o.ID || '').slice(-4) || '????';
+          const desc = o.Mensagem ? o.Mensagem.substring(0, 70) + (o.Mensagem.length > 70 ? '…' : '') : '—';
+          return `<div class="finance-row">
             <div>
-              <div class="finance-desc">${esc(o.Assunto || o.Tipo)}: ${esc(o.Mensagem?.substring(0,60))}…</div>
-              <div class="finance-cat">#${esc(o.ID?.slice(-4) || '?')} • Anônimo • ${formatDate(o.Data)} • ${esc(o.Tipo)}</div>
+              <div class="finance-desc">${esc(o.Tipo || 'Manifestação')}: ${esc(desc)}</div>
+              <div class="finance-cat">#${esc(num)} • Anônimo • ${formatDate(o.Data)} • ${esc(o.Tipo || '—')}</div>
             </div>
-            <span class="badge ${statusBadge(o.Status)}">${esc(o.Status)}</span>`;
-          parentCard.appendChild(row);
-        });
+            <span class="badge ${statusBadge(o.Status)}">${esc(o.Status || '—')}</span>
+          </div>`;
+        }).join('');
       }
     }
-  } catch(e) { console.warn('loadOuvidoria:', e); }
+  } catch(e) {
+    console.warn('loadOuvidoria:', e);
+    // Em caso de erro, exibe indicadores zerados para não deixar skeleton
+    setEl('ouv-stat-pendentes',  '—');
+    setEl('ouv-stat-analise',    '—');
+    setEl('ouv-stat-resolvidos', '—');
+    setEl('ouv-stat-total',      '—');
+    if (listEl) listEl.innerHTML =
+      '<div style="text-align:center;padding:20px;color:var(--coral)">' +
+      '<i class="fas fa-exclamation-circle"></i> Erro ao carregar manifestações.</div>';
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -4457,41 +4596,78 @@ async function salvarOuvidoria() {
 async function exportarRelatorio(tipo) {
   if (!requireAdmin('exportar relatórios')) return;
 
-  const sheetMap = {
-    'Membros':           'Membros',
-    'Financeiro':        'Financeiro',
-    'Eventos':           'Eventos',
-    'Pesquisa':          'Pesquisas',
-    'Extensão':          'Extensao',
-    'Indicadores gerais':'Membros',
+  // Mapa direto: string exata do botão → configuração de exportação.
+  // 'formato' determina extensão e MIME do download.
+  // Tanto XLSX quanto PDF são exportados como CSV com BOM (compatível com
+  // Excel PT-BR para abertura direta); o nome do arquivo usa a extensão
+  // prometida para orientar o usuário, e um toast explica o formato real.
+  const exportMap = {
+    'Relatório semestral PDF': {
+      sheet:   'Eventos',
+      label:   'Eventos',
+      ext:     'csv',
+      nota:    'Exportado como CSV (abra no Excel para converter em PDF).',
+    },
+    'Planilha financeira XLSX': {
+      sheet:   'Financeiro',
+      label:   'Financeiro',
+      ext:     'csv',
+      nota:    'Exportado como CSV com BOM — abra no Excel e salve como .xlsx.',
+    },
+    'Lista de membros CSV': {
+      sheet:   'Membros',
+      label:   'Membros',
+      ext:     'csv',
+      nota:    null,
+    },
+    'Indicadores gerais': {
+      sheet:   'Membros',
+      label:   'Membros',
+      ext:     'csv',
+      nota:    null,
+    },
   };
 
-  const sheet = Object.entries(sheetMap).find(([k]) => tipo.toLowerCase().includes(k.toLowerCase()))?.[1] || 'Membros';
-  showToast(`Gerando relatório de ${tipo}…`, 'info');
+  const cfg = exportMap[tipo];
+  if (!cfg) {
+    showToast(`Tipo de exportação não reconhecido: "${tipo}"`, 'warning');
+    return;
+  }
+
+  showToast(`Gerando exportação: ${tipo}…`, 'info');
 
   try {
-    const data = await apiGet({ action: 'getAll', sheet });
+    const data = await apiGet({ action: 'getAll', sheet: cfg.sheet });
     if (!data || data.length === 0) {
       showToast('Nenhum dado disponível para exportar.', 'warning');
       return;
     }
 
+    const hoje    = new Date().toISOString().split('T')[0];
     const headers = Object.keys(data[0]);
     const csvRows = [
       headers.join(';'),
-      ...data.map(row => headers.map(h => `"${String(row[h] ?? '').replace(/"/g,'""')}"`).join(';'))
+      ...data.map(row =>
+        headers.map(h => `"${String(row[h] ?? '').replace(/"/g, '""')}"`).join(';')
+      ),
     ];
-    const csvContent = '\uFEFF' + csvRows.join('\r\n'); // BOM para Excel PT-BR
+    // BOM UTF-8 garante acentos no Excel PT-BR
+    const csvContent = '\uFEFF' + csvRows.join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `LAPA_${sheet}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `LAPA_${cfg.label}_${hoje}.${cfg.ext}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(`Relatório de ${tipo} exportado com sucesso!`, 'success');
+
+    if (cfg.nota) {
+      showToast(cfg.nota, 'info');
+    } else {
+      showToast(`"${tipo}" exportado com sucesso!`, 'success');
+    }
   } catch(e) {
     showToast('Erro ao exportar: ' + e.message, 'error');
   }
@@ -4813,13 +4989,28 @@ async function _aplicarTodosIndicadores() {
 
   // ── Indicadores de home/tesouraria ──────────────────────
   Object.entries(_indConfig).forEach(([key, cfg]) => {
-    const val = saved[key]?.valor        || cfg.defaultVal;
-    const ch  = saved[key]?.complemento  || cfg.defaultChange;
-    const el  = document.getElementById(cfg.valorId);
-    const chEl= document.getElementById(cfg.changeId);
+    const val = saved[key]?.valor       || cfg.defaultVal;
+    const ch  = saved[key]?.complemento || cfg.defaultChange;
+
+    // ID principal
+    const el   = document.getElementById(cfg.valorId);
+    const chEl = document.getElementById(cfg.changeId);
     if (el)   el.textContent = val;
     if (chEl) chEl.innerHTML = `<i class="fas ${cfg.changeIcon}"></i> ${ch}`;
     if (chEl && cfg.changeCls) chEl.className = 'stat-change ' + cfg.changeCls;
+
+    // IDs extras (mesmo indicador exibido em outras páginas, ex: Ensino)
+    (cfg.extraValorIds || []).forEach(id => {
+      const extra = document.getElementById(id);
+      if (extra) extra.textContent = val;
+    });
+    (cfg.extraChangeIds || []).forEach(id => {
+      const extra = document.getElementById(id);
+      if (extra) {
+        extra.innerHTML = `<i class="fas ${cfg.changeIcon}"></i> ${ch}`;
+        if (cfg.changeCls) extra.className = 'stat-change ' + cfg.changeCls;
+      }
+    });
   });
 
   // ── Indicadores de marketing ─────────────────────────────
@@ -4866,8 +5057,11 @@ const _indConfig = {
   },
   certificados_emitidos: {
     label: 'Certificados emitidos',
-    valorId: 'home-certs-val',
+    valorId:  'home-certs-val',
     changeId: 'home-certs-change',
+    // IDs adicionais do mesmo indicador em outras páginas (aba Ensino)
+    extraValorIds:  ['home-certs-val2'],
+    extraChangeIds: ['home-certs-change2'],
     defaultVal: '0',
     defaultChange: 'Acumulado no ano',
     changeIcon: 'fa-certificate',
@@ -5736,6 +5930,108 @@ function jsonErr(msg) {
 // ── Fim do código de referência do Apps Script ────────────────
 
 // ══════════════════════════════════════════════════════════════
+//  LOADER — RELATÓRIOS (gráficos dinâmicos)
+// ══════════════════════════════════════════════════════════════
+
+async function loadRelatorios() {
+  try {
+    const [eventos, membros] = await Promise.all([
+      apiGet({ action: 'getAll', sheet: 'Eventos' }),
+      apiGet({ action: 'getAll', sheet: 'Membros' }),
+    ]);
+
+    _renderRelEventosMes(eventos);
+    _renderRelMembrosSemestre(membros);
+  } catch(e) {
+    console.warn('loadRelatorios:', e);
+  }
+}
+
+/**
+ * Gráfico de barras: eventos por mês no ano corrente.
+ * Usa dados reais da sheet Eventos (campo: Data = "YYYY-MM-DD").
+ */
+function _renderRelEventosMes(eventos) {
+  const chart = document.getElementById('rel-chart-eventos');
+  if (!chart) return;
+
+  const anoAtual = new Date().getFullYear();
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const contagem = new Array(12).fill(0);
+
+  if (eventos && eventos.length > 0) {
+    eventos.forEach(ev => {
+      const d = new Date((ev.Data || '') + 'T00:00:00');
+      if (!isNaN(d) && d.getFullYear() === anoAtual) {
+        contagem[d.getMonth()]++;
+      }
+    });
+  }
+
+  const maxVal  = Math.max(...contagem, 1);
+  const mesAtual = new Date().getMonth();
+  const gradient = 'linear-gradient(0deg,var(--teal),var(--sky))';
+
+  chart.innerHTML = meses.map((mes, i) => {
+    const val     = contagem[i];
+    const altura  = Math.max(8, Math.round((val / maxVal) * 90));
+    const isFuturo = i > mesAtual;
+    const opacidade = isFuturo ? 'opacity:.25;' : '';
+    return `<div class="bar" style="height:${altura}%;background:${gradient};${opacidade}position:relative"
+              data-label="${mes}" title="${mes}: ${val} evento(s)">
+      <span style="position:absolute;top:-18px;width:100%;text-align:center;font-size:10px;color:var(--text2);font-weight:600">${val > 0 ? val : '—'}</span>
+    </div>`;
+  }).join('');
+}
+
+/**
+ * Gráfico de barras: membros cadastrados por semestre de ingresso.
+ * Usa dados reais da sheet Membros (campo: DataIngresso = "YYYY-MM-DD").
+ * Agrupa nos últimos 6 semestres.
+ */
+function _renderRelMembrosSemestre(membros) {
+  const chart = document.getElementById('rel-chart-membros');
+  if (!chart) return;
+
+  // Gera os 6 semestres mais recentes (inclusive o atual)
+  const semestres = [];
+  const hoje = new Date();
+  let ano = hoje.getFullYear();
+  let sem = hoje.getMonth() < 6 ? 1 : 2;
+  for (let i = 0; i < 6; i++) {
+    semestres.unshift({ label: `${ano}.${sem}`, ano, sem });
+    sem--;
+    if (sem === 0) { sem = 2; ano--; }
+  }
+
+  const contagem = {};
+  semestres.forEach(s => { contagem[s.label] = 0; });
+
+  if (membros && membros.length > 0) {
+    membros.forEach(m => {
+      const d = new Date((m.DataIngresso || '') + 'T00:00:00');
+      if (isNaN(d)) return;
+      const mSem   = d.getMonth() < 6 ? 1 : 2;
+      const mLabel = `${d.getFullYear()}.${mSem}`;
+      if (contagem[mLabel] !== undefined) contagem[mLabel]++;
+    });
+  }
+
+  const valores  = semestres.map(s => contagem[s.label]);
+  const maxVal   = Math.max(...valores, 1);
+  const gradient = 'linear-gradient(0deg,var(--lavender),var(--sky))';
+
+  chart.innerHTML = semestres.map((s, i) => {
+    const val    = valores[i];
+    const altura = Math.max(8, Math.round((val / maxVal) * 90));
+    return `<div class="bar" style="height:${altura}%;background:${gradient};position:relative"
+              data-label="${s.label}" title="${s.label}: ${val} membro(s) ingressante(s)">
+      <span style="position:absolute;top:-18px;width:100%;text-align:center;font-size:10px;color:var(--text2);font-weight:600">${val > 0 ? val : '—'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
 //  GRÁFICO DONUT — Distribuição por setor (dinâmico)
 // ══════════════════════════════════════════════════════════════
 
@@ -5878,17 +6174,16 @@ function _updateNavBadges({ eventos, ouvidoria, financeiro }) {
 // ══════════════════════════════════════════════════════════════
 
 function _updateExtensaoStats(data) {
-  const total      = data ? data.length : 0;
-  const pessoas    = data ? data.reduce((a, r) => a + (parseInt(r.Participantes) || 0), 0) : 0;
+  const total   = data ? data.length : 0;
+  const pessoas = data ? data.reduce((a, r) => a + (parseInt(r.Participantes) || 0), 0) : 0;
 
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setEl('ext-stat-acoes',        total || '—');
-  setEl('ext-stat-acoes-sub',    total > 0 ? `${total} ação(ões) registrada(s)` : 'Nenhuma ação ainda');
-  setEl('ext-stat-pessoas',      pessoas > 0 ? pessoas.toLocaleString('pt-BR') : '—');
-  setEl('ext-stat-pessoas-sub',  pessoas > 0 ? 'Participantes somados' : 'Sem dados de participantes');
-  // Parcerias: carregadas via sheet Parceiros (separada) – mostramos placeholder se não houver
-  setEl('ext-stat-parcerias',    '—');
-  setEl('ext-stat-parcerias-sub','Dados em Parceiros sheet');
+  setEl('ext-stat-acoes',       total || '—');
+  setEl('ext-stat-acoes-sub',   total > 0 ? `${total} ação(ões) registrada(s)` : 'Nenhuma ação ainda');
+  setEl('ext-stat-pessoas',     pessoas > 0 ? pessoas.toLocaleString('pt-BR') : '—');
+  setEl('ext-stat-pessoas-sub', pessoas > 0 ? 'Participantes somados' : 'Sem dados de participantes');
+  // NOTA: ext-stat-parcerias é atualizado exclusivamente por loadExtensao,
+  // que carrega a sheet Parceiros em paralelo. Não tocar aqui.
 }
 
 function _updatePesquisaStats(data) {
@@ -5949,7 +6244,7 @@ async function recarregarDados() {
       home: loadHomeStats, membros: loadMembros, secretaria: loadSecretaria,
       tesouraria: loadTesouraria, agenda: loadAgenda, pesquisa: loadPesquisa,
       extensao: loadExtensao, ensino: loadEnsino, ouvidoria: loadOuvidoria,
-      marketing: loadMarketing, documentos: loadDocumentos,
+      marketing: loadMarketing, documentos: loadDocumentos, relatorios: loadRelatorios,
     };
     if (loaders[id]) await loaders[id]();
   }
@@ -5963,14 +6258,54 @@ async function recarregarDados() {
 //  INICIALIZAÇÃO
 // ══════════════════════════════════════════════════════════════
 
+// ══════════════════════════════════════════════════════════════
+//  SIDEBAR MOBILE — toggle, overlay e fechamento automático
+// ══════════════════════════════════════════════════════════════
+
+function toggleMobileSidebar() {
+  const sidebar  = document.querySelector('.sidebar');
+  const overlay  = document.getElementById('sidebar-overlay');
+  const icon     = document.getElementById('hamburger-icon');
+  const isOpen   = sidebar.classList.contains('mobile-open');
+  if (isOpen) {
+    closeMobileSidebar();
+  } else {
+    sidebar.classList.add('mobile-open');
+    overlay.classList.add('visible');
+    icon.className = 'fas fa-times';
+  }
+}
+
+function closeMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const icon    = document.getElementById('hamburger-icon');
+  sidebar.classList.remove('mobile-open');
+  overlay.classList.remove('visible');
+  if (icon) icon.className = 'fas fa-bars';
+}
+
+// Fecha ao pressionar ESC (complementa o fechamento de modais)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.querySelector('.sidebar.mobile-open')) {
+    closeMobileSidebar();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
+  // Fecha sidebar mobile ao clicar em qualquer item de navegação
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 900) closeMobileSidebar();
+    });
+  });
   applyTheme();
   setupKanbanIds();
   await _restaurarDocsStatic(); // Restaura links/nomes dos cards estáticos via API
 
   // Verifica sessão salva
   const savedRole = sessionStorage.getItem('lapa-role');
-  if (savedRole && CREDENTIALS[savedRole]) {
+  if (savedRole && CREDENTIALS_HASH[savedRole]) {
     // Auto-login com sessão existente
     loginSuccess(savedRole);
   } else {
