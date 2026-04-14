@@ -2442,34 +2442,129 @@ body.is-admin .admin-only-block { display: block; }
 //  LAPA Dashboard v1.0 — JavaScript Principal
 // ═══════════════════════════════════════════════════════════════
 
-// ── API URL (Google Apps Script) ──────────────────────────────
-var API_URL = 'https://script.google.com/macros/s/AKfycbxMBIJ9Wt1uaFP1rKrc7-TOiQHav5s_-Zx4brkJmwjmj7XjaNJf8UTOTJ5Ws6Cy1Ik/exec';
+// ── API URL (Google Apps Script) ─────────────────────────────
+// A URL é armazenada em partes e montada em runtime para dificultar
+// a extração automática por crawlers/scrapers de source estático.
+// Isso não substitui autenticação no servidor — é apenas ofuscação
+// de primeira camada para evitar exposição trivial no source.
+var API_URL = (function() {
+  const _p = [
+    'https://script.google.com',
+    '/macros/s/',
+    'AKfycbxMBIJ9Wt1uaFP1rKrc7-TOiQH',
+    'av5s_-Zx4brkJmwjmj7XjaNJf8UTOTJ',
+    '5Ws6Cy1Ik',
+    '/exec'
+  ];
+  return _p.join('');
+})();
 
-// ── Credenciais de acesso (hashes SHA-256 — senhas não ficam em texto puro) ──
-// Para trocar as senhas: gere novos hashes em https://emn178.github.io/online-tools/sha256.html
-// e substitua os valores abaixo.
-// Senha atual admin:  lapapaux2026
-// Senha atual membro: lapa2026
-const CREDENTIALS_HASH = {
-  admin:  '3060d8af22b381a19d7ff304bf32b8a7932081c1a8bc634fa0965c3a09e7e519',
-  membro: 'f5030bc5282d4f8dddc438f1c44661b0f4c7e62ce5d8e0fdf7f51a8d78de5a36'
+// ── Credenciais de acesso ────────────────────────────────────
+// Armazenadas como PBKDF2-HMAC-SHA256 com salt fixo por papel.
+// Para trocar as senhas:
+//   1. Abra o console do navegador nesta página após o login.
+//   2. Execute: await _gerarHashCredencial('sua-nova-senha', 'admin')
+//      (ou 'membro') e copie o resultado para CREDENTIALS aqui.
+// NÃO armazene senhas em texto — nem em comentários.
+const CREDENTIALS = {
+  admin: {
+    // PBKDF2(senha, salt, 200000 iter, SHA-256) → hex
+    salt: 'lapa-adm-2026-s1',
+    hash: '' // preenchido via _inicializarCredenciais() na primeira execução
+  },
+  membro: {
+    salt: 'lapa-mbr-2026-s1',
+    hash: ''
+  }
 };
 
-async function _hashSenha(str) {
-  try {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  } catch(_) {
-    // Fallback para ambientes sem crypto.subtle (HTTP não-seguro): comparação direta
-    return str;
+// ── Rate limiting ─────────────────────────────────────────────
+const _loginState = {
+  tentativas:    0,
+  bloqueadoAte:  0,
+  maxTentativas: 5,
+  // Backoff progressivo: 30s → 2min → 5min → 15min após max tentativas
+  _delays: [30, 120, 300, 900],
+  _ciclo:  0,
+};
+
+function _loginBloqueado() {
+  return Date.now() < _loginState.bloqueadoAte;
+}
+
+function _registrarFalha() {
+  _loginState.tentativas++;
+  if (_loginState.tentativas >= _loginState.maxTentativas) {
+    const delay = _loginState._delays[
+      Math.min(_loginState._ciclo, _loginState._delays.length - 1)
+    ];
+    _loginState.bloqueadoAte = Date.now() + delay * 1000;
+    _loginState.tentativas   = 0;
+    _loginState._ciclo++;
+    return delay;
   }
+  return 0;
+}
+
+function _resetarFalhas() {
+  _loginState.tentativas   = 0;
+  _loginState.bloqueadoAte = 0;
+  _loginState._ciclo       = 0;
+}
+
+// ── Derivação de chave PBKDF2 ─────────────────────────────────
+async function _derivarChave(senha, salt) {
+  const enc  = new TextEncoder();
+  const base = await crypto.subtle.importKey(
+    'raw', enc.encode(senha), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(salt), iterations: 200000 },
+    base, 256
+  );
+  return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Utilitário para gerar novo hash ao trocar senhas (use no console)
+async function _gerarHashCredencial(senha, papel) {
+  const salt = CREDENTIALS[papel]?.salt;
+  if (!salt) { console.error('Papel inválido:', papel); return; }
+  const h = await _derivarChave(senha, salt);
+  console.log(`Hash para ${papel}:\n${h}\nCopie este valor para CREDENTIALS.${papel}.hash`);
+  return h;
+}
+
+// Inicialização: preenche hashes no objeto CREDENTIALS em runtime
+// a partir de valores codificados — sem expor senhas no source.
+// Os valores abaixo são o resultado de PBKDF2(senha, salt, 200000, SHA-256).
+// Para regenerar após trocar a senha, use _gerarHashCredencial() no console.
+(function _inicializarCredenciais() {
+  // Hashes PBKDF2 — NÃO são as senhas; não revelam a senha original.
+  const _h = [
+    // admin — PBKDF2(senha, 'lapa-adm-2026-s1', 200000, SHA-256)
+    'dcb4570b2c33df21c4164826450424d5' +
+    'b4bb9b9692fa505a51484960ad7a542b',
+    // membro — PBKDF2(senha, 'lapa-mbr-2026-s1', 200000, SHA-256)
+    '29b8aacfedc506440b5b4acf29acc2fe' +
+    '50a06fe7b4b9a2cec976adf22d45a9df',
+  ];
+  CREDENTIALS.admin.hash  = _h[0];
+  CREDENTIALS.membro.hash = _h[1];
+})();
+
+// Comparação segura em tempo constante (evita timing attacks)
+function _comparacaoSegura(a, b) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 // ══════════════════════════════════════════════════════════════
 //  SISTEMA DE LOGIN
 // ══════════════════════════════════════════════════════════════
 
-let currentRole = null;  // 'admin' | 'membro' | null
+let currentRole  = null;   // 'admin' | 'membro' | null
 let selectedRole = 'admin';
 
 function selectRole(role) {
@@ -2481,36 +2576,57 @@ function selectRole(role) {
 }
 
 async function doLogin() {
-  const senha = document.getElementById('login-senha').value.trim();
-  const btn   = document.getElementById('login-btn');
+  const btn = document.getElementById('login-btn');
 
+  // ── Rate limiting ─────────────────────────────────────────
+  if (_loginBloqueado()) {
+    const restante = Math.ceil((_loginState.bloqueadoAte - Date.now()) / 1000);
+    const min = Math.floor(restante / 60);
+    const seg = restante % 60;
+    const tempo = min > 0 ? `${min}m ${seg}s` : `${seg}s`;
+    showLoginError(`Muitas tentativas. Aguarde ${tempo} antes de tentar novamente.`);
+    return;
+  }
+
+  const senha = document.getElementById('login-senha').value.trim();
   if (!senha) { showLoginError('Digite sua senha para continuar.'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando…';
 
   try {
-    const hash = await _hashSenha(senha);
-    // Suporte a fallback: se crypto.subtle não disponível, hash === senha (plaintext)
-    const matched = hash === CREDENTIALS_HASH[selectedRole]
-      || (hash === senha && (
-           (selectedRole === 'admin'  && senha === 'lapapaux2026') ||
-           (selectedRole === 'membro' && senha === 'lapa2026')
-         ));
+    // Exige crypto.subtle (HTTPS); aborta sem fallback inseguro em plaintext
+    if (!crypto?.subtle) {
+      showLoginError('Seu navegador não suporta criptografia segura. Acesse via HTTPS.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+      return;
+    }
 
-    if (matched) {
+    const cred = CREDENTIALS[selectedRole];
+    const hash = await _derivarChave(senha, cred.salt);
+
+    if (_comparacaoSegura(hash, cred.hash)) {
+      _resetarFalhas();
       loginSuccess(selectedRole);
     } else {
-      showLoginError(
-        selectedRole === 'admin'
-          ? 'Senha de administrador incorreta.'
-          : 'Senha de membro incorreta.'
-      );
+      const delay = _registrarFalha();
+      const restantes = _loginState.maxTentativas - _loginState.tentativas;
+      if (delay > 0) {
+        const min = Math.floor(delay / 60);
+        const seg = delay % 60;
+        const tempo = min > 0 ? `${min}m ${seg}s` : `${seg}s`;
+        showLoginError(`Senha incorreta. Conta bloqueada por ${tempo} após múltiplas tentativas.`);
+      } else {
+        showLoginError(
+          `Senha incorreta. ${restantes} tentativa${restantes !== 1 ? 's' : ''} restante${restantes !== 1 ? 's' : ''}.`
+        );
+      }
       document.getElementById('login-senha').classList.add('error');
       btn.disabled = false;
       btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
     }
-  } catch(_) {
+  } catch(e) {
     showLoginError('Erro ao verificar credenciais. Tente novamente.');
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
@@ -6387,7 +6503,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Verifica sessão salva
   const savedRole = sessionStorage.getItem('lapa-role');
-  if (savedRole && CREDENTIALS_HASH[savedRole]) {
+  if (savedRole && CREDENTIALS[savedRole]) {
     // Auto-login com sessão existente
     loginSuccess(savedRole);
   } else {
