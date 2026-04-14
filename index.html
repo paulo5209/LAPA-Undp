@@ -1494,7 +1494,7 @@ body.is-admin .admin-only-block { display: block; }
         <div class="card">
           <div class="card-header">
             <div class="card-title">Parceiros</div>
-            <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-nova-acao')" style="display:none"><i class="fas fa-plus"></i> Parceiro</button>
+            <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-novo-parceiro')"><i class="fas fa-plus"></i> Parceiro</button>
           </div>
           <div id="extensao-parceiros-list">
             <div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
@@ -1598,10 +1598,10 @@ body.is-admin .admin-only-block { display: block; }
       <div class="card">
         <div class="card-header"><div class="card-title">Exportar relatórios</div></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <button class="btn btn-outline" onclick="exportarRelatorio('Relatório semestral PDF')"><i class="fas fa-file-pdf" style="color:var(--coral)"></i> Relatório semestral (PDF)</button>
-          <button class="btn btn-outline" onclick="exportarRelatorio('Planilha financeira XLSX')"><i class="fas fa-file-excel" style="color:var(--sage)"></i> Planilha financeira (XLSX)</button>
-          <button class="btn btn-outline" onclick="exportarRelatorio('Lista de membros CSV')"><i class="fas fa-file-alt" style="color:var(--teal)"></i> Lista de membros (CSV)</button>
-          <button class="btn btn-outline" onclick="exportarRelatorio('Indicadores gerais')"><i class="fas fa-chart-bar" style="color:var(--lavender)"></i> Indicadores gerais</button>
+          <button class="btn btn-outline" data-export="Relatório semestral CSV"><i class="fas fa-file-csv" style="color:var(--coral)"></i> Relatório semestral (CSV)</button>
+          <button class="btn btn-outline" data-export="Planilha financeira XLSX"><i class="fas fa-file-excel" style="color:var(--sage)"></i> Planilha financeira (XLSX)</button>
+          <button class="btn btn-outline" data-export="Lista de membros CSV"><i class="fas fa-file-alt" style="color:var(--teal)"></i> Lista de membros (CSV)</button>
+          <button class="btn btn-outline" data-export="Indicadores gerais"><i class="fas fa-chart-bar" style="color:var(--lavender)"></i> Indicadores gerais</button>
         </div>
       </div>
     </div>
@@ -1614,8 +1614,8 @@ body.is-admin .admin-only-block { display: block; }
       <div class="section-sub">Diretório completo de todos os integrantes ativos e inativos.</div>
       <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
         <div class="search-box" style="flex:1;min-width:200px"><i class="fas fa-search" style="color:var(--text3)"></i><input type="text" placeholder="Buscar membro…"></div>
-        <select class="form-select" style="width:auto;padding:8px 12px"><option>Todos os setores</option><option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option><option>Extensão</option><option>Ensino</option></select>
-        <select class="form-select" style="width:auto;padding:8px 12px"><option>Todos os status</option><option>Ativo</option><option>Afastado</option><option>Desligado</option></select>
+        <select id="mbr-filter-setor" class="form-select" style="width:auto;padding:8px 12px"><option>Todos os setores</option><option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option><option>Extensão</option><option>Ensino</option></select>
+        <select id="mbr-filter-status" class="form-select" style="width:auto;padding:8px 12px"><option>Todos os status</option><option>Ativo</option><option>Afastado</option><option>Desligado</option></select>
         <button class="btn btn-primary admin-only" onclick="openModal('modal-add-membro')"><i class="fas fa-user-plus"></i> Adicionar membro</button>
       </div>
       <div class="card" style="padding:0">
@@ -1775,15 +1775,15 @@ body.is-admin .admin-only-block { display: block; }
       <button class="modal-close" onclick="closeModal('modal-nova-ata')">✕</button>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo de reunião</label><select class="form-select"><option>Ordinária</option><option>Extraordinária</option><option>Diretoria</option></select></div>
-      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Tipo de reunião</label><select id="ata-tipo" class="form-select"><option>Ordinária</option><option>Extraordinária</option><option>Diretoria</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input id="ata-data" class="form-input" type="date"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Horário</label><input class="form-input" type="time"></div>
-      <div class="form-group"><label class="form-label">Nº de presentes</label><input class="form-input" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Horário de início</label><input id="ata-horario" class="form-input" type="time"></div>
+      <div class="form-group"><label class="form-label">Nº de presentes</label><input id="ata-presentes" class="form-input" type="number" placeholder="0"></div>
     </div>
-    <div class="form-group"><label class="form-label">Pauta</label><textarea class="form-textarea" placeholder="Liste os pontos de pauta da reunião…"></textarea></div>
-    <div class="form-group"><label class="form-label">Deliberações</label><textarea class="form-textarea" placeholder="Registre as decisões tomadas…"></textarea></div>
+    <div class="form-group"><label class="form-label">Pauta</label><textarea id="ata-pauta" class="form-textarea" placeholder="Liste os pontos de pauta da reunião…"></textarea></div>
+    <div class="form-group"><label class="form-label">Deliberações</label><textarea id="ata-deliberacoes" class="form-textarea" placeholder="Registre as decisões tomadas…"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-nova-ata')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-save"></i> Salvar ata</button>
@@ -1830,18 +1830,18 @@ body.is-admin .admin-only-block { display: block; }
       <button class="modal-close" onclick="closeModal('modal-add-membro')">✕</button>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" placeholder="Nome do membro"></div>
-      <div class="form-group"><label class="form-label">Matrícula</label><input class="form-input" type="text" placeholder="Ex: 2023001"></div>
+      <div class="form-group"><label class="form-label">Nome completo</label><input id="mb-nome" class="form-input" type="text" placeholder="Nome do membro"></div>
+      <div class="form-group"><label class="form-label">Matrícula</label><input id="mb-matricula" class="form-input" type="text" placeholder="Ex: 2023001"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Período</label><select class="form-select"><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option><option>7º</option><option>8º</option></select></div>
-      <div class="form-group"><label class="form-label">Setor</label><select class="form-select"><option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option><option>Extensão</option><option>Ensino</option><option>Secretaria</option></select></div>
+      <div class="form-group"><label class="form-label">Período</label><select id="mb-periodo" class="form-select"><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option><option>7º</option><option>8º</option></select></div>
+      <div class="form-group"><label class="form-label">Setor</label><select id="mb-setor" class="form-select"><option>Pesquisa</option><option>Marketing</option><option>Tesouraria</option><option>Extensão</option><option>Ensino</option><option>Secretaria</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Cargo</label><select class="form-select"><option>Membro</option><option>Coordenador(a)</option><option>Diretor(a)</option><option>Presidente</option><option>Vice-Presidente</option><option>Tesoureiro(a)</option><option>Secretário(a)</option></select></div>
-      <div class="form-group"><label class="form-label">Data de ingresso</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Cargo</label><select id="mb-cargo" class="form-select"><option>Membro</option><option>Coordenador(a)</option><option>Diretor(a)</option><option>Presidente</option><option>Vice-Presidente</option><option>Tesoureiro(a)</option><option>Secretário(a)</option></select></div>
+      <div class="form-group"><label class="form-label">Data de ingresso</label><input id="mb-data-ingresso" class="form-input" type="date"></div>
     </div>
-    <div class="form-group"><label class="form-label">Email institucional</label><input class="form-input" type="email" placeholder="nome@faculdade.edu.br"></div>
+    <div class="form-group"><label class="form-label">Email institucional</label><input id="mb-email" class="form-input" type="email" placeholder="nome@faculdade.edu.br"></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-add-membro')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-user-plus"></i> Adicionar</button>
@@ -1857,15 +1857,15 @@ body.is-admin .admin-only-block { display: block; }
       <button class="modal-close" onclick="closeModal('modal-lancamento')">✕</button>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Receita</option><option>Despesa</option></select></div>
-      <div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" type="number" placeholder="0,00" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select id="lanc-tipo" class="form-select"><option>Receita</option><option>Despesa</option></select></div>
+      <div class="form-group"><label class="form-label">Valor (R$)</label><input id="lanc-valor" class="form-input" type="number" placeholder="0,00" step="0.01"></div>
     </div>
-    <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" type="text" placeholder="Descreva o lançamento"></div>
+    <div class="form-group"><label class="form-label">Descrição</label><input id="lanc-descricao" class="form-input" type="text" placeholder="Descreva o lançamento"></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Categoria</label><select class="form-select"><option>Mensalidades</option><option>Eventos</option><option>Material</option><option>Patrocínio</option><option>Administrativo</option><option>Pesquisa</option></select></div>
-      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Categoria</label><select id="lanc-categoria" class="form-select"><option>Mensalidades</option><option>Eventos</option><option>Material</option><option>Patrocínio</option><option>Administrativo</option><option>Pesquisa</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input id="lanc-data" class="form-input" type="date"></div>
     </div>
-    <div class="form-group"><label class="form-label">Comprovante (opcional)</label><input class="form-input" type="file" style="padding:8px"></div>
+    <div class="form-group"><label class="form-label">Comprovante (opcional)</label><input id="lanc-comprovante" class="form-input" type="file" style="padding:8px"></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-lancamento')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-save"></i> Registrar</button>
@@ -1880,18 +1880,18 @@ body.is-admin .admin-only-block { display: block; }
       <div class="modal-title">Novo Evento</div>
       <button class="modal-close" onclick="closeModal('modal-novo-evento')">✕</button>
     </div>
-    <div class="form-group"><label class="form-label">Título do evento</label><input class="form-input" type="text" placeholder="Nome do evento"></div>
+    <div class="form-group"><label class="form-label">Título do evento</label><input id="ev-titulo" class="form-input" type="text" placeholder="Nome do evento"></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Palestra</option><option>Workshop</option><option>Reunião</option><option>Jornada</option><option>Ação de extensão</option><option>Congresso</option></select></div>
-      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select id="ev-tipo" class="form-select"><option>Palestra</option><option>Workshop</option><option>Reunião</option><option>Jornada</option><option>Ação de extensão</option><option>Congresso</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input id="ev-data" class="form-input" type="date"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Horário início</label><input class="form-input" type="time"></div>
-      <div class="form-group"><label class="form-label">Horário fim</label><input class="form-input" type="time"></div>
+      <div class="form-group"><label class="form-label">Horário início</label><input id="ev-hora-inicio" class="form-input" type="time"></div>
+      <div class="form-group"><label class="form-label">Horário fim</label><input id="ev-hora-fim" class="form-input" type="time"></div>
     </div>
-    <div class="form-group"><label class="form-label">Local</label><input class="form-input" type="text" placeholder="Ex: Auditório A, Sala 204"></div>
-    <div class="form-group"><label class="form-label">Palestrante / Responsável</label><input class="form-input" type="text" placeholder="Nome e cargo"></div>
-    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" placeholder="Descreva o evento…"></textarea></div>
+    <div class="form-group"><label class="form-label">Local</label><input id="ev-local" class="form-input" type="text" placeholder="Ex: Auditório A, Sala 204"></div>
+    <div class="form-group"><label class="form-label">Palestrante / Responsável</label><input id="ev-responsavel" class="form-input" type="text" placeholder="Nome e cargo"></div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea id="ev-descricao" class="form-textarea" placeholder="Descreva o evento…"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-novo-evento')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-calendar-plus"></i> Criar evento</button>
@@ -1906,16 +1906,16 @@ body.is-admin .admin-only-block { display: block; }
       <div class="modal-title">Novo Projeto de Pesquisa</div>
       <button class="modal-close" onclick="closeModal('modal-novo-projeto')">✕</button>
     </div>
-    <div class="form-group"><label class="form-label">Título do projeto</label><input class="form-input" type="text" placeholder="Título completo"></div>
+    <div class="form-group"><label class="form-label">Título do projeto</label><input id="proj-titulo" class="form-input" type="text" placeholder="Título completo"></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo de estudo</label><select class="form-select"><option>Transversal</option><option>Longitudinal</option><option>Ensaio clínico</option><option>Revisão sistemática</option><option>Observacional</option></select></div>
-      <div class="form-group"><label class="form-label">Status</label><select class="form-select"><option>Planejamento</option><option>Aguardando CEP</option><option>Coleta de dados</option><option>Análise</option><option>Escrita</option><option>Publicado</option></select></div>
+      <div class="form-group"><label class="form-label">Tipo de estudo</label><select id="proj-tipo-estudo" class="form-select"><option>Transversal</option><option>Longitudinal</option><option>Ensaio clínico</option><option>Revisão sistemática</option><option>Observacional</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select id="proj-status" class="form-select"><option>Planejamento</option><option>Aguardando CEP</option><option>Coleta de dados</option><option>Análise</option><option>Escrita</option><option>Publicado</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">CAAE (se houver)</label><input class="form-input" type="text" placeholder="Nº CAAE"></div>
-      <div class="form-group"><label class="form-label">Nº de pesquisadores</label><input class="form-input" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">CAAE (se houver)</label><input id="proj-caae" class="form-input" type="text" placeholder="Nº CAAE"></div>
+      <div class="form-group"><label class="form-label">Nº de pesquisadores</label><input id="proj-pesquisadores" class="form-input" type="number" placeholder="0"></div>
     </div>
-    <div class="form-group"><label class="form-label">Descrição / Objetivos</label><textarea class="form-textarea" placeholder="Descreva o projeto e seus objetivos…"></textarea></div>
+    <div class="form-group"><label class="form-label">Descrição / Objetivos</label><textarea id="proj-descricao" class="form-textarea" placeholder="Descreva o projeto e seus objetivos…"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-novo-projeto')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-flask"></i> Cadastrar projeto</button>
@@ -1950,16 +1950,16 @@ body.is-admin .admin-only-block { display: block; }
       <div class="modal-title">Novo Curso / Capacitação</div>
       <button class="modal-close" onclick="closeModal('modal-novo-curso')">✕</button>
     </div>
-    <div class="form-group"><label class="form-label">Título</label><input class="form-input" type="text" placeholder="Nome do curso"></div>
+    <div class="form-group"><label class="form-label">Título</label><input id="curso-titulo" class="form-input" type="text" placeholder="Nome do curso"></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Modalidade</label><select class="form-select"><option>Presencial</option><option>Online</option><option>Híbrido</option></select></div>
-      <div class="form-group"><label class="form-label">Carga horária (h)</label><input class="form-input" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Modalidade</label><select id="curso-modalidade" class="form-select"><option>Presencial</option><option>Online</option><option>Híbrido</option></select></div>
+      <div class="form-group"><label class="form-label">Carga horária (h)</label><input id="curso-carga-horaria" class="form-input" type="number" placeholder="0"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Vagas</label><input class="form-input" type="number" placeholder="0"></div>
-      <div class="form-group"><label class="form-label">Data início</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Vagas</label><input id="curso-vagas" class="form-input" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Data início</label><input id="curso-data-inicio" class="form-input" type="date"></div>
     </div>
-    <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" placeholder="Descreva os objetivos do curso…"></textarea></div>
+    <div class="form-group"><label class="form-label">Descrição</label><textarea id="curso-descricao" class="form-textarea" placeholder="Descreva os objetivos do curso…"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-novo-curso')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-graduation-cap"></i> Criar curso</button>
@@ -1974,18 +1974,40 @@ body.is-admin .admin-only-block { display: block; }
       <div class="modal-title">Nova Ação de Extensão</div>
       <button class="modal-close" onclick="closeModal('modal-nova-acao')">✕</button>
     </div>
-    <div class="form-group"><label class="form-label">Nome da ação</label><input class="form-input" type="text" placeholder="Ex: Treinamento de RCP na Praça"></div>
+    <div class="form-group"><label class="form-label">Nome da ação</label><input id="acao-nome" class="form-input" type="text" placeholder="Ex: Treinamento de RCP na Praça"></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Treinamento prático</option><option>Palestra</option><option>Simulação de emergência</option><option>Campanha</option><option>Triagem</option></select></div>
-      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select id="acao-tipo" class="form-select"><option>Treinamento prático</option><option>Palestra</option><option>Simulação de emergência</option><option>Campanha</option><option>Triagem</option></select></div>
+      <div class="form-group"><label class="form-label">Data</label><input id="acao-data" class="form-input" type="date"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Local / Parceiro</label><input class="form-input" type="text" placeholder="Ex: CAPS II Centro"></div>
-      <div class="form-group"><label class="form-label">Pessoas impactadas</label><input class="form-input" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Local / Parceiro</label><input id="acao-local" class="form-input" type="text" placeholder="Ex: CAPS II Centro"></div>
+      <div class="form-group"><label class="form-label">Pessoas impactadas</label><input id="acao-participantes" class="form-input" type="number" placeholder="0"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-nova-acao')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-hands-helping"></i> Registrar ação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Parceiro -->
+<div class="modal-overlay" id="modal-novo-parceiro">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Parceiro</div>
+      <button class="modal-close" onclick="closeModal('modal-novo-parceiro')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Nome da instituição / organização</label><input id="parc-nome" class="form-input" type="text" placeholder="Ex: UPA Central"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Área de atuação</label><input id="parc-area" class="form-input" type="text" placeholder="Ex: Saúde pública"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select id="parc-status" class="form-select"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição / tipo de parceria</label><textarea id="parc-descricao" class="form-textarea" placeholder="Descreva o tipo de parceria…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-novo-parceiro')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarParceiro()"><i class="fas fa-handshake"></i> Cadastrar parceiro</button>
     </div>
   </div>
 </div>
@@ -1998,11 +2020,11 @@ body.is-admin .admin-only-block { display: block; }
       <button class="modal-close" onclick="closeModal('modal-nova-corr')">✕</button>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Ofício</option><option>Carta</option><option>Email institucional</option><option>Memorando</option></select></div>
-      <div class="form-group"><label class="form-label">Destinatário</label><input class="form-input" type="text" placeholder="Para quem é enviado"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select id="corr-tipo" class="form-select"><option>Ofício</option><option>Carta</option><option>Email institucional</option><option>Memorando</option></select></div>
+      <div class="form-group"><label class="form-label">Destinatário</label><input id="corr-destinatario" class="form-input" type="text" placeholder="Para quem é enviado"></div>
     </div>
-    <div class="form-group"><label class="form-label">Assunto</label><input class="form-input" type="text" placeholder="Assunto da correspondência"></div>
-    <div class="form-group"><label class="form-label">Corpo</label><textarea class="form-textarea" style="min-height:120px" placeholder="Conteúdo da correspondência…"></textarea></div>
+    <div class="form-group"><label class="form-label">Assunto</label><input id="corr-assunto" class="form-input" type="text" placeholder="Assunto da correspondência"></div>
+    <div class="form-group"><label class="form-label">Corpo</label><textarea id="corr-corpo" class="form-textarea" style="min-height:120px" placeholder="Conteúdo da correspondência…"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-nova-corr')">Cancelar</button>
       <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> Registrar envio</button>
@@ -2531,6 +2553,7 @@ function loginSuccess(role) {
   setupFilters();
   bindModalButtons();
   loadHomeStats();
+  _restaurarDocsStatic(); // Seguro: executada após autenticação confirmada
 
   showToast('Bem-vindo' + (role === 'admin' ? ', Administrador!' : ' à LAPA!'), 'success');
   _aplicarTodosIndicadores();
@@ -2669,7 +2692,7 @@ function openModal(id) {
   // Modais de edição/criação exigem admin
   const adminModals = ['modal-add-membro','modal-nova-ata','modal-lancamento',
     'modal-novo-evento','modal-novo-projeto','modal-novo-curso',
-    'modal-nova-acao','modal-nova-corr','modal-new-task',
+    'modal-nova-acao','modal-novo-parceiro','modal-nova-corr','modal-new-task',
     'modal-upload-doc','modal-edit-membro','modal-edit-evento',
     'modal-edit-projeto','modal-edit-ata','modal-configuracoes',
     'modal-edit-doc-static'];
@@ -2864,7 +2887,8 @@ async function apiPost(payload) {
 // ══════════════════════════════════════════════════════════════
 
 function setupSearch() {
-  document.querySelectorAll('.search-box input').forEach(input => {
+  // Exclui #sec-filter-busca: já tratado por filterSecMembros() via setupFilters()
+  document.querySelectorAll('.search-box input:not(#sec-filter-busca)').forEach(input => {
     input.addEventListener('input', function () {
       const val = this.value.toLowerCase().trim();
 
@@ -2892,10 +2916,11 @@ function setupSearch() {
 // ══════════════════════════════════════════════════════════════
 
 function setupFilters() {
-  // Filtro de setor + status na página Membros
-  document.querySelectorAll('#page-membros select').forEach(sel => {
-    sel.addEventListener('change', filterMembros);
-  });
+  // Filtro de setor + status na página Membros — usa IDs estáveis
+  const mbrSetor  = document.getElementById('mbr-filter-setor');
+  const mbrStatus = document.getElementById('mbr-filter-status');
+  if (mbrSetor)  mbrSetor.addEventListener('change',  filterMembros);
+  if (mbrStatus) mbrStatus.addEventListener('change', filterMembros);
 
   // Filtro de setor na Secretaria (sec-membros-ctrl) — select + input de busca
   const secSetor = document.getElementById('sec-filter-setor');
@@ -2921,9 +2946,8 @@ function filterSecMembros() {
 }
 
 function filterMembros() {
-  const sels   = document.querySelectorAll('#page-membros select');
-  const setor  = sels[0]?.value || 'Todos os setores';
-  const status = sels[1]?.value || 'Todos os status';
+  const setor  = document.getElementById('mbr-filter-setor')?.value  || 'Todos os setores';
+  const status = document.getElementById('mbr-filter-status')?.value || 'Todos os status';
 
   document.querySelectorAll('#members-table tr:not(#members-empty)').forEach(row => {
     const rowText = row.textContent;
@@ -3455,6 +3479,7 @@ async function loadAgenda() {
 
     if (!data || data.length === 0) {
       setEmptyMsg('agenda-list-container', 'fa-calendar-alt', 'Nenhum evento cadastrado ainda.');
+      renderCalendar(_calYear, _calMonth, []); // garante calendário vazio renderizado
       return;
     }
 
@@ -3496,6 +3521,7 @@ async function loadAgenda() {
 
   } catch(e) {
     setEmptyMsg('agenda-list-container', 'fa-exclamation-circle', 'Erro ao carregar agenda.');
+    renderCalendar(_calYear, _calMonth, []); // garante calendário vazio mesmo em caso de erro
   }
 }
 
@@ -3917,6 +3943,7 @@ async function loadMarketing() {
     // ── Mapeamento exato Status → coluna ──────────────────
     const cols = {
       'Ideia':     'backlog-col',
+      'Backlog':   'backlog-col',   // alias explícito — evita fallback silencioso
       'Produção':  'producao-col',
       'Revisão':   'revisao-col',
       'Publicado': 'publicado-col',
@@ -3953,12 +3980,16 @@ async function loadMarketing() {
     const counts = { 'backlog-col':0,'producao-col':0,'revisao-col':0,'publicado-col':0 };
 
     data.forEach(t => {
-      // Mapeamento direto por Status exato; fallback para Backlog
-      const colId = cols[t.Status] || 'backlog-col';
-      const col   = document.getElementById(colId);
+      // Mapeamento direto por Status exato; fallback para Backlog com aviso
+      const colId = cols[t.Status];
+      if (!colId) {
+        console.warn(`[Kanban] Status desconhecido "${t.Status}" na tarefa ID=${t.ID} — alocado em Backlog por fallback.`);
+      }
+      const resolvedColId = colId || 'backlog-col';
+      const col   = document.getElementById(resolvedColId);
       if (!col) return;
 
-      counts[colId] = (counts[colId] || 0) + 1;
+      counts[resolvedColId] = (counts[resolvedColId] || 0) + 1;
 
       // Evita duplicata
       if (col.querySelector(`[data-task-id="${CSS.escape(String(t.ID))}"]`)) return;
@@ -4118,23 +4149,21 @@ async function deleteMembro(id, nome) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  SALVAR — MEMBRO
+//  SALVAR — MEMBRO (IDs semânticos — sem índice posicional)
 // ══════════════════════════════════════════════════════════════
 
 async function salvarMembro() {
   if (!requireAdmin('adicionar membros')) return;
   const modal = document.getElementById('modal-add-membro');
-  const inputs   = modal.querySelectorAll('input');
-  const selects  = modal.querySelectorAll('select');
 
   const row = {
-    Nome:         inputs[0]?.value.trim() || '',
-    Matricula:    inputs[1]?.value.trim() || '',
-    Periodo:      selects[0]?.value || '',
-    Setor:        selects[1]?.value || '',
-    Cargo:        selects[2]?.value || '',
-    DataIngresso: inputs[2]?.value || new Date().toISOString().split('T')[0],
-    Email:        inputs[3]?.value.trim() || '',
+    Nome:         document.getElementById('mb-nome')?.value.trim()         || '',
+    Matricula:    document.getElementById('mb-matricula')?.value.trim()    || '',
+    Periodo:      document.getElementById('mb-periodo')?.value             || '',
+    Setor:        document.getElementById('mb-setor')?.value               || '',
+    Cargo:        document.getElementById('mb-cargo')?.value               || '',
+    DataIngresso: document.getElementById('mb-data-ingresso')?.value       || new Date().toISOString().split('T')[0],
+    Email:        document.getElementById('mb-email')?.value.trim()        || '',
     Status:       'Ativo'
   };
 
@@ -4163,18 +4192,29 @@ async function salvarMembro() {
 
 async function salvarAta() {
   if (!requireAdmin('registrar atas')) return;
-  const modal   = document.getElementById('modal-nova-ata');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
-  const textas  = modal.querySelectorAll('textarea');
+  const modal = document.getElementById('modal-nova-ata');
+
+  const tipo     = document.getElementById('ata-tipo')?.value     || 'Ordinária';
+  const data     = document.getElementById('ata-data')?.value     || '';
+  const horario  = document.getElementById('ata-horario')?.value  || '';
+  const presentes= document.getElementById('ata-presentes')?.value|| '0';
+  const pauta    = document.getElementById('ata-pauta')?.value    || '';
+  const deliber  = document.getElementById('ata-deliberacoes')?.value || '';
+
+  const dataPtBR = data
+    ? new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+    : '';
 
   const row = {
-    Titulo:    `Reunião ${selects[0]?.value} — ${new Date(inputs[0]?.value + 'T00:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}`,
-    Data:      inputs[0]?.value || '',
-    Duracao:   inputs[1]?.value || '',
-    Presentes: inputs[2]?.value || '0',
-    Status:    'Pendente assinatura',
-    Conteudo:  (textas[0]?.value || '') + '\n\nDeliberações:\n' + (textas[1]?.value || '')
+    Titulo:       `Reunião ${tipo} — ${dataPtBR}`,
+    Tipo:         tipo,
+    Data:         data,
+    HorarioInicio:horario,   // campo semântico correto: hora de início
+    Duracao:      '',         // duração (não preenchida neste modal; editável em modal-edit-ata)
+    Presentes:    presentes,
+    Pauta:        pauta,
+    Deliberacoes: deliber,
+    Status:       'Pendente assinatura'
   };
 
   if (!row.Data) { showToast('Informe a data da reunião.', 'warning'); return; }
@@ -4201,16 +4241,14 @@ async function salvarAta() {
 
 async function salvarLancamento() {
   if (!requireAdmin('registrar lançamentos')) return;
-  const modal   = document.getElementById('modal-lancamento');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
+  const modal = document.getElementById('modal-lancamento');
 
   const row = {
-    Tipo:      selects[0]?.value || 'Receita',
-    Valor:     inputs[0]?.value || '0',
-    Descricao: inputs[1]?.value.trim() || '',
-    Categoria: selects[1]?.value || '',
-    Data:      inputs[2]?.value || new Date().toISOString().split('T')[0]
+    Tipo:      document.getElementById('lanc-tipo')?.value                    || 'Receita',
+    Valor:     document.getElementById('lanc-valor')?.value                   || '0',
+    Descricao: document.getElementById('lanc-descricao')?.value.trim()        || '',
+    Categoria: document.getElementById('lanc-categoria')?.value               || '',
+    Data:      document.getElementById('lanc-data')?.value                    || new Date().toISOString().split('T')[0]
   };
 
   if (!row.Descricao) { showToast('Informe a descrição do lançamento.', 'warning'); return; }
@@ -4223,7 +4261,7 @@ async function salvarLancamento() {
 
   try {
     // Upload do comprovante para o Drive (se fornecido)
-    const fileInput = modal.querySelector('input[type="file"]');
+    const fileInput = document.getElementById('lanc-comprovante');
     if (fileInput?.files?.length) {
       const file = fileInput.files[0];
       if (file.size <= 10 * 1024 * 1024) {
@@ -4275,19 +4313,17 @@ async function salvarLancamento() {
 
 async function salvarEvento() {
   if (!requireAdmin('criar eventos')) return;
-  const modal   = document.getElementById('modal-novo-evento');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
+  const modal = document.getElementById('modal-novo-evento');
 
   const row = {
-    Titulo:      inputs[0]?.value.trim() || '',
-    Tipo:        selects[0]?.value || '',
-    Data:        inputs[1]?.value || '',
-    HoraInicio:  inputs[2]?.value || '',
-    HoraFim:     inputs[3]?.value || '',
-    Local:       inputs[4]?.value.trim() || '',
-    Responsavel: inputs[5]?.value.trim() || '',
-    Descricao:   modal.querySelector('textarea')?.value || '',
+    Titulo:      document.getElementById('ev-titulo')?.value.trim()       || '',
+    Tipo:        document.getElementById('ev-tipo')?.value                || '',
+    Data:        document.getElementById('ev-data')?.value                || '',
+    HoraInicio:  document.getElementById('ev-hora-inicio')?.value         || '',
+    HoraFim:     document.getElementById('ev-hora-fim')?.value            || '',
+    Local:       document.getElementById('ev-local')?.value.trim()        || '',
+    Responsavel: document.getElementById('ev-responsavel')?.value.trim()  || '',
+    Descricao:   document.getElementById('ev-descricao')?.value           || '',
     Status:      'Confirmado'
   };
 
@@ -4316,17 +4352,15 @@ async function salvarEvento() {
 
 async function salvarProjeto() {
   if (!requireAdmin('cadastrar projetos')) return;
-  const modal   = document.getElementById('modal-novo-projeto');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
+  const modal = document.getElementById('modal-novo-projeto');
 
   const row = {
-    Titulo:        inputs[0]?.value.trim() || '',
-    TipoEstudo:    selects[0]?.value || '',
-    Status:        selects[1]?.value || '',
-    CAAE:          inputs[1]?.value.trim() || '',
-    Pesquisadores: inputs[2]?.value || '0',
-    Descricao:     modal.querySelector('textarea')?.value || '',
+    Titulo:        document.getElementById('proj-titulo')?.value.trim()       || '',
+    TipoEstudo:    document.getElementById('proj-tipo-estudo')?.value         || '',
+    Status:        document.getElementById('proj-status')?.value              || '',
+    CAAE:          document.getElementById('proj-caae')?.value.trim()         || '',
+    Pesquisadores: document.getElementById('proj-pesquisadores')?.value       || '0',
+    Descricao:     document.getElementById('proj-descricao')?.value           || '',
     Progresso:     '0'
   };
 
@@ -4359,18 +4393,15 @@ async function editCurso(id) {
     const data = await apiGet({ action: 'getAll', sheet: 'Cursos' });
     const c    = data?.find(x => String(x.ID) === String(id));
     if (!c) { showToast('Curso não encontrado.', 'error'); return; }
-    // Reutiliza modal de novo curso preenchido
+    // Preenche modal via IDs semânticos
     const modal = document.getElementById('modal-novo-curso');
     if (!modal) return;
-    const inputs  = modal.querySelectorAll('input');
-    const selects = modal.querySelectorAll('select');
-    const textas  = modal.querySelectorAll('textarea');
-    if (inputs[0])  inputs[0].value  = c.Titulo      || '';
-    if (selects[0]) selects[0].value = c.Modalidade   || '';
-    if (inputs[1])  inputs[1].value  = c.CargaHoraria || '';
-    if (inputs[2])  inputs[2].value  = c.Vagas        || '';
-    if (inputs[3])  inputs[3].value  = c.DataInicio   || '';
-    if (textas[0])  textas[0].value  = c.Descricao    || '';
+    document.getElementById('curso-titulo').value        = c.Titulo       || '';
+    document.getElementById('curso-modalidade').value    = c.Modalidade    || '';
+    document.getElementById('curso-carga-horaria').value = c.CargaHoraria  || '';
+    document.getElementById('curso-vagas').value         = c.Vagas         || '';
+    document.getElementById('curso-data-inicio').value   = c.DataInicio    || '';
+    document.getElementById('curso-descricao').value     = c.Descricao     || '';
     // Muda botão para modo edição
     const btn = modal.querySelector('.btn-primary');
     if (btn) {
@@ -4379,12 +4410,12 @@ async function editCurso(id) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
         const row = {
-          Titulo:       inputs[0]?.value.trim(),
-          Modalidade:   selects[0]?.value,
-          CargaHoraria: inputs[1]?.value,
-          Vagas:        inputs[2]?.value,
-          DataInicio:   inputs[3]?.value,
-          Descricao:    textas[0]?.value.trim(),
+          Titulo:       document.getElementById('curso-titulo')?.value.trim(),
+          Modalidade:   document.getElementById('curso-modalidade')?.value,
+          CargaHoraria: document.getElementById('curso-carga-horaria')?.value,
+          Vagas:        document.getElementById('curso-vagas')?.value,
+          DataInicio:   document.getElementById('curso-data-inicio')?.value,
+          Descricao:    document.getElementById('curso-descricao')?.value.trim(),
         };
         try {
           await apiPost({ action: 'update', sheet: 'Cursos', id, row });
@@ -4408,17 +4439,15 @@ async function editCurso(id) {
 
 async function salvarCurso() {
   if (!requireAdmin('criar cursos')) return;
-  const modal   = document.getElementById('modal-novo-curso');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
+  const modal = document.getElementById('modal-novo-curso');
 
   const row = {
-    Titulo:       inputs[0]?.value.trim() || '',
-    Modalidade:   selects[0]?.value || '',
-    CargaHoraria: inputs[1]?.value || '0',
-    Vagas:        inputs[2]?.value || '0',
-    DataInicio:   inputs[3]?.value || '',
-    Descricao:    modal.querySelector('textarea')?.value || '',
+    Titulo:       document.getElementById('curso-titulo')?.value.trim()        || '',
+    Modalidade:   document.getElementById('curso-modalidade')?.value           || '',
+    CargaHoraria: document.getElementById('curso-carga-horaria')?.value        || '0',
+    Vagas:        document.getElementById('curso-vagas')?.value                || '0',
+    DataInicio:   document.getElementById('curso-data-inicio')?.value          || '',
+    Descricao:    document.getElementById('curso-descricao')?.value            || '',
     Progresso:    '0',
     Status:       'Planejado'
   };
@@ -4447,16 +4476,14 @@ async function salvarCurso() {
 
 async function salvarAcao() {
   if (!requireAdmin('registrar ações')) return;
-  const modal   = document.getElementById('modal-nova-acao');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
+  const modal = document.getElementById('modal-nova-acao');
 
   const row = {
-    Nome:          inputs[0]?.value.trim() || '',
-    Tipo:          selects[0]?.value || '',
-    Data:          inputs[1]?.value || '',
-    Local:         inputs[2]?.value.trim() || '',
-    Participantes: inputs[3]?.value || '0',
+    Nome:          document.getElementById('acao-nome')?.value.trim()          || '',
+    Tipo:          document.getElementById('acao-tipo')?.value                  || '',
+    Data:          document.getElementById('acao-data')?.value                  || '',
+    Local:         document.getElementById('acao-local')?.value.trim()          || '',
+    Participantes: document.getElementById('acao-participantes')?.value         || '0',
     Status:        'Realizado'
   };
 
@@ -4479,21 +4506,52 @@ async function salvarAcao() {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  SALVAR — PARCEIRO DE EXTENSÃO
+// ══════════════════════════════════════════════════════════════
+
+async function salvarParceiro() {
+  if (!requireAdmin('cadastrar parceiros')) return;
+  const modal = document.getElementById('modal-novo-parceiro');
+
+  const row = {
+    Nome:      document.getElementById('parc-nome')?.value.trim()      || '',
+    Area:      document.getElementById('parc-area')?.value.trim()      || '',
+    Status:    document.getElementById('parc-status')?.value           || 'Ativo',
+    Descricao: document.getElementById('parc-descricao')?.value.trim() || '',
+  };
+
+  if (!row.Nome) { showToast('Informe o nome do parceiro.', 'warning'); return; }
+
+  const btn = modal.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cadastrando…';
+
+  try {
+    await apiPost({ action: 'insert', sheet: 'Parceiros', row });
+    closeModal('modal-novo-parceiro');
+    showToast(`Parceiro "${row.Nome}" cadastrado com sucesso!`, 'success');
+    loadExtensao();
+  } catch(e) {
+    showToast('Erro ao cadastrar: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-handshake"></i> Cadastrar parceiro';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 //  SALVAR — CORRESPONDÊNCIA
 // ══════════════════════════════════════════════════════════════
 
 async function salvarCorrespondencia() {
   if (!requireAdmin('registrar correspondências')) return;
-  const modal   = document.getElementById('modal-nova-corr');
-  const selects = modal.querySelectorAll('select');
-  const inputs  = modal.querySelectorAll('input');
+  const modal = document.getElementById('modal-nova-corr');
 
   const row = {
-    Tipo:         selects[0]?.value || '',
+    Tipo:         document.getElementById('corr-tipo')?.value              || '',
     Direcao:      'Enviada',
-    Destinatario: inputs[0]?.value.trim() || '',
-    Assunto:      inputs[1]?.value.trim() || '',
-    Corpo:        modal.querySelector('textarea')?.value || '',
+    Destinatario: document.getElementById('corr-destinatario')?.value.trim()|| '',
+    Assunto:      document.getElementById('corr-assunto')?.value.trim()    || '',
+    Corpo:        document.getElementById('corr-corpo')?.value             || '',
     Data:         new Date().toISOString().split('T')[0],
     Status:       'Enviada'
   };
@@ -4602,11 +4660,11 @@ async function exportarRelatorio(tipo) {
   // Excel PT-BR para abertura direta); o nome do arquivo usa a extensão
   // prometida para orientar o usuário, e um toast explica o formato real.
   const exportMap = {
-    'Relatório semestral PDF': {
+    'Relatório semestral CSV': {
       sheet:   'Eventos',
       label:   'Eventos',
       ext:     'csv',
-      nota:    'Exportado como CSV (abra no Excel para converter em PDF).',
+      nota:    null,
     },
     'Planilha financeira XLSX': {
       sheet:   'Financeiro',
@@ -5175,10 +5233,10 @@ function bindModalButtons() {
     nb.addEventListener('click', salvarOuvidoria);
   }
 
-  // Relatórios — botões de exportar
-  document.querySelectorAll('#page-relatorios .btn-outline').forEach(btn => {
-    const txt = btn.textContent;
-    btn.addEventListener('click', () => exportarRelatorio(txt.trim()));
+  // Relatórios — botões de exportar: lê chave estável via data-export (não textContent)
+  document.querySelectorAll('#page-relatorios [data-export]').forEach(btn => {
+    const key = btn.getAttribute('data-export');
+    btn.addEventListener('click', () => exportarRelatorio(key));
   });
 
   // Documentos — botão upload
@@ -5465,9 +5523,15 @@ async function openConfiguracoes() {
     const anoEl   = document.getElementById('cfg-ano-fundacao');
     const prazoEl = document.getElementById('cfg-prazo-contas');
     const apiEl   = document.getElementById('cfg-api-url');
-    if (anoEl   && cfgs['ano_fundacao']?.valor)              anoEl.value   = cfgs['ano_fundacao'].valor;
-    if (prazoEl && cfgs['prazo_prestacao_contas']?.valor)    prazoEl.value = cfgs['prazo_prestacao_contas'].valor;
-    if (apiEl)  apiEl.value = API_URL || '';
+    if (anoEl   && cfgs['ano_fundacao']?.valor)           anoEl.value   = cfgs['ano_fundacao'].valor;
+    if (prazoEl && cfgs['prazo_prestacao_contas']?.valor) prazoEl.value = cfgs['prazo_prestacao_contas'].valor;
+    // Mostra a URL ativa em memória; se a sheet tiver outra, aplica em memória também
+    const urlSalva = cfgs['api_url']?.valor;
+    if (urlSalva && urlSalva !== API_URL) {
+      API_URL = urlSalva;
+      Object.keys(_apiCache).forEach(k => delete _apiCache[k]);
+    }
+    if (apiEl) apiEl.value = API_URL || '';
   } catch(_) {}
 }
 
@@ -5477,20 +5541,38 @@ async function salvarConfiguracoes() {
   const anoFund   = document.getElementById('cfg-ano-fundacao')?.value.trim();
   const prazo     = document.getElementById('cfg-prazo-contas')?.value.trim();
 
+  // ── Atualiza nome da organização na sidebar ───────────────
   if (nomeOrg) {
-    document.querySelector('.logo-title').textContent = nomeOrg;
+    const logoEl = document.querySelector('.logo-title');
+    if (logoEl) logoEl.textContent = nomeOrg;
   }
-  if (apiUrlCfg) {
-    // Atualiza API_URL em tempo de execução (persiste apenas na sessão)
+
+  // ── Atualiza API_URL em runtime imediatamente ─────────────
+  // A variável é global (var), então a reatribuição aqui se propaga para
+  // todas as chamadas subsequentes de apiGet/apiPost sem precisar recarregar.
+  if (apiUrlCfg && apiUrlCfg !== API_URL) {
     API_URL = apiUrlCfg;
-    window.API_URL = apiUrlCfg;
+    // Invalida todo o cache para forçar re-fetch com a nova URL
+    Object.keys(_apiCache).forEach(k => delete _apiCache[k]);
+    // Persiste a nova URL na sheet Configuracoes para leituras futuras
+    await _upsertConfig('api_url', apiUrlCfg, '').catch(() => {
+      // Se a persistência falhar (ex.: ainda com a URL antiga), não é crítico —
+      // a variável em memória já está correta para a sessão atual.
+    });
+    showToast('URL da API atualizada — cache limpo. Dados serão recarregados.', 'info');
   }
-  // Persiste ano de fundação e prazo na sheet Configuracoes
-  if (anoFund) await _upsertConfig('ano_fundacao', anoFund, '');
-  if (prazo)   await _upsertConfig('prazo_prestacao_contas', prazo, '');
+
+  // ── Persiste outras configurações na sheet ────────────────
+  const tarefas = [];
+  if (anoFund) tarefas.push(_upsertConfig('ano_fundacao', anoFund, ''));
+  if (prazo)   tarefas.push(_upsertConfig('prazo_prestacao_contas', prazo, ''));
+  await Promise.allSettled(tarefas);
 
   closeModal('modal-configuracoes');
   showToast('Configurações salvas com sucesso!', 'success');
+
+  // Reaplica indicadores para refletir novo ano de fundação imediatamente
+  _aplicarTodosIndicadores();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -6301,7 +6383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   applyTheme();
   setupKanbanIds();
-  await _restaurarDocsStatic(); // Restaura links/nomes dos cards estáticos via API
+  // NOTA: _restaurarDocsStatic() é chamada em loginSuccess() — após autenticação.
 
   // Verifica sessão salva
   const savedRole = sessionStorage.getItem('lapa-role');
