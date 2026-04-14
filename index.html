@@ -901,6 +901,44 @@ body.is-admin .admin-only-block { display: block; }
   font-size: 10px; color: var(--text3);
   display: flex; align-items: center; gap: 4px;
 }
+
+/* ─── Sortable table headers ─────────────────────────────── */
+th.sortable {
+  cursor: pointer; user-select: none; white-space: nowrap;
+  transition: color var(--transition);
+}
+th.sortable:hover { color: var(--teal); }
+th.sortable::after { content: ' ⇅'; font-size: 9px; opacity: .3; }
+th.sort-asc::after  { content: ' ▲'; font-size: 9px; opacity: 1; color: var(--teal); }
+th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--teal); }
+
+/* ─── Pagination bar ──────────────────────────────────────── */
+.pagination-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px 10px; border-top: 1px solid var(--border);
+  font-size: 12px; flex-wrap: wrap; gap: 8px;
+}
+.pagination-info { color: var(--text3); }
+.pagination-pages { display: flex; align-items: center; gap: 3px; }
+.pg-btn {
+  min-width: 28px; height: 28px; padding: 0 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 7px; border: 1px solid var(--border2);
+  background: var(--bg3); color: var(--text2); cursor: pointer;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  transition: all var(--transition);
+}
+.pg-btn:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+.pg-btn.active { background: var(--teal); color: var(--bg); border-color: var(--teal); }
+.pg-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ─── Search no-results feedback ─────────────────────────── */
+.search-noresult {
+  display: none; text-align: center; padding: 28px 16px;
+  color: var(--text3); font-size: 13px;
+}
+.search-noresult.visible { display: block; }
+.search-noresult i { font-size: 26px; display: block; margin-bottom: 8px; opacity: .28; }
 </style>
 </head>
 <body>
@@ -1178,6 +1216,9 @@ body.is-admin .admin-only-block { display: block; }
           <button class="btn btn-primary admin-only" onclick="openModal('modal-nova-ata')"><i class="fas fa-plus"></i> Nova Ata</button>
         </div>
         <div id="atas-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+        <div id="atas-noresult" class="search-noresult">
+          <i class="fas fa-search"></i>Nenhuma ata encontrada para esta busca.
+        </div>
       </div>
 
       <!-- ABA MEMBROS CTRL -->
@@ -1290,6 +1331,10 @@ body.is-admin .admin-only-block { display: block; }
             <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-lancamento')"><i class="fas fa-plus"></i> Lançamento</button>
           </div>
           <div id="finance-movimentacoes" style="min-height:60px"><div style="text-align:center;padding:24px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+          <div id="finance-noresult" class="search-noresult">
+            <i class="fas fa-search"></i>Nenhuma movimentação encontrada para esta busca.
+          </div>
+          <div data-pganchor="finance-pgbar" style="display:none"></div>
         </div>
 
         <div class="card">
@@ -1429,6 +1474,9 @@ body.is-admin .admin-only-block { display: block; }
       </div>
 
       <div class="grid grid-2" id="pesquisa-grid"><div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+      <div id="pesquisa-noresult" class="search-noresult">
+        <i class="fas fa-flask"></i>Nenhum projeto encontrado para esta busca.
+      </div>
     </div>
     <!-- AGENDA
     ══════════════════════════════ -->
@@ -1446,6 +1494,9 @@ body.is-admin .admin-only-block { display: block; }
 
       <div class="inner-panel active" id="ag-lista">
         <div id="agenda-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
+        <div id="agenda-noresult" class="search-noresult">
+          <i class="fas fa-calendar-times"></i>Nenhum evento encontrado para esta busca.
+        </div>
       </div>
 
       <div class="inner-panel" id="ag-cal">
@@ -1498,6 +1549,9 @@ body.is-admin .admin-only-block { display: block; }
           </div>
           <div id="extensao-parceiros-list">
             <div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
+          </div>
+          <div id="parceiros-noresult" class="search-noresult">
+            <i class="fas fa-handshake"></i>Nenhum parceiro encontrado para esta busca.
           </div>
         </div>
       </div>
@@ -1621,12 +1675,25 @@ body.is-admin .admin-only-block { display: block; }
       <div class="card" style="padding:0">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Nome</th><th>Matrícula</th><th>Período</th><th>Setor</th><th>Cargo</th><th>Ingresso</th><th>Status</th><th>Ações</th></tr></thead>
+            <thead><tr>
+              <th class="sortable" data-col="Nome"         onclick="_sortMembros('Nome')">Nome</th>
+              <th class="sortable" data-col="Matricula"    onclick="_sortMembros('Matricula')">Matrícula</th>
+              <th class="sortable" data-col="Periodo"      onclick="_sortMembros('Periodo')">Período</th>
+              <th class="sortable" data-col="Setor"        onclick="_sortMembros('Setor')">Setor</th>
+              <th class="sortable" data-col="Cargo"        onclick="_sortMembros('Cargo')">Cargo</th>
+              <th class="sortable" data-col="DataIngresso" onclick="_sortMembros('DataIngresso')">Ingresso</th>
+              <th class="sortable" data-col="Status"       onclick="_sortMembros('Status')">Status</th>
+              <th>Ações</th>
+            </tr></thead>
             <tbody id="members-table">
                 <tr id="members-empty"><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-users" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>Nenhum membro cadastrado ainda.</td></tr>
               </tbody>
           </table>
         </div>
+        <div id="members-noresult" class="search-noresult">
+          <i class="fas fa-search"></i>Nenhum membro encontrado para esta busca.
+        </div>
+        <div data-pganchor="members-pgbar" style="display:none"></div>
       </div>
     </div>
 
@@ -1755,6 +1822,9 @@ body.is-admin .admin-only-block { display: block; }
           <div class="doc-link-indicator" style="display:none;font-size:10px;color:var(--sage);margin-top:4px"><i class="fas fa-link"></i> Drive vinculado</div>
         </div>
 
+      </div>
+      <div id="docs-noresult" class="search-noresult">
+        <i class="fas fa-folder-open"></i>Nenhum documento encontrado para esta busca.
       </div>
       <div id="docs-empty-msg" style="display:none;text-align:center;padding:32px;color:var(--text3)">
         <i class="fas fa-folder-open" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>
@@ -2999,32 +3069,173 @@ async function apiPost(payload) {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  ESTADO DAS TABELAS — paginação & ordenação
+// ══════════════════════════════════════════════════════════════
+
+const _tbl = {
+  membros:    { data:[], page:1, perPage:15, sortCol:null, sortDir:'asc' },
+  financeiro: { data:[], page:1, perPage:15 },
+};
+
+/** Cria/atualiza a barra de paginação dentro do card que contém o data-pganchor. */
+function _buildPaginationBar(barId, state, gotoFn) {
+  let bar = document.getElementById(barId);
+  if (!bar) {
+    const anchor = document.querySelector('[data-pganchor="' + barId + '"]');
+    if (!anchor) return;
+    bar = document.createElement('div');
+    bar.id        = barId;
+    bar.className = 'pagination-bar';
+    anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+  }
+
+  const total  = state.data.length;
+  const pages  = Math.max(1, Math.ceil(total / state.perPage));
+  const cur    = Math.max(1, Math.min(state.page, pages));
+  state.page   = cur;
+  const from   = total === 0 ? 0 : (cur - 1) * state.perPage + 1;
+  const to     = Math.min(cur * state.perPage, total);
+
+  // Gera botões: sempre mostra 1, última e ±2 ao redor da atual
+  const show = new Set([1, pages]);
+  for (let p = Math.max(1, cur - 2); p <= Math.min(pages, cur + 2); p++) show.add(p);
+  const sorted = [...show].sort((a, b) => a - b);
+  let pageHtml = '', prev = 0;
+  sorted.forEach(p => {
+    if (p - prev > 1) pageHtml += `<span style="padding:0 3px;color:var(--text3)">…</span>`;
+    pageHtml += `<button class="pg-btn${p===cur?' active':''}" onclick="${gotoFn}(${p})">${p}</button>`;
+    prev = p;
+  });
+
+  bar.innerHTML = `
+    <span class="pagination-info">${from}–${to} de ${total} registro${total !== 1 ? 's' : ''}</span>
+    <div class="pagination-pages">
+      <button class="pg-btn" ${cur<=1?'disabled':''} onclick="${gotoFn}(${cur-1})">
+        <i class="fas fa-chevron-left" style="font-size:10px"></i></button>
+      ${pageHtml}
+      <button class="pg-btn" ${cur>=pages?'disabled':''} onclick="${gotoFn}(${cur+1})">
+        <i class="fas fa-chevron-right" style="font-size:10px"></i></button>
+    </div>`;
+}
+
+/** Ordena array por coluna, detectando tipo automaticamente. */
+function _sortArr(arr, col, dir) {
+  if (!col) return arr;
+  return [...arr].sort((a, b) => {
+    const va = a[col] ?? '', vb = b[col] ?? '';
+    const na = parseFloat(va), nb = parseFloat(vb);
+    if (!isNaN(na) && !isNaN(nb)) return dir === 'asc' ? na - nb : nb - na;
+    if (/^\d{4}-\d{2}-\d{2}/.test(String(va)))
+      return dir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+    return dir === 'asc'
+      ? String(va).toLowerCase().localeCompare(String(vb).toLowerCase())
+      : String(vb).toLowerCase().localeCompare(String(va).toLowerCase());
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
 //  BUSCA GLOBAL
 // ══════════════════════════════════════════════════════════════
 
 function setupSearch() {
-  // Exclui #sec-filter-busca: já tratado por filterSecMembros() via setupFilters()
+  // Exclui #sec-filter-busca: tratado por filterSecMembros() via setupFilters()
   document.querySelectorAll('.search-box input:not(#sec-filter-busca)').forEach(input => {
     input.addEventListener('input', function () {
       const val = this.value.toLowerCase().trim();
 
-      // Busca na tabela de membros
-      const memberRows = document.querySelectorAll('#members-table tr:not(#members-empty)');
-      memberRows.forEach(r => {
-        r.style.display = (!val || r.textContent.toLowerCase().includes(val)) ? '' : 'none';
-      });
+      /* ── 1. Membros (tabela principal) ───────────────────── */
+      {
+        const rows = document.querySelectorAll('#members-table tr:not(#members-empty)');
+        let vis = 0;
+        rows.forEach(r => {
+          const show = !val || r.textContent.toLowerCase().includes(val);
+          r.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('members-noresult', vis === 0 && rows.length > 0);
+      }
 
-      // Busca em atas
-      document.querySelectorAll('.ata-card').forEach(c => {
-        c.style.display = (!val || c.textContent.toLowerCase().includes(val)) ? '' : 'none';
-      });
+      /* ── 2. Atas ─────────────────────────────────────────── */
+      {
+        const cards = document.querySelectorAll('.ata-card');
+        let vis = 0;
+        cards.forEach(c => {
+          const show = !val || c.textContent.toLowerCase().includes(val);
+          c.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('atas-noresult', vis === 0 && cards.length > 0);
+      }
 
-      // Busca em linhas financeiras
-      document.querySelectorAll('#finance-movimentacoes .finance-row').forEach(r => {
-        r.style.display = (!val || r.textContent.toLowerCase().includes(val)) ? '' : 'none';
-      });
+      /* ── 3. Movimentações financeiras ────────────────────── */
+      {
+        const rows = document.querySelectorAll('#finance-movimentacoes .finance-row');
+        let vis = 0;
+        rows.forEach(r => {
+          const show = !val || r.textContent.toLowerCase().includes(val);
+          r.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('finance-noresult', vis === 0 && rows.length > 0);
+      }
+
+      /* ── 4. Eventos (agenda) ─────────────────────────────── */
+      {
+        const cards = document.querySelectorAll('#ag-lista .card');
+        let vis = 0;
+        cards.forEach(c => {
+          const show = !val || c.textContent.toLowerCase().includes(val);
+          c.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('agenda-noresult', vis === 0 && cards.length > 0);
+      }
+
+      /* ── 5. Projetos de pesquisa ─────────────────────────── */
+      {
+        const cards = document.querySelectorAll('.research-card');
+        let vis = 0;
+        cards.forEach(c => {
+          const show = !val || c.textContent.toLowerCase().includes(val);
+          c.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('pesquisa-noresult', vis === 0 && cards.length > 0);
+      }
+
+      /* ── 6. Documentos ───────────────────────────────────── */
+      {
+        const cards = document.querySelectorAll('.doc-card');
+        let vis = 0;
+        cards.forEach(c => {
+          const nome = (c.getAttribute('data-nome') || '') + c.textContent;
+          const show = !val || nome.toLowerCase().includes(val);
+          c.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('docs-noresult', vis === 0 && cards.length > 0);
+      }
+
+      /* ── 7. Parceiros de extensão ────────────────────────── */
+      {
+        const rows = document.querySelectorAll('#extensao-parceiros-list .finance-row');
+        let vis = 0;
+        rows.forEach(r => {
+          const show = !val || r.textContent.toLowerCase().includes(val);
+          r.style.display = show ? '' : 'none';
+          if (show) vis++;
+        });
+        _toggleNoResult('parceiros-noresult', vis === 0 && rows.length > 0);
+      }
     });
   });
+}
+
+/** Cria (se necessário) e exibe/oculta o aviso "nenhum resultado". */
+function _toggleNoResult(id, show) {
+  let el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('visible', show);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3330,7 +3541,34 @@ async function loadMembros() {
       return;
     }
 
-    tbody.innerHTML = data.map(m => {
+    _tbl.membros.data = data;
+    _tbl.membros.page = 1;
+    _renderMembrosPaged(1);
+
+    // Também atualiza tabela da secretaria e home
+    renderSecMembros(data);
+    renderHomeMembros(data);
+
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--coral)"><i class="fas fa-exclamation-circle"></i> Erro ao carregar: ${esc(e.message)}</td></tr>`;
+  }
+}
+
+/** Renderiza a página N da tabela de membros, aplicando ordenação ativa. */
+function _renderMembrosPaged(page) {
+  const state = _tbl.membros;
+  state.page  = page;
+  const tbody = document.getElementById('members-table');
+  if (!tbody) return;
+
+  const sorted   = _sortArr(state.data, state.sortCol, state.sortDir);
+  const startIdx = (page - 1) * state.perPage;
+  const slice    = sorted.slice(startIdx, startIdx + state.perPage);
+
+  if (slice.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3)">Nenhum registro nesta página.</td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map(m => {
       const cor = setorCor(m.Setor);
       const ini = (m.Nome || '?')[0].toUpperCase();
       const actionBtns = isAdmin()
@@ -3350,15 +3588,29 @@ async function loadMembros() {
         ${actionBtns}
       </tr>`;
     }).join('');
-
-    // Também atualiza tabela da secretaria
-    renderSecMembros(data);
-    // Atualiza home
-    renderHomeMembros(data);
-
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--coral)"><i class="fas fa-exclamation-circle"></i> Erro ao carregar: ${esc(e.message)}</td></tr>`;
   }
+
+  // Atualiza cabeçalhos com indicador de ordenação
+  document.querySelectorAll('#page-membros thead th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === state.sortCol) {
+      th.classList.add(state.sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+
+  _buildPaginationBar('members-pgbar', state, '_renderMembrosPaged');
+}
+
+/** Alterna ordenação ao clicar em um <th>. */
+function _sortMembros(col) {
+  const state = _tbl.membros;
+  if (state.sortCol === col) {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.sortCol = col;
+    state.sortDir = 'asc';
+  }
+  _renderMembrosPaged(1);
 }
 
 function renderSecMembros(data) {
@@ -3559,26 +3811,47 @@ async function loadTesouraria() {
       prazoEl.textContent = prazo ? formatDate(prazo) : '—';
     }
 
-    // ── Lista de movimentações ────────────────────────────
-    container.innerHTML = data
-      .sort((a,b) => new Date(b.Data) - new Date(a.Data))
-      .slice(0, 12)
-      .map(mov => {
-        const isRec = String(mov.Tipo).toLowerCase() === 'receita';
-        const v = parseFloat(mov.Valor) || 0;
-        return `<div class="finance-row">
-          <div>
-            <div class="finance-desc">${esc(mov.Descricao)}</div>
-            <div class="finance-cat">${esc(mov.Tipo)} • ${esc(mov.Categoria)} • ${formatDate(mov.Data)}</div>
-          </div>
-          <div class="finance-val ${isRec?'pos':'neg'}">${isRec?'+':'−'} R$ ${v.toFixed(2).replace('.',',')}</div>
-        </div>`;
-      }).join('');
+    // ── Lista de movimentações (paginada) ─────────────────
+    _tbl.financeiro.data = [...data].sort((a,b) => new Date(b.Data) - new Date(a.Data));
+    _tbl.financeiro.page = 1;
+    _renderFinancePaged(1);
 
   } catch(e) {
     setEmptyMsg('finance-movimentacoes', 'fa-exclamation-circle', 'Erro ao carregar movimentações.');
     _aplicarIndicadoresLocais();
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RENDER PAGINADO — Movimentações financeiras
+// ══════════════════════════════════════════════════════════════
+
+function _renderFinancePaged(page) {
+  const state     = _tbl.financeiro;
+  state.page      = page;
+  const container = document.getElementById('finance-movimentacoes');
+  if (!container) return;
+
+  const startIdx = (page - 1) * state.perPage;
+  const slice    = state.data.slice(startIdx, startIdx + state.perPage);
+
+  if (slice.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3)">Nenhum lançamento nesta página.</div>';
+  } else {
+    container.innerHTML = slice.map(mov => {
+      const isRec = String(mov.Tipo).toLowerCase() === 'receita';
+      const v = parseFloat(mov.Valor) || 0;
+      return `<div class="finance-row">
+        <div>
+          <div class="finance-desc">${esc(mov.Descricao)}</div>
+          <div class="finance-cat">${esc(mov.Tipo)} • ${esc(mov.Categoria)} • ${formatDate(mov.Data)}</div>
+        </div>
+        <div class="finance-val ${isRec?'pos':'neg'}">${isRec?'+':'−'} R$ ${v.toFixed(2).replace('.',',')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  _buildPaginationBar('finance-pgbar', state, '_renderFinancePaged');
 }
 
 // ══════════════════════════════════════════════════════════════
