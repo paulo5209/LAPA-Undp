@@ -147,28 +147,124 @@ function renderHomeStats(data) {
   ];
   
   counters.forEach(({ el, value, suffix }) => {
-    if (el) animateCounter(el, value, '', suffix || '');
+    if (el) window.ui.animateCounter(el, value, '', suffix || '');
   });
 }
 
+function renderHomeTimeline(eventos) {
+  const container = document.getElementById('home-timeline');
+  if (!container) return;
+  
+  if (!eventos || eventos.length === 0) {
+    window.utils.setEmptyMsg('home-timeline', 'fas fa-calendar-times', 'Nenhum evento próximo.');
+    return;
+  }
+  
+  let html = '<div class="timeline">';
+  eventos.slice(0, 5).forEach(evento => {
+    html += `
+      <div class="timeline-item">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+          <div class="timeline-header">
+            <strong>${window.utils.esc(evento.nome)}</strong>
+            <span class="badge">${window.utils.formatDate(evento.data)}</span>
+          </div>
+          <p class="timeline-description">${window.utils.esc(evento.descricao || '')}</p>
+          <small><i class="fas fa-map-marker-alt"></i> ${window.utils.esc(evento.local || 'Local a definir')}</small>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function renderHomeMembros(membros) {
+  const container = document.getElementById('home-membros-ativos');
+  if (!container) return;
+  
+  if (!membros || membros.length === 0) {
+    window.utils.setEmptyMsg('home-membros-ativos', 'fas fa-users-slash', 'Nenhum membro ativo.');
+    return;
+  }
+  
+  let html = '<div class="members-grid">';
+  membros.filter(m => m.status === 'Ativo').slice(0, 6).forEach(membro => {
+    html += `
+      <div class="member-card-mini">
+        <div class="member-avatar">${membro.nome.charAt(0).toUpperCase()}</div>
+        <div class="member-info">
+          <strong>${window.utils.esc(membro.nome)}</strong>
+          <small>${window.utils.esc(membro.setor)}</small>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
 async function loadEventosData() {
-  // Implementar carregamento de eventos
-  console.log('Carregando eventos...');
+  window.utils.setLoadingMsg('eventos-container', 'Carregando eventos...');
+  
+  try {
+    const data = await window.api.fetchWithCache({ action: 'getEventos' });
+    if (data) {
+      // Implementar renderização de eventos (calendário/kanban)
+      console.log('Eventos carregados:', data);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar eventos:', error);
+    window.utils.setEmptyMsg('eventos-container', 'fas fa-exclamation-triangle', 'Erro ao carregar eventos.');
+  }
 }
 
 async function loadDocumentosData() {
-  // Implementar carregamento de documentos
-  console.log('Carregando documentos...');
+  window.utils.setLoadingMsg('documentos-container', 'Carregando documentos...');
+  
+  try {
+    const data = await window.api.fetchWithCache({ action: 'getDocumentos' });
+    if (data) {
+      // Implementar renderização de documentos
+      console.log('Documentos carregados:', data);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar documentos:', error);
+    window.utils.setEmptyMsg('documentos-container', 'fas fa-exclamation-triangle', 'Erro ao carregar documentos.');
+  }
 }
 
 async function loadRelatoriosData() {
-  // Implementar carregamento de relatórios
-  console.log('Carregando relatórios...');
+  window.utils.setLoadingMsg('relatorios-container', 'Carregando relatórios...');
+  
+  try {
+    const data = await window.api.fetchWithCache({ action: 'getRelatorios' });
+    if (data) {
+      // Implementar renderização de gráficos e estatísticas
+      console.log('Relatórios carregados:', data);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar relatórios:', error);
+    window.utils.setEmptyMsg('relatorios-container', 'fas fa-exclamation-triangle', 'Erro ao carregar relatórios.');
+  }
 }
 
 async function loadFinanceiroData() {
-  // Implementar carregamento de financeiro
-  console.log('Carregando financeiro...');
+  window.utils.setLoadingMsg('financeiro-container', 'Carregando dados financeiros...');
+  
+  try {
+    const data = await window.api.fetchWithCache({ action: 'getFinanceiro' });
+    if (data) {
+      // Implementar renderização de tabela financeira e gráficos
+      console.log('Dados financeiros carregados:', data);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar financeiro:', error);
+    window.utils.setEmptyMsg('financeiro-container', 'fas fa-exclamation-triangle', 'Erro ao carregar dados financeiros.');
+  }
 }
 
 // Atualização de badges da sidebar
