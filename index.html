@@ -902,43 +902,191 @@ body.is-admin .admin-only-block { display: block; }
   display: flex; align-items: center; gap: 4px;
 }
 
-/* ─── Sortable table headers ─────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   COLUNAS ORDENÁVEIS
+═══════════════════════════════════════════════════ */
 th.sortable {
-  cursor: pointer; user-select: none; white-space: nowrap;
+  cursor: pointer; user-select: none;
   transition: color var(--transition);
+  white-space: nowrap;
 }
 th.sortable:hover { color: var(--teal); }
-th.sortable::after { content: ' ⇅'; font-size: 9px; opacity: .3; }
-th.sort-asc::after  { content: ' ▲'; font-size: 9px; opacity: 1; color: var(--teal); }
-th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--teal); }
+th.sortable .sort-icon { margin-left: 5px; font-size: 9px; opacity: .5; }
+th.sort-asc  .sort-icon { opacity: 1; color: var(--teal); }
+th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
 
-/* ─── Pagination bar ──────────────────────────────────────── */
-.pagination-bar {
+/* ═══════════════════════════════════════════════════
+   PAGINAÇÃO
+═══════════════════════════════════════════════════ */
+.pagination {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 11px 16px 10px; border-top: 1px solid var(--border);
-  font-size: 12px; flex-wrap: wrap; gap: 8px;
+  padding: 14px 0 2px; gap: 8px; flex-wrap: wrap;
 }
-.pagination-info { color: var(--text3); }
-.pagination-pages { display: flex; align-items: center; gap: 3px; }
-.pg-btn {
-  min-width: 28px; height: 28px; padding: 0 7px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 7px; border: 1px solid var(--border2);
-  background: var(--bg3); color: var(--text2); cursor: pointer;
-  font-size: 12px; font-weight: 600; font-family: inherit;
+.pagination-info { font-size: 12px; color: var(--text3); }
+.pagination-btns { display: flex; gap: 4px; }
+.pag-btn {
+  min-width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--border2); background: var(--bg3);
+  color: var(--text2); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 10px;
+}
+.pag-btn:hover { border-color: var(--teal); color: var(--teal); }
+.pag-btn.active { background: var(--teal); color: var(--bg); border-color: var(--teal); }
+.pag-btn:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+
+/* ═══════════════════════════════════════════════════
+   VALIDAÇÃO INLINE
+═══════════════════════════════════════════════════ */
+.form-input.field-error,
+.form-select.field-error,
+.form-textarea.field-error {
+  border-color: var(--coral) !important;
+  box-shadow: 0 0 0 3px rgba(244,63,94,.12) !important;
+  animation: shakeField .3s ease;
+}
+@keyframes shakeField {
+  0%,100%{ transform:translateX(0); }
+  25%{ transform:translateX(-4px); }
+  75%{ transform:translateX(4px); }
+}
+.field-error-msg {
+  font-size: 11px; color: var(--coral); margin-top: 5px;
+  display: flex; align-items: center; gap: 4px; line-height: 1.4;
+}
+.field-error-msg i { font-size: 10px; }
+
+/* ═══════════════════════════════════════════════════
+   BUSCA GLOBAL — DROPDOWN
+═══════════════════════════════════════════════════ */
+.search-box {
+  position: relative;
+}
+.search-dropdown {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  width: 380px; max-height: 480px; overflow-y: auto;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  z-index: 9999; display: none; animation: fadeIn .18s ease;
+}
+.search-dropdown.open { display: block; }
+.search-group-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--text3);
+  padding: 10px 14px 4px;
+}
+.search-result-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; cursor: pointer;
+  transition: background var(--transition); font-size: 13px;
+}
+.search-result-item:hover { background: var(--bg3); }
+.search-result-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.search-result-title { font-weight: 600; line-height: 1.3; }
+.search-result-sub { font-size: 11px; color: var(--text3); }
+.search-no-results {
+  text-align: center; padding: 28px 16px; color: var(--text3);
+  font-size: 13px;
+}
+.search-no-results i { display: block; font-size: 22px; margin-bottom: 8px; opacity: .35; }
+
+/* ═══════════════════════════════════════════════════
+   KANBAN — DRAG AND DROP
+═══════════════════════════════════════════════════ */
+.kanban-card {
+  cursor: grab !important;
+  transition: opacity .2s, box-shadow .2s, transform .2s;
+}
+.kanban-card:active { cursor: grabbing !important; }
+.kanban-card.dragging {
+  opacity: .35; transform: scale(.97);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+}
+.kanban-card.drag-ghost {
+  opacity: .95; transform: rotate(2deg);
+  box-shadow: 0 16px 48px rgba(0,0,0,.6);
+}
+.kanban-col.drag-over {
+  background: rgba(239,68,68,.07) !important;
+  border: 1.5px dashed var(--teal) !important;
+  border-radius: var(--radius);
+}
+.kanban-drop-indicator {
+  height: 3px; background: var(--teal);
+  border-radius: 4px; margin: 4px 0;
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   CALENDÁRIO — VISÕES SEMANA / DIA
+═══════════════════════════════════════════════════ */
+.cal-view-tabs {
+  display: flex; gap: 4px; margin-bottom: 14px;
+}
+.cal-view-tab {
+  padding: 5px 12px; border-radius: 8px; font-size: 12px;
+  font-weight: 600; cursor: pointer; border: 1px solid var(--border2);
+  background: var(--bg3); color: var(--text2);
   transition: all var(--transition);
 }
-.pg-btn:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
-.pg-btn.active { background: var(--teal); color: var(--bg); border-color: var(--teal); }
-.pg-btn:disabled { opacity: .35; cursor: not-allowed; }
-
-/* ─── Search no-results feedback ─────────────────────────── */
-.search-noresult {
-  display: none; text-align: center; padding: 28px 16px;
-  color: var(--text3); font-size: 13px;
+.cal-view-tab.active {
+  background: var(--teal); color: var(--bg); border-color: var(--teal);
 }
-.search-noresult.visible { display: block; }
-.search-noresult i { font-size: 26px; display: block; margin-bottom: 8px; opacity: .28; }
+.cal-week-grid, .cal-day-grid {
+  display: flex; flex-direction: column; gap: 0;
+}
+.cal-time-row {
+  display: grid; align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  min-height: 40px;
+}
+.cal-time-label {
+  font-size: 10px; color: var(--text3); padding: 8px 6px 0;
+  text-align: right; flex-shrink: 0; width: 44px;
+}
+.cal-time-cell {
+  border-left: 1px solid var(--border); padding: 4px 6px;
+  cursor: pointer; transition: background .1s; min-height: 40px;
+  position: relative;
+}
+.cal-time-cell:hover { background: rgba(239,68,68,.04); }
+.cal-time-cell.has-event { background: rgba(239,68,68,.08); }
+.cal-week-header {
+  display: grid; border-bottom: 2px solid var(--border2);
+  margin-bottom: 0;
+}
+.cal-week-day-label {
+  font-size: 11px; font-weight: 700; color: var(--text2);
+  text-align: center; padding: 8px 4px;
+  border-left: 1px solid var(--border);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.cal-week-day-label.today { color: var(--teal); }
+.cal-ev-chip {
+  font-size: 10px; font-weight: 600; border-radius: 4px;
+  padding: 2px 5px; margin-bottom: 2px;
+  cursor: pointer; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 100%;
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL DE CONFIRMAÇÃO CUSTOM
+═══════════════════════════════════════════════════ */
+#modal-confirm {
+  z-index: 99999;
+}
+.confirm-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(244,63,94,.12); border: 1px solid rgba(244,63,94,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: var(--coral); margin: 0 auto 18px;
+}
 </style>
 </head>
 <body>
@@ -1068,9 +1216,10 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
   <div class="topbar">
     <div class="page-title" id="page-title">Início</div>
     <div class="topbar-actions" id="topbar-actions">
-      <div class="search-box">
+      <div class="search-box" id="global-search-wrap">
         <i class="fas fa-search" style="color:var(--text3)"></i>
-        <input type="text" placeholder="Buscar…">
+        <input type="text" id="global-search-input" placeholder="Buscar em tudo…" autocomplete="off">
+        <div class="search-dropdown" id="global-search-dropdown"></div>
       </div>
       <div class="btn-icon notif-btn" data-tooltip="Notificações" onclick="openNotificacoes()">
         <i class="fas fa-bell"></i>
@@ -1216,9 +1365,6 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
           <button class="btn btn-primary admin-only" onclick="openModal('modal-nova-ata')"><i class="fas fa-plus"></i> Nova Ata</button>
         </div>
         <div id="atas-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
-        <div id="atas-noresult" class="search-noresult">
-          <i class="fas fa-search"></i>Nenhuma ata encontrada para esta busca.
-        </div>
       </div>
 
       <!-- ABA MEMBROS CTRL -->
@@ -1331,10 +1477,6 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
             <button class="btn btn-primary admin-only btn-sm" onclick="openModal('modal-lancamento')"><i class="fas fa-plus"></i> Lançamento</button>
           </div>
           <div id="finance-movimentacoes" style="min-height:60px"><div style="text-align:center;padding:24px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
-          <div id="finance-noresult" class="search-noresult">
-            <i class="fas fa-search"></i>Nenhuma movimentação encontrada para esta busca.
-          </div>
-          <div data-pganchor="finance-pgbar" style="display:none"></div>
         </div>
 
         <div class="card">
@@ -1474,9 +1616,6 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
       </div>
 
       <div class="grid grid-2" id="pesquisa-grid"><div style="text-align:center;padding:32px;color:var(--text3);grid-column:1/-1"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
-      <div id="pesquisa-noresult" class="search-noresult">
-        <i class="fas fa-flask"></i>Nenhum projeto encontrado para esta busca.
-      </div>
     </div>
     <!-- AGENDA
     ══════════════════════════════ -->
@@ -1487,20 +1626,23 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
         <div class="inner-tabs" style="margin-bottom:0">
           <div class="inner-tab active" onclick="switchTab(this,'ag-lista')">📋 Lista</div>
-          <div class="inner-tab" onclick="switchTab(this,'ag-cal')">📅 Calendário</div>
+          <div class="inner-tab" onclick="switchTab(this,'ag-cal');renderCalendar()">📅 Calendário</div>
         </div>
         <button class="btn btn-primary admin-only" onclick="openModal('modal-novo-evento')"><i class="fas fa-plus"></i> Novo evento</button>
       </div>
 
       <div class="inner-panel active" id="ag-lista">
         <div id="agenda-list-container"><div style="text-align:center;padding:32px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando...</div></div>
-        <div id="agenda-noresult" class="search-noresult">
-          <i class="fas fa-calendar-times"></i>Nenhum evento encontrado para esta busca.
-        </div>
       </div>
 
       <div class="inner-panel" id="ag-cal">
         <div class="card" style="padding:24px">
+          <!-- View toggle -->
+          <div class="cal-view-tabs" id="cal-view-tabs">
+            <div class="cal-view-tab active" onclick="switchCalView('month',this)"><i class="fas fa-calendar-alt"></i> Mês</div>
+            <div class="cal-view-tab" onclick="switchCalView('week',this)"><i class="fas fa-calendar-week"></i> Semana</div>
+            <div class="cal-view-tab" onclick="switchCalView('day',this)"><i class="fas fa-calendar-day"></i> Dia</div>
+          </div>
           <div id="mini-calendar-container">
             <div style="text-align:center;padding:24px;color:var(--text3)">
               <i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Carregando calendário…
@@ -1549,9 +1691,6 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
           </div>
           <div id="extensao-parceiros-list">
             <div style="text-align:center;padding:20px;color:var(--text3)"><i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Carregando…</div>
-          </div>
-          <div id="parceiros-noresult" class="search-noresult">
-            <i class="fas fa-handshake"></i>Nenhum parceiro encontrado para esta busca.
           </div>
         </div>
       </div>
@@ -1676,13 +1815,13 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th class="sortable" data-col="Nome"         onclick="_sortMembros('Nome')">Nome</th>
-              <th class="sortable" data-col="Matricula"    onclick="_sortMembros('Matricula')">Matrícula</th>
-              <th class="sortable" data-col="Periodo"      onclick="_sortMembros('Periodo')">Período</th>
-              <th class="sortable" data-col="Setor"        onclick="_sortMembros('Setor')">Setor</th>
-              <th class="sortable" data-col="Cargo"        onclick="_sortMembros('Cargo')">Cargo</th>
-              <th class="sortable" data-col="DataIngresso" onclick="_sortMembros('DataIngresso')">Ingresso</th>
-              <th class="sortable" data-col="Status"       onclick="_sortMembros('Status')">Status</th>
+              <th class="sortable" onclick="sortMembros('Nome')">Nome <span class="sort-icon"></span></th>
+              <th class="sortable" onclick="sortMembros('Matricula')">Matrícula <span class="sort-icon"></span></th>
+              <th class="sortable" onclick="sortMembros('Periodo')">Período <span class="sort-icon"></span></th>
+              <th class="sortable" onclick="sortMembros('Setor')">Setor <span class="sort-icon"></span></th>
+              <th class="sortable" onclick="sortMembros('Cargo')">Cargo <span class="sort-icon"></span></th>
+              <th class="sortable" onclick="sortMembros('DataIngresso')">Ingresso <span class="sort-icon"></span></th>
+              <th class="sortable" onclick="sortMembros('Status')">Status <span class="sort-icon"></span></th>
               <th>Ações</th>
             </tr></thead>
             <tbody id="members-table">
@@ -1690,10 +1829,10 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
               </tbody>
           </table>
         </div>
-        <div id="members-noresult" class="search-noresult">
-          <i class="fas fa-search"></i>Nenhum membro encontrado para esta busca.
+        <div id="members-pagination" class="pagination" style="padding:14px 20px 10px;display:none">
+          <div class="pagination-info" id="members-pag-info"></div>
+          <div class="pagination-btns" id="members-pag-btns"></div>
         </div>
-        <div data-pganchor="members-pgbar" style="display:none"></div>
       </div>
     </div>
 
@@ -1823,9 +1962,6 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
         </div>
 
       </div>
-      <div id="docs-noresult" class="search-noresult">
-        <i class="fas fa-folder-open"></i>Nenhum documento encontrado para esta busca.
-      </div>
       <div id="docs-empty-msg" style="display:none;text-align:center;padding:32px;color:var(--text3)">
         <i class="fas fa-folder-open" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>
         Nenhum documento encontrado para este filtro.
@@ -1900,8 +2036,8 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
       <button class="modal-close" onclick="closeModal('modal-add-membro')">✕</button>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Nome completo</label><input id="mb-nome" class="form-input" type="text" placeholder="Nome do membro"></div>
-      <div class="form-group"><label class="form-label">Matrícula</label><input id="mb-matricula" class="form-input" type="text" placeholder="Ex: 2023001"></div>
+      <div class="form-group"><label class="form-label">Nome completo <span style="color:var(--coral)">*</span></label><input id="mb-nome" class="form-input" type="text" placeholder="Nome do membro" required></div>
+      <div class="form-group"><label class="form-label">Matrícula <span style="color:var(--coral)">*</span></label><input id="mb-matricula" class="form-input" type="text" placeholder="Ex: 2023001" required></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Período</label><select id="mb-periodo" class="form-select"><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option><option>7º</option><option>8º</option></select></div>
@@ -1928,9 +2064,9 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Tipo</label><select id="lanc-tipo" class="form-select"><option>Receita</option><option>Despesa</option></select></div>
-      <div class="form-group"><label class="form-label">Valor (R$)</label><input id="lanc-valor" class="form-input" type="number" placeholder="0,00" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Valor (R$) <span style="color:var(--coral)">*</span></label><input id="lanc-valor" class="form-input" type="number" placeholder="0,00" step="0.01" required></div>
     </div>
-    <div class="form-group"><label class="form-label">Descrição</label><input id="lanc-descricao" class="form-input" type="text" placeholder="Descreva o lançamento"></div>
+    <div class="form-group"><label class="form-label">Descrição <span style="color:var(--coral)">*</span></label><input id="lanc-descricao" class="form-input" type="text" placeholder="Descreva o lançamento" required></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Categoria</label><select id="lanc-categoria" class="form-select"><option>Mensalidades</option><option>Eventos</option><option>Material</option><option>Patrocínio</option><option>Administrativo</option><option>Pesquisa</option></select></div>
       <div class="form-group"><label class="form-label">Data</label><input id="lanc-data" class="form-input" type="date"></div>
@@ -1950,7 +2086,7 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
       <div class="modal-title">Novo Evento</div>
       <button class="modal-close" onclick="closeModal('modal-novo-evento')">✕</button>
     </div>
-    <div class="form-group"><label class="form-label">Título do evento</label><input id="ev-titulo" class="form-input" type="text" placeholder="Nome do evento"></div>
+    <div class="form-group"><label class="form-label">Título do evento <span style="color:var(--coral)">*</span></label><input id="ev-titulo" class="form-input" type="text" placeholder="Nome do evento" required></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Tipo</label><select id="ev-tipo" class="form-select"><option>Palestra</option><option>Workshop</option><option>Reunião</option><option>Jornada</option><option>Ação de extensão</option><option>Congresso</option></select></div>
       <div class="form-group"><label class="form-label">Data</label><input id="ev-data" class="form-input" type="date"></div>
@@ -2505,6 +2641,21 @@ th.sort-desc::after { content: ' ▼'; font-size: 9px; opacity: 1; color: var(--
   </div>
 </div>
 
+<!-- MODAL: Confirmação Customizada -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="width:400px;text-align:center">
+    <div class="confirm-icon" id="confirm-icon-wrap">
+      <i class="fas fa-exclamation-triangle" id="confirm-icon"></i>
+    </div>
+    <div class="modal-title" id="confirm-title" style="justify-content:center;font-size:17px;margin-bottom:10px">Confirmar ação</div>
+    <p id="confirm-message" style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px"></p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-outline" id="confirm-cancel-btn" onclick="closeModal('modal-confirm')" style="min-width:100px">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-ok-btn" style="min-width:100px">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
 <script>
 'use strict';
@@ -2737,6 +2888,7 @@ function loginSuccess(role) {
   applyTheme();
   setupSearch();
   setupFilters();
+  setupInlineValidation();
   bindModalButtons();
   loadHomeStats();
   _restaurarDocsStatic(); // Seguro: executada após autenticação confirmada
@@ -2746,21 +2898,26 @@ function loginSuccess(role) {
 }
 
 function doLogout() {
-  if (!confirm('Deseja realmente sair do sistema?')) return;
-  currentRole = null;
-  sessionStorage.removeItem('lapa-role');
-  document.body.classList.remove('is-admin');
-
-  // Limpa senha e reseta login screen
-  document.getElementById('login-senha').value = '';
-  document.getElementById('login-senha').classList.remove('error');
-  clearLoginError();
-  selectRole('admin');
-
-  const screen = document.getElementById('login-screen');
-  screen.style.display = 'flex';
-  screen.style.opacity = '0';
-  setTimeout(() => { screen.style.transition = 'opacity .4s ease'; screen.style.opacity = '1'; }, 10);
+  customConfirm({
+    title: 'Sair do sistema',
+    message: 'Deseja realmente encerrar sua sessão?',
+    confirmLabel: 'Sair',
+    icon: 'fa-sign-out-alt',
+    iconColor: 'var(--coral)',
+    onConfirm: () => {
+      currentRole = null;
+      sessionStorage.removeItem('lapa-role');
+      document.body.classList.remove('is-admin');
+      document.getElementById('login-senha').value = '';
+      document.getElementById('login-senha').classList.remove('error');
+      clearLoginError();
+      selectRole('admin');
+      const screen = document.getElementById('login-screen');
+      screen.style.display = 'flex';
+      screen.style.opacity = '0';
+      setTimeout(() => { screen.style.transition = 'opacity .4s ease'; screen.style.opacity = '1'; }, 10);
+    }
+  });
 }
 
 function showLoginError(msg) {
@@ -3069,173 +3226,176 @@ async function apiPost(payload) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  ESTADO DAS TABELAS — paginação & ordenação
+//  MODAL DE CONFIRMAÇÃO CUSTOMIZADO — substitui window.confirm
 // ══════════════════════════════════════════════════════════════
 
-const _tbl = {
-  membros:    { data:[], page:1, perPage:15, sortCol:null, sortDir:'asc' },
-  financeiro: { data:[], page:1, perPage:15 },
-};
+let _confirmCallback = null;
 
-/** Cria/atualiza a barra de paginação dentro do card que contém o data-pganchor. */
-function _buildPaginationBar(barId, state, gotoFn) {
-  let bar = document.getElementById(barId);
-  if (!bar) {
-    const anchor = document.querySelector('[data-pganchor="' + barId + '"]');
-    if (!anchor) return;
-    bar = document.createElement('div');
-    bar.id        = barId;
-    bar.className = 'pagination-bar';
-    anchor.parentNode.insertBefore(bar, anchor.nextSibling);
-  }
+function customConfirm({ title, message, confirmLabel = 'Confirmar', cancelLabel = 'Cancelar',
+                          icon = 'fa-exclamation-triangle', iconColor = 'var(--coral)', danger = true, onConfirm }) {
+  _confirmCallback = onConfirm;
+  const wrap  = document.getElementById('modal-confirm');
+  const ico   = document.getElementById('confirm-icon');
+  const icoW  = document.getElementById('confirm-icon-wrap');
+  const tit   = document.getElementById('confirm-title');
+  const msg   = document.getElementById('confirm-message');
+  const okBtn = document.getElementById('confirm-ok-btn');
+  const canBtn= document.getElementById('confirm-cancel-btn');
 
-  const total  = state.data.length;
-  const pages  = Math.max(1, Math.ceil(total / state.perPage));
-  const cur    = Math.max(1, Math.min(state.page, pages));
-  state.page   = cur;
-  const from   = total === 0 ? 0 : (cur - 1) * state.perPage + 1;
-  const to     = Math.min(cur * state.perPage, total);
+  ico.className = 'fas ' + icon;
+  ico.style.color = iconColor;
+  icoW.style.background = danger ? 'rgba(244,63,94,.12)' : 'rgba(239,68,68,.12)';
+  icoW.style.borderColor = danger ? 'rgba(244,63,94,.25)' : 'rgba(239,68,68,.25)';
+  tit.textContent  = title   || 'Confirmar ação';
+  msg.textContent  = message || 'Tem certeza?';
+  okBtn.textContent = confirmLabel;
+  okBtn.className   = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+  canBtn.textContent = cancelLabel;
 
-  // Gera botões: sempre mostra 1, última e ±2 ao redor da atual
-  const show = new Set([1, pages]);
-  for (let p = Math.max(1, cur - 2); p <= Math.min(pages, cur + 2); p++) show.add(p);
-  const sorted = [...show].sort((a, b) => a - b);
-  let pageHtml = '', prev = 0;
-  sorted.forEach(p => {
-    if (p - prev > 1) pageHtml += `<span style="padding:0 3px;color:var(--text3)">…</span>`;
-    pageHtml += `<button class="pg-btn${p===cur?' active':''}" onclick="${gotoFn}(${p})">${p}</button>`;
-    prev = p;
-  });
-
-  bar.innerHTML = `
-    <span class="pagination-info">${from}–${to} de ${total} registro${total !== 1 ? 's' : ''}</span>
-    <div class="pagination-pages">
-      <button class="pg-btn" ${cur<=1?'disabled':''} onclick="${gotoFn}(${cur-1})">
-        <i class="fas fa-chevron-left" style="font-size:10px"></i></button>
-      ${pageHtml}
-      <button class="pg-btn" ${cur>=pages?'disabled':''} onclick="${gotoFn}(${cur+1})">
-        <i class="fas fa-chevron-right" style="font-size:10px"></i></button>
-    </div>`;
+  wrap.classList.add('open');
+  okBtn.focus();
 }
 
-/** Ordena array por coluna, detectando tipo automaticamente. */
-function _sortArr(arr, col, dir) {
-  if (!col) return arr;
-  return [...arr].sort((a, b) => {
-    const va = a[col] ?? '', vb = b[col] ?? '';
-    const na = parseFloat(va), nb = parseFloat(vb);
-    if (!isNaN(na) && !isNaN(nb)) return dir === 'asc' ? na - nb : nb - na;
-    if (/^\d{4}-\d{2}-\d{2}/.test(String(va)))
-      return dir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
-    return dir === 'asc'
-      ? String(va).toLowerCase().localeCompare(String(vb).toLowerCase())
-      : String(vb).toLowerCase().localeCompare(String(va).toLowerCase());
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-//  BUSCA GLOBAL
-// ══════════════════════════════════════════════════════════════
-
-function setupSearch() {
-  // Exclui #sec-filter-busca: tratado por filterSecMembros() via setupFilters()
-  document.querySelectorAll('.search-box input:not(#sec-filter-busca)').forEach(input => {
-    input.addEventListener('input', function () {
-      const val = this.value.toLowerCase().trim();
-
-      /* ── 1. Membros (tabela principal) ───────────────────── */
-      {
-        const rows = document.querySelectorAll('#members-table tr:not(#members-empty)');
-        let vis = 0;
-        rows.forEach(r => {
-          const show = !val || r.textContent.toLowerCase().includes(val);
-          r.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('members-noresult', vis === 0 && rows.length > 0);
-      }
-
-      /* ── 2. Atas ─────────────────────────────────────────── */
-      {
-        const cards = document.querySelectorAll('.ata-card');
-        let vis = 0;
-        cards.forEach(c => {
-          const show = !val || c.textContent.toLowerCase().includes(val);
-          c.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('atas-noresult', vis === 0 && cards.length > 0);
-      }
-
-      /* ── 3. Movimentações financeiras ────────────────────── */
-      {
-        const rows = document.querySelectorAll('#finance-movimentacoes .finance-row');
-        let vis = 0;
-        rows.forEach(r => {
-          const show = !val || r.textContent.toLowerCase().includes(val);
-          r.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('finance-noresult', vis === 0 && rows.length > 0);
-      }
-
-      /* ── 4. Eventos (agenda) ─────────────────────────────── */
-      {
-        const cards = document.querySelectorAll('#ag-lista .card');
-        let vis = 0;
-        cards.forEach(c => {
-          const show = !val || c.textContent.toLowerCase().includes(val);
-          c.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('agenda-noresult', vis === 0 && cards.length > 0);
-      }
-
-      /* ── 5. Projetos de pesquisa ─────────────────────────── */
-      {
-        const cards = document.querySelectorAll('.research-card');
-        let vis = 0;
-        cards.forEach(c => {
-          const show = !val || c.textContent.toLowerCase().includes(val);
-          c.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('pesquisa-noresult', vis === 0 && cards.length > 0);
-      }
-
-      /* ── 6. Documentos ───────────────────────────────────── */
-      {
-        const cards = document.querySelectorAll('.doc-card');
-        let vis = 0;
-        cards.forEach(c => {
-          const nome = (c.getAttribute('data-nome') || '') + c.textContent;
-          const show = !val || nome.toLowerCase().includes(val);
-          c.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('docs-noresult', vis === 0 && cards.length > 0);
-      }
-
-      /* ── 7. Parceiros de extensão ────────────────────────── */
-      {
-        const rows = document.querySelectorAll('#extensao-parceiros-list .finance-row');
-        let vis = 0;
-        rows.forEach(r => {
-          const show = !val || r.textContent.toLowerCase().includes(val);
-          r.style.display = show ? '' : 'none';
-          if (show) vis++;
-        });
-        _toggleNoResult('parceiros-noresult', vis === 0 && rows.length > 0);
+document.addEventListener('DOMContentLoaded', () => {
+  const okBtn = document.getElementById('confirm-ok-btn');
+  if (okBtn) {
+    okBtn.addEventListener('click', () => {
+      closeModal('modal-confirm');
+      if (typeof _confirmCallback === 'function') {
+        _confirmCallback();
+        _confirmCallback = null;
       }
     });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+//  BUSCA GLOBAL — DROPDOWN COMPLETO (todos os módulos)
+// ══════════════════════════════════════════════════════════════
+
+let _searchDebounceTimer = null;
+let _allDataCache = {};  // cache local para busca
+
+function setupSearch() {
+  const input    = document.getElementById('global-search-input');
+  const dropdown = document.getElementById('global-search-dropdown');
+  if (!input || !dropdown) return;
+
+  // Fechar ao clicar fora
+  document.addEventListener('click', e => {
+    if (!document.getElementById('global-search-wrap')?.contains(e.target)) {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2) dropdown.classList.add('open');
+  });
+
+  input.addEventListener('input', () => {
+    clearTimeout(_searchDebounceTimer);
+    const val = input.value.trim();
+    if (val.length < 2) { dropdown.classList.remove('open'); return; }
+    _searchDebounceTimer = setTimeout(() => _runGlobalSearch(val), 220);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { dropdown.classList.remove('open'); input.value = ''; }
   });
 }
 
-/** Cria (se necessário) e exibe/oculta o aviso "nenhum resultado". */
-function _toggleNoResult(id, show) {
-  let el = document.getElementById(id);
-  if (!el) return;
-  el.classList.toggle('visible', show);
+async function _runGlobalSearch(q) {
+  const dropdown = document.getElementById('global-search-dropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = `<div class="search-no-results"><i class="fas fa-spinner fa-spin"></i> Buscando…</div>`;
+  dropdown.classList.add('open');
+
+  const term = q.toLowerCase();
+  const results = {};
+
+  // Sheets a buscar
+  const sheets = [
+    { key: 'Membros',           label: 'Membros',        icon: 'fa-user',           color: 'var(--teal)',     badge: 'teal',    page: 'membros',    fields: ['Nome','Matricula','Setor','Cargo'] },
+    { key: 'Eventos',           label: 'Eventos',        icon: 'fa-calendar-check', color: 'var(--lavender)', badge: 'lav',     page: 'agenda',     fields: ['Titulo','Tipo','Local','Responsavel'] },
+    { key: 'Atas',              label: 'Atas',           icon: 'fa-file-alt',       color: 'var(--gold)',     badge: 'gold',    page: 'secretaria', fields: ['Titulo','Status'] },
+    { key: 'Financeiro',        label: 'Financeiro',     icon: 'fa-receipt',        color: 'var(--sage)',     badge: 'sage',    page: 'tesouraria', fields: ['Descricao','Categoria','Tipo'] },
+    { key: 'Pesquisas',         label: 'Projetos',       icon: 'fa-flask',          color: 'var(--coral)',    badge: 'coral',   page: 'pesquisa',   fields: ['Titulo','Status','Descricao'] },
+    { key: 'Cursos',            label: 'Cursos',         icon: 'fa-graduation-cap', color: 'var(--lavender)', badge: 'lav',     page: 'ensino',     fields: ['Titulo','Status'] },
+    { key: 'Parceiros',         label: 'Parceiros',      icon: 'fa-handshake',      color: 'var(--sky)',      badge: 'sky',     page: 'extensao',   fields: ['Nome','Area','Status'] },
+    { key: 'TarefasMarketing',  label: 'Conteúdo',       icon: 'fa-bullhorn',       color: 'var(--lavender)', badge: 'lav',     page: 'marketing',  fields: ['Titulo','Formato','Status'] },
+    { key: 'Documentos',        label: 'Documentos',     icon: 'fa-folder-open',    color: 'var(--gold)',     badge: 'gold',    page: 'documentos', fields: ['fileName','Nome','categoria','Categoria'] },
+  ];
+
+  // Busca em paralelo com cache
+  await Promise.all(sheets.map(async s => {
+    try {
+      let data = _allDataCache[s.key];
+      if (!data) {
+        data = await apiGet({ action: 'getAll', sheet: s.key });
+        if (data) _allDataCache[s.key] = data;
+      }
+      if (!data) return;
+      const hits = data.filter(row =>
+        s.fields.some(f => String(row[f] || '').toLowerCase().includes(term))
+      ).slice(0, 4);
+      if (hits.length) results[s.key] = { ...s, hits };
+    } catch(_) {}
+  }));
+
+  // Busca em docs estáticos (não estão na API)
+  const staticDocs = [];
+  document.querySelectorAll('#docs-static-grid .doc-card').forEach(card => {
+    const nome = (card.getAttribute('data-nome') || '').toLowerCase();
+    if (nome.includes(term)) {
+      staticDocs.push({ _nome: card.querySelector('.doc-static-nome')?.textContent || nome, _cat: card.getAttribute('data-cat') || '' });
+    }
+  });
+  if (staticDocs.length) {
+    results['_static_docs'] = {
+      label: 'Documentos', icon: 'fa-folder-open', color: 'var(--gold)', page: 'documentos',
+      hits: staticDocs.map(d => ({ _display: d._nome, _sub: d._cat }))
+    };
+  }
+
+  // Render
+  const keys = Object.keys(results);
+  if (keys.length === 0) {
+    dropdown.innerHTML = `<div class="search-no-results">
+      <i class="fas fa-search"></i>
+      Nenhum resultado encontrado para "<strong>${esc(q)}</strong>"
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  keys.forEach(k => {
+    const s = results[k];
+    html += `<div class="search-group-label"><i class="fas ${s.icon}" style="color:${s.color};margin-right:5px"></i>${s.label}</div>`;
+    s.hits.forEach(row => {
+      const title = row._display || row.Titulo || row.Nome || row.Descricao || row.fileName || '—';
+      const sub   = row._sub   || row.Setor || row.Tipo || row.Status || row.Categoria || row.categoria || '';
+      html += `<div class="search-result-item" onclick="closeSearchAndGo('${s.page}')">
+        <div class="search-result-icon" style="background:rgba(0,0,0,.12);color:${s.color}">
+          <i class="fas ${s.icon}"></i>
+        </div>
+        <div>
+          <div class="search-result-title">${esc(String(title))}</div>
+          ${sub ? `<div class="search-result-sub">${esc(String(sub))}</div>` : ''}
+        </div>
+      </div>`;
+    });
+  });
+
+  dropdown.innerHTML = html;
+}
+
+function closeSearchAndGo(page) {
+  const dropdown = document.getElementById('global-search-dropdown');
+  const input    = document.getElementById('global-search-input');
+  if (dropdown) dropdown.classList.remove('open');
+  if (input) input.value = '';
+  showPage(page);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3248,6 +3408,12 @@ function setupFilters() {
   const mbrStatus = document.getElementById('mbr-filter-status');
   if (mbrSetor)  mbrSetor.addEventListener('change',  filterMembros);
   if (mbrStatus) mbrStatus.addEventListener('change', filterMembros);
+
+  // Conecta o campo de busca local de membros ao filterMembros paginado
+  const mbrBusca = document.querySelector('#page-membros .search-box input');
+  if (mbrBusca) {
+    mbrBusca.addEventListener('input', () => { _membrosPagina = 1; _renderMembrosTable(); });
+  }
 
   // Filtro de setor na Secretaria (sec-membros-ctrl) — select + input de busca
   const secSetor = document.getElementById('sec-filter-setor');
@@ -3521,8 +3687,14 @@ function renderHomeMembros(data) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  LOADER — MEMBROS
+//  LOADER — MEMBROS (com paginação e ordenação)
 // ══════════════════════════════════════════════════════════════
+
+let _membrosData   = [];   // dataset completo filtrado
+let _membrosSortKey = null;
+let _membrosSortDir = 1;   // 1 = asc, -1 = desc
+let _membrosPagina  = 1;
+const _membrosPorPagina = 15;
 
 async function loadMembros() {
   const tbody = document.getElementById('members-table');
@@ -3538,12 +3710,13 @@ async function loadMembros() {
         <i class="fas fa-users" style="font-size:28px;display:block;margin-bottom:12px;opacity:.3"></i>
         Nenhum membro cadastrado. ${isAdmin() ? 'Clique em <strong style="color:var(--teal)">Adicionar membro</strong> para começar.' : ''}
       </td></tr>`;
+      document.getElementById('members-pagination').style.display = 'none';
       return;
     }
 
-    _tbl.membros.data = data;
-    _tbl.membros.page = 1;
-    _renderMembrosPaged(1);
+    _membrosData   = data;
+    _membrosPagina = 1;
+    _renderMembrosTable();
 
     // Também atualiza tabela da secretaria e home
     renderSecMembros(data);
@@ -3554,63 +3727,124 @@ async function loadMembros() {
   }
 }
 
-/** Renderiza a página N da tabela de membros, aplicando ordenação ativa. */
-function _renderMembrosPaged(page) {
-  const state = _tbl.membros;
-  state.page  = page;
-  const tbody = document.getElementById('members-table');
-  if (!tbody) return;
-
-  const sorted   = _sortArr(state.data, state.sortCol, state.sortDir);
-  const startIdx = (page - 1) * state.perPage;
-  const slice    = sorted.slice(startIdx, startIdx + state.perPage);
-
-  if (slice.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3)">Nenhum registro nesta página.</td></tr>`;
+function sortMembros(key) {
+  if (_membrosSortKey === key) {
+    _membrosSortDir *= -1;
   } else {
-    tbody.innerHTML = slice.map(m => {
-      const cor = setorCor(m.Setor);
-      const ini = (m.Nome || '?')[0].toUpperCase();
-      const actionBtns = isAdmin()
-        ? `<td style="display:flex;gap:6px">
-            <button class="btn btn-outline btn-sm" title="Editar" onclick="editMembro('${esc(m.ID)}')"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-outline btn-sm" style="color:var(--coral)" title="Remover" onclick="deleteMembro('${esc(m.ID)}','${esc(m.Nome)}')"><i class="fas fa-trash"></i></button>
-           </td>`
-        : `<td><span style="font-size:11px;color:var(--text3)">—</span></td>`;
-      return `<tr>
-        <td><div class="td-name"><div class="td-avatar" style="background:${cor.bg};color:${cor.fg}">${ini}</div>${esc(m.Nome)}</div></td>
-        <td><code style="font-family:'DM Mono';font-size:12px;color:var(--text3)">${esc(m.Matricula)}</code></td>
-        <td>${esc(m.Periodo)}º</td>
-        <td><span class="badge ${cor.badge}">${esc(m.Setor)}</span></td>
-        <td>${esc(m.Cargo)}</td>
-        <td>${formatDate(m.DataIngresso)}</td>
-        <td><span class="badge ${statusBadge(m.Status)}">${esc(m.Status)}</span></td>
-        ${actionBtns}
-      </tr>`;
-    }).join('');
+    _membrosSortKey = key;
+    _membrosSortDir = 1;
   }
-
-  // Atualiza cabeçalhos com indicador de ordenação
-  document.querySelectorAll('#page-membros thead th.sortable').forEach(th => {
-    th.classList.remove('sort-asc', 'sort-desc');
-    if (th.dataset.col === state.sortCol) {
-      th.classList.add(state.sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
-    }
+  // Atualiza ícones de cabeçalho
+  document.querySelectorAll('#page-membros th.sortable').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    const ico = th.querySelector('.sort-icon');
+    if (ico) ico.textContent = '⇅';
   });
-
-  _buildPaginationBar('members-pgbar', state, '_renderMembrosPaged');
+  const activeEl = [...document.querySelectorAll('#page-membros th.sortable')].find(th =>
+    th.getAttribute('onclick')?.includes(`'${key}'`)
+  );
+  if (activeEl) {
+    activeEl.classList.add(_membrosSortDir === 1 ? 'sort-asc' : 'sort-desc');
+    const ico = activeEl.querySelector('.sort-icon');
+    if (ico) ico.textContent = _membrosSortDir === 1 ? '↑' : '↓';
+  }
+  _membrosPagina = 1;
+  _renderMembrosTable();
 }
 
-/** Alterna ordenação ao clicar em um <th>. */
-function _sortMembros(col) {
-  const state = _tbl.membros;
-  if (state.sortCol === col) {
-    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
-  } else {
-    state.sortCol = col;
-    state.sortDir = 'asc';
+function _getMembrosFiltrados() {
+  const setor  = document.getElementById('mbr-filter-setor')?.value  || 'Todos os setores';
+  const status = document.getElementById('mbr-filter-status')?.value || 'Todos os status';
+  const busca  = (document.querySelector('#page-membros .search-box input')?.value || '').toLowerCase().trim();
+
+  let list = _membrosData.filter(m => {
+    const txt = Object.values(m).join(' ').toLowerCase();
+    const setorOk  = setor  === 'Todos os setores'  || (m.Setor  || '') === setor;
+    const statusOk = status === 'Todos os status'   || (m.Status || '') === status;
+    const buscaOk  = !busca || txt.includes(busca);
+    return setorOk && statusOk && buscaOk;
+  });
+
+  if (_membrosSortKey) {
+    list = list.slice().sort((a, b) => {
+      let va = String(a[_membrosSortKey] || '');
+      let vb = String(b[_membrosSortKey] || '');
+      if (!isNaN(va) && !isNaN(vb)) { va = +va; vb = +vb; }
+      return va < vb ? -_membrosSortDir : va > vb ? _membrosSortDir : 0;
+    });
   }
-  _renderMembrosPaged(1);
+  return list;
+}
+
+function _renderMembrosTable() {
+  const tbody   = document.getElementById('members-table');
+  const pagWrap = document.getElementById('members-pagination');
+  const pagInfo = document.getElementById('members-pag-info');
+  const pagBtns = document.getElementById('members-pag-btns');
+  if (!tbody) return;
+
+  const filtered = _getMembrosFiltrados();
+  const total    = filtered.length;
+  const pages    = Math.ceil(total / _membrosPorPagina);
+  _membrosPagina = Math.min(_membrosPagina, Math.max(1, pages));
+
+  const inicio = (_membrosPagina - 1) * _membrosPorPagina;
+  const slice  = filtered.slice(inicio, inicio + _membrosPorPagina);
+
+  if (slice.length === 0) {
+    tbody.innerHTML = `<tr id="members-empty"><td colspan="8" style="text-align:center;padding:32px;color:var(--text3)">
+      <i class="fas fa-search" style="font-size:24px;display:block;margin-bottom:10px;opacity:.3"></i>Nenhum membro corresponde ao filtro.
+    </td></tr>`;
+    if (pagWrap) pagWrap.style.display = 'none';
+    return;
+  }
+
+  tbody.innerHTML = slice.map(m => {
+    const cor = setorCor(m.Setor);
+    const ini = (m.Nome || '?')[0].toUpperCase();
+    const actionBtns = isAdmin()
+      ? `<td style="display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" title="Editar" onclick="editMembro('${esc(m.ID)}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-outline btn-sm" style="color:var(--coral)" title="Remover" onclick="deleteMembro('${esc(m.ID)}','${esc(m.Nome)}')"><i class="fas fa-trash"></i></button>
+         </td>`
+      : `<td><span style="font-size:11px;color:var(--text3)">—</span></td>`;
+    return `<tr>
+      <td><div class="td-name"><div class="td-avatar" style="background:${cor.bg};color:${cor.fg}">${ini}</div>${esc(m.Nome)}</div></td>
+      <td><code style="font-family:'DM Mono';font-size:12px;color:var(--text3)">${esc(m.Matricula)}</code></td>
+      <td>${esc(m.Periodo)}º</td>
+      <td><span class="badge ${cor.badge}">${esc(m.Setor)}</span></td>
+      <td>${esc(m.Cargo)}</td>
+      <td>${formatDate(m.DataIngresso)}</td>
+      <td><span class="badge ${statusBadge(m.Status)}">${esc(m.Status)}</span></td>
+      ${actionBtns}
+    </tr>`;
+  }).join('');
+
+  // Paginação
+  if (pagWrap && pagInfo && pagBtns) {
+    if (pages <= 1) {
+      pagWrap.style.display = 'none';
+    } else {
+      pagWrap.style.display = 'flex';
+      pagInfo.textContent = `${inicio + 1}–${Math.min(inicio + _membrosPorPagina, total)} de ${total} membros`;
+      let btns = `<button class="pag-btn" onclick="_membrosPagina=Math.max(1,_membrosPagina-1);_renderMembrosTable()" ${_membrosPagina===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+      for (let p = 1; p <= pages; p++) {
+        if (pages <= 7 || Math.abs(p - _membrosPagina) <= 1 || p === 1 || p === pages) {
+          btns += `<button class="pag-btn${p===_membrosPagina?' active':''}" onclick="_membrosPagina=${p};_renderMembrosTable()">${p}</button>`;
+        } else if (Math.abs(p - _membrosPagina) === 2) {
+          btns += `<button class="pag-btn" disabled>…</button>`;
+        }
+      }
+      btns += `<button class="pag-btn" onclick="_membrosPagina=Math.min(${pages},_membrosPagina+1);_renderMembrosTable()" ${_membrosPagina===pages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+      pagBtns.innerHTML = btns;
+    }
+  }
+}
+
+// Filtros — agora acionam re-render paginado
+function filterMembros() {
+  _membrosPagina = 1;
+  _renderMembrosTable();
 }
 
 function renderSecMembros(data) {
@@ -3811,47 +4045,26 @@ async function loadTesouraria() {
       prazoEl.textContent = prazo ? formatDate(prazo) : '—';
     }
 
-    // ── Lista de movimentações (paginada) ─────────────────
-    _tbl.financeiro.data = [...data].sort((a,b) => new Date(b.Data) - new Date(a.Data));
-    _tbl.financeiro.page = 1;
-    _renderFinancePaged(1);
+    // ── Lista de movimentações ────────────────────────────
+    container.innerHTML = data
+      .sort((a,b) => new Date(b.Data) - new Date(a.Data))
+      .slice(0, 12)
+      .map(mov => {
+        const isRec = String(mov.Tipo).toLowerCase() === 'receita';
+        const v = parseFloat(mov.Valor) || 0;
+        return `<div class="finance-row">
+          <div>
+            <div class="finance-desc">${esc(mov.Descricao)}</div>
+            <div class="finance-cat">${esc(mov.Tipo)} • ${esc(mov.Categoria)} • ${formatDate(mov.Data)}</div>
+          </div>
+          <div class="finance-val ${isRec?'pos':'neg'}">${isRec?'+':'−'} R$ ${v.toFixed(2).replace('.',',')}</div>
+        </div>`;
+      }).join('');
 
   } catch(e) {
     setEmptyMsg('finance-movimentacoes', 'fa-exclamation-circle', 'Erro ao carregar movimentações.');
     _aplicarIndicadoresLocais();
   }
-}
-
-// ══════════════════════════════════════════════════════════════
-//  RENDER PAGINADO — Movimentações financeiras
-// ══════════════════════════════════════════════════════════════
-
-function _renderFinancePaged(page) {
-  const state     = _tbl.financeiro;
-  state.page      = page;
-  const container = document.getElementById('finance-movimentacoes');
-  if (!container) return;
-
-  const startIdx = (page - 1) * state.perPage;
-  const slice    = state.data.slice(startIdx, startIdx + state.perPage);
-
-  if (slice.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3)">Nenhum lançamento nesta página.</div>';
-  } else {
-    container.innerHTML = slice.map(mov => {
-      const isRec = String(mov.Tipo).toLowerCase() === 'receita';
-      const v = parseFloat(mov.Valor) || 0;
-      return `<div class="finance-row">
-        <div>
-          <div class="finance-desc">${esc(mov.Descricao)}</div>
-          <div class="finance-cat">${esc(mov.Tipo)} • ${esc(mov.Categoria)} • ${formatDate(mov.Data)}</div>
-        </div>
-        <div class="finance-val ${isRec?'pos':'neg'}">${isRec?'+':'−'} R$ ${v.toFixed(2).replace('.',',')}</div>
-      </div>`;
-    }).join('');
-  }
-
-  _buildPaginationBar('finance-pgbar', state, '_renderFinancePaged');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -4065,12 +4278,19 @@ async function salvarEdicaoAta() {
 
 async function deleteEvento(id, nome) {
   if (!requireAdmin('excluir eventos')) return;
-  if (!confirm(`Excluir o evento "${nome}"?\nEsta ação não pode ser desfeita.`)) return;
-  try {
-    await apiPost({ action: 'delete', sheet: 'Eventos', id });
-    showToast('Evento excluído.', 'success');
-    loadAgenda();
-  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+  customConfirm({
+    title: 'Excluir evento',
+    message: `Deseja realmente excluir o evento "${nome}"? Esta ação não pode ser desfeita.`,
+    confirmLabel: 'Excluir',
+    icon: 'fa-calendar-times',
+    onConfirm: async () => {
+      try {
+        await apiPost({ action: 'delete', sheet: 'Eventos', id });
+        showToast('Evento excluído.', 'success');
+        loadAgenda();
+      } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -4415,6 +4635,9 @@ async function loadMarketing() {
       if (titleEl) titleEl.innerHTML = `${info.emoji} ${info.label} <span class="badge ${info.badge}">${total}</span>`;
     });
 
+    // Activa drag-and-drop após renderizar os cards
+    _initKanbanDnD();
+
   } catch(e) { console.warn('loadMarketing:', e); }
 
   // ── Carrega campanhas da sheet Campanhas (ou TarefasMarketing filtrada) ──
@@ -4445,12 +4668,19 @@ async function loadMarketing() {
 
 async function excluirTarefaMkt(id, titulo) {
   if (!requireAdmin('excluir tarefas')) return;
-  if (!confirm(`Excluir a tarefa "${titulo}"?`)) return;
-  try {
-    await apiPost({ action: 'delete', sheet: 'TarefasMarketing', id });
-    showToast('Tarefa excluída.', 'success');
-    loadMarketing();
-  } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+  customConfirm({
+    title: 'Excluir tarefa',
+    message: `Deseja remover a tarefa "${titulo}" do Kanban?`,
+    confirmLabel: 'Excluir',
+    icon: 'fa-trash',
+    onConfirm: async () => {
+      try {
+        await apiPost({ action: 'delete', sheet: 'TarefasMarketing', id });
+        showToast('Tarefa excluída.', 'success');
+        loadMarketing();
+      } catch(e) { showToast('Erro: ' + e.message, 'error'); }
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -4529,12 +4759,19 @@ async function salvarEdicaoMembro() {
 
 async function deleteMembro(id, nome) {
   if (!requireAdmin('remover membros')) return;
-  if (!confirm(`Remover o membro "${nome}"?\nEsta ação não pode ser desfeita.`)) return;
-  try {
-    await apiPost({ action: 'delete', sheet: 'Membros', id });
-    showToast('Membro removido com sucesso.', 'success');
-    loadMembros();
-  } catch(e) { showToast('Erro ao remover: ' + e.message, 'error'); }
+  customConfirm({
+    title: 'Remover membro',
+    message: `Deseja realmente remover "${nome}" da liga? Esta ação não pode ser desfeita.`,
+    confirmLabel: 'Remover',
+    icon: 'fa-user-times',
+    onConfirm: async () => {
+      try {
+        await apiPost({ action: 'delete', sheet: 'Membros', id });
+        showToast('Membro removido com sucesso.', 'success');
+        loadMembros();
+      } catch(e) { showToast('Erro ao remover: ' + e.message, 'error'); }
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -5746,117 +5983,10 @@ async function loadCorrespondencias() {
 //  CALENDÁRIO MINI — GERADO A PARTIR DOS EVENTOS DA API
 // ══════════════════════════════════════════════════════════════
 
+// State vars para o calendário (declarados aqui para compatibilidade)
 let _calEventos = [];
 let _calYear    = new Date().getFullYear();
 let _calMonth   = new Date().getMonth();
-
-async function renderCalendar(year, month, eventos) {
-  if (eventos !== undefined) _calEventos = eventos;
-  _calYear  = year  ?? _calYear;
-  _calMonth = month ?? _calMonth;
-
-  const container = document.getElementById('mini-calendar-container');
-  if (!container) return;
-
-  const hoje     = new Date();
-  const primeiro = new Date(_calYear, _calMonth, 1);
-  const ultimo   = new Date(_calYear, _calMonth + 1, 0);
-  const diaSemana= primeiro.getDay(); // 0=Dom
-  const meses    = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-  // Mapa: "YYYY-MM-DD" → array de eventos
-  const eventosPorDia = {};
-  (_calEventos || []).forEach(ev => {
-    if (ev.Data) {
-      const key = ev.Data.substring(0, 10);
-      if (!eventosPorDia[key]) eventosPorDia[key] = [];
-      eventosPorDia[key].push(ev);
-    }
-  });
-
-  // Cabeçalho
-  let html = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <button class="btn btn-outline btn-sm" onclick="renderCalendar(${_calMonth===0?_calYear-1:_calYear},${_calMonth===0?11:_calMonth-1})">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">
-        ${meses[_calMonth]} ${_calYear}
-      </div>
-      <button class="btn btn-outline btn-sm" onclick="renderCalendar(${_calMonth===11?_calYear+1:_calYear},${_calMonth===11?0:_calMonth+1})">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-bottom:8px">
-      ${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d =>
-        `<div style="font-size:11px;font-weight:600;color:var(--text3);padding:4px">${d}</div>`
-      ).join('')}
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
-  `;
-
-  // Células vazias antes do dia 1
-  for (let i = 0; i < diaSemana; i++) {
-    html += `<div style="min-height:44px"></div>`;
-  }
-
-  // Dias do mês
-  for (let dia = 1; dia <= ultimo.getDate(); dia++) {
-    const dateStr = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-    const evsDia  = eventosPorDia[dateStr] || [];
-    const isHoje  = dia === hoje.getDate() && _calMonth === hoje.getMonth() && _calYear === hoje.getFullYear();
-    const temEv   = evsDia.length > 0;
-
-    const cellStyle = isHoje
-      ? 'background:var(--teal);color:var(--bg);border-radius:8px;font-weight:700'
-      : temEv
-        ? 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:var(--teal);font-weight:600'
-        : 'border-radius:8px';
-
-    const tooltip = temEv
-      ? evsDia.map(e => e.Titulo).join(', ').substring(0, 60)
-      : '';
-
-    html += `
-      <div style="min-height:44px;padding:6px 4px;text-align:center;cursor:${temEv?'pointer':'default'};${cellStyle};transition:.15s"
-           title="${esc(tooltip)}"
-           onclick="${temEv ? `mostrarEventosDia('${dateStr}')` : ''}">
-        <div style="font-size:13px">${dia}</div>
-        ${temEv ? `<div style="font-size:9px;margin-top:2px;overflow:hidden;white-space:nowrap;max-width:36px">● ${evsDia.length}</div>` : ''}
-      </div>`;
-  }
-
-  html += `</div>`;
-
-  // Legenda
-  if (_calEventos && _calEventos.length > 0) {
-    const proxEvs = (_calEventos)
-      .filter(e => e.Data && new Date(e.Data + 'T00:00:00') >= new Date(hoje.toDateString()))
-      .sort((a,b) => new Date(a.Data) - new Date(b.Data))
-      .slice(0, 3);
-    if (proxEvs.length) {
-      html += `<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
-        <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Próximos eventos</div>`;
-      proxEvs.forEach(ev => {
-        const cor = setorCor(ev.Tipo);
-        html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-          <div style="width:36px;height:36px;border-radius:8px;background:${cor.bg};border:1px solid ${cor.bd};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${cor.fg};font-size:12px;font-weight:700">
-            ${new Date(ev.Data+'T00:00:00').getDate()}
-          </div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ev.Titulo)}</div>
-            <div style="font-size:11px;color:var(--text3)">${formatDate(ev.Data)} ${ev.HoraInicio ? '• ' + ev.HoraInicio : ''}</div>
-          </div>
-          <span class="badge ${cor.badge}">${esc(ev.Tipo)}</span>
-        </div>`;
-      });
-      html += `</div>`;
-    }
-  }
-
-  container.innerHTML = html;
-}
 
 function mostrarEventosDia(dateStr) {
   const evs = _calEventos.filter(e => (e.Data || '').substring(0,10) === dateStr);
@@ -6037,6 +6167,421 @@ function setupKanbanIds() {
   const cols = document.querySelectorAll('.kanban-col');
   const ids  = ['backlog-col','producao-col','revisao-col','publicado-col'];
   cols.forEach((col, i) => { if (ids[i]) col.id = ids[i]; });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  KANBAN — DRAG AND DROP
+// ══════════════════════════════════════════════════════════════
+
+const _kanbanStatusMap = {
+  'backlog-col':   'Ideia',
+  'producao-col':  'Produção',
+  'revisao-col':   'Revisão',
+  'publicado-col': 'Publicado',
+};
+
+let _dragCard = null;
+
+function _initKanbanDnD() {
+  const board = document.getElementById('kanban-board');
+  if (!board || board.dataset.dndReady) return;
+  board.dataset.dndReady = '1';
+
+  // ── cards: eventos dragstart/dragend ──────────────────────
+  board.addEventListener('dragstart', e => {
+    const card = e.target.closest('.kanban-card');
+    if (!card || !isAdmin()) { e.preventDefault(); return; }
+    _dragCard = card;
+    card.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', card.getAttribute('data-task-id') || '');
+  });
+
+  board.addEventListener('dragend', () => {
+    if (_dragCard) { _dragCard.classList.remove('dragging'); _dragCard = null; }
+    document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+  });
+
+  // ── colunas: dragover / drop ──────────────────────────────
+  board.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const col = e.target.closest('.kanban-col');
+    document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+    if (col && _dragCard && !col.contains(_dragCard)) col.classList.add('drag-over');
+  });
+
+  board.addEventListener('dragleave', e => {
+    const col = e.target.closest('.kanban-col');
+    if (col && !col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+  });
+
+  board.addEventListener('drop', async e => {
+    e.preventDefault();
+    const col = e.target.closest('.kanban-col');
+    col?.classList.remove('drag-over');
+    if (!col || !_dragCard) return;
+    if (col.contains(_dragCard)) return;
+
+    const taskId    = _dragCard.getAttribute('data-task-id');
+    const newStatus = _kanbanStatusMap[col.id];
+    if (!newStatus || !taskId) return;
+
+    // Move o card visualmente de imediato
+    const titleEl = col.querySelector('.kanban-col-title');
+    col.insertBefore(_dragCard, titleEl ? titleEl.nextSibling : col.firstChild);
+
+    // Atualiza contadores
+    _updateKanbanCounts();
+
+    // Persiste na API
+    try {
+      await apiPost({ action: 'update', sheet: 'TarefasMarketing', id: taskId, row: { Status: newStatus } });
+      showToast(`Tarefa movida para "${newStatus}"`, 'success');
+    } catch(e) {
+      showToast('Erro ao mover tarefa: ' + e.message, 'error');
+    }
+  });
+
+  // Habilita todos os cards para drag
+  _refreshKanbanDraggable();
+}
+
+function _refreshKanbanDraggable() {
+  document.querySelectorAll('.kanban-card').forEach(card => {
+    card.draggable = isAdmin();
+  });
+}
+
+function _updateKanbanCounts() {
+  const colTitles = {
+    'backlog-col':   { emoji:'📋', label:'Backlog',      badge:'teal'  },
+    'producao-col':  { emoji:'🛠',  label:'Em Produção',  badge:'gold'  },
+    'revisao-col':   { emoji:'🔍', label:'Revisão',      badge:'coral' },
+    'publicado-col': { emoji:'✅', label:'Publicado',    badge:'sage'  },
+  };
+  Object.entries(colTitles).forEach(([colId, info]) => {
+    const col = document.getElementById(colId);
+    if (!col) return;
+    const cnt = col.querySelectorAll('.kanban-card').length;
+    const el  = col.querySelector('.kanban-col-title');
+    if (el) el.innerHTML = `${info.emoji} ${info.label} <span class="badge ${info.badge}">${cnt}</span>`;
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  VALIDAÇÃO INLINE — blur em campos obrigatórios
+// ══════════════════════════════════════════════════════════════
+
+function setupInlineValidation() {
+  // Escuta blur em qualquer input/select/textarea dentro de modais
+  document.addEventListener('blur', e => {
+    const el = e.target;
+    if (!el.matches('.form-input,.form-select,.form-textarea')) return;
+    if (!el.closest('.modal')) return;
+    _validateField(el);
+  }, true);
+
+  // Limpa erro quando usuário começa a digitar
+  document.addEventListener('input', e => {
+    const el = e.target;
+    if (!el.matches('.form-input,.form-select,.form-textarea')) return;
+    if (el.classList.contains('field-error')) {
+      el.classList.remove('field-error');
+      el.nextElementSibling?.classList.contains('field-error-msg') && el.nextElementSibling.remove();
+    }
+  });
+}
+
+function _validateField(el) {
+  const isRequired = el.hasAttribute('required') || el.closest('.form-group')?.querySelector('.form-label')?.textContent?.includes('*');
+  if (!isRequired) return true;
+  const val = el.value.trim();
+  if (!val) {
+    el.classList.add('field-error');
+    // Adiciona msg de erro se não existir ainda
+    if (!el.nextElementSibling?.classList.contains('field-error-msg')) {
+      const msg = document.createElement('div');
+      msg.className = 'field-error-msg';
+      msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Este campo é obrigatório';
+      el.insertAdjacentElement('afterend', msg);
+    }
+    return false;
+  }
+  el.classList.remove('field-error');
+  el.nextElementSibling?.classList.contains('field-error-msg') && el.nextElementSibling.remove();
+  return true;
+}
+
+function _validateModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return true;
+  // Valida todos os campos required e os com asterisco no label
+  let allOk = true;
+  modal.querySelectorAll('.form-input[required],.form-select[required],.form-textarea[required]').forEach(el => {
+    if (!_validateField(el)) allOk = false;
+  });
+  return allOk;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CALENDÁRIO — VISÕES: MÊS / SEMANA / DIA
+// ══════════════════════════════════════════════════════════════
+
+let _calView = 'month';  // 'month' | 'week' | 'day'
+let _calDayTarget = new Date();  // data de referência para week/day
+
+function switchCalView(view, tabEl) {
+  _calView = view;
+  document.querySelectorAll('.cal-view-tab').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  renderCalendar();
+}
+
+async function renderCalendar(year, month, eventos) {
+  if (eventos !== undefined) _calEventos = eventos;
+  if (year  !== undefined) _calYear  = year;
+  if (month !== undefined) { _calMonth = month; _calDayTarget = new Date(_calYear, _calMonth, _calDayTarget.getDate() || 1); }
+
+  const container = document.getElementById('mini-calendar-container');
+  if (!container) return;
+
+  if (_calView === 'week') {
+    _renderCalWeek(container);
+  } else if (_calView === 'day') {
+    _renderCalDay(container);
+  } else {
+    _renderCalMonth(container);
+  }
+}
+
+function _renderCalMonth(container) {
+  const hoje     = new Date();
+  const primeiro = new Date(_calYear, _calMonth, 1);
+  const ultimo   = new Date(_calYear, _calMonth + 1, 0);
+  const diaSemana= primeiro.getDay();
+  const meses    = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  const eventosPorDia = {};
+  (_calEventos || []).forEach(ev => {
+    if (ev.Data) {
+      const key = ev.Data.substring(0, 10);
+      if (!eventosPorDia[key]) eventosPorDia[key] = [];
+      eventosPorDia[key].push(ev);
+    }
+  });
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <button class="btn btn-outline btn-sm" onclick="renderCalendar(${_calMonth===0?_calYear-1:_calYear},${_calMonth===0?11:_calMonth-1})">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">
+        ${meses[_calMonth]} ${_calYear}
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="renderCalendar(${_calMonth===11?_calYear+1:_calYear},${_calMonth===11?0:_calMonth+1})">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-bottom:8px">
+      ${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d =>
+        `<div style="font-size:11px;font-weight:600;color:var(--text3);padding:4px">${d}</div>`
+      ).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">`;
+
+  for (let i = 0; i < diaSemana; i++) html += `<div style="min-height:44px"></div>`;
+
+  for (let dia = 1; dia <= ultimo.getDate(); dia++) {
+    const dateStr = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+    const evsDia  = eventosPorDia[dateStr] || [];
+    const isHoje  = dia === hoje.getDate() && _calMonth === hoje.getMonth() && _calYear === hoje.getFullYear();
+    const temEv   = evsDia.length > 0;
+    const cellStyle = isHoje
+      ? 'background:var(--teal);color:var(--bg);border-radius:8px;font-weight:700'
+      : temEv
+        ? 'background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:var(--teal);font-weight:600'
+        : 'border-radius:8px';
+    const tooltip = temEv ? evsDia.map(e => e.Titulo).join(', ').substring(0, 60) : '';
+
+    html += `<div style="min-height:44px;padding:6px 4px;text-align:center;cursor:pointer;${cellStyle};transition:.15s"
+         title="${esc(tooltip)}"
+         onclick="${temEv ? `mostrarEventosDia('${dateStr}')` : isAdmin() ? `_criarEventoNoDia('${dateStr}')` : ''}">
+      <div style="font-size:13px">${dia}</div>
+      ${temEv ? `<div style="font-size:9px;margin-top:2px;overflow:hidden;white-space:nowrap;max-width:36px">● ${evsDia.length}</div>` : ''}
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Próximos eventos
+  if (_calEventos && _calEventos.length > 0) {
+    const proxEvs = _calEventos
+      .filter(e => e.Data && new Date(e.Data + 'T00:00:00') >= new Date(hoje.toDateString()))
+      .sort((a,b) => new Date(a.Data) - new Date(b.Data)).slice(0, 3);
+    if (proxEvs.length) {
+      html += `<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
+        <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Próximos eventos</div>`;
+      proxEvs.forEach(ev => {
+        const cor = setorCor(ev.Tipo);
+        html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:36px;height:36px;border-radius:8px;background:${cor.bg};border:1px solid ${cor.bd};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${cor.fg};font-size:12px;font-weight:700">
+            ${new Date(ev.Data+'T00:00:00').getDate()}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ev.Titulo)}</div>
+            <div style="font-size:11px;color:var(--text3)">${formatDate(ev.Data)} ${ev.HoraInicio ? '• ' + ev.HoraInicio : ''}</div>
+          </div>
+          <span class="badge ${cor.badge}">${esc(ev.Tipo)}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+function _renderCalWeek(container) {
+  const hoje = new Date();
+  // Encontra domingo da semana de referência
+  const ref  = new Date(_calDayTarget);
+  const dow  = ref.getDay();
+  const dom  = new Date(ref); dom.setDate(ref.getDate() - dow);
+
+  const dias = Array.from({length:7}, (_, i) => { const d = new Date(dom); d.setDate(dom.getDate()+i); return d; });
+  const meses= ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const semNomes = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  const horas = Array.from({length:14}, (_, i) => 7 + i); // 07:00–20:00
+
+  const eventosPorDia = {};
+  (_calEventos || []).forEach(ev => {
+    if (ev.Data) {
+      const key = ev.Data.substring(0, 10);
+      if (!eventosPorDia[key]) eventosPorDia[key] = [];
+      eventosPorDia[key].push(ev);
+    }
+  });
+
+  const prevDom  = new Date(dom); prevDom.setDate(dom.getDate()-7);
+  const nextDom  = new Date(dom); nextDom.setDate(dom.getDate()+7);
+  const fmtDate  = d => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <button class="btn btn-outline btn-sm" onclick="_calDayTarget=new Date(${prevDom.getTime()});renderCalendar()"><i class="fas fa-chevron-left"></i></button>
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">
+        ${dias[0].getDate()} ${meses[dias[0].getMonth()]} – ${dias[6].getDate()} ${meses[dias[6].getMonth()]} ${dias[6].getFullYear()}
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="_calDayTarget=new Date(${nextDom.getTime()});renderCalendar()"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div style="display:grid;grid-template-columns:44px repeat(7,1fr);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="background:var(--bg3)"></div>`;
+
+  dias.forEach(d => {
+    const isHoje = d.toDateString() === hoje.toDateString();
+    html += `<div style="text-align:center;padding:8px 4px;background:var(--bg3);border-left:1px solid var(--border);font-size:11px">
+      <div style="font-weight:600;color:var(--text3)">${semNomes[d.getDay()]}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;${isHoje?'color:var(--teal)':''}">${d.getDate()}</div>
+    </div>`;
+  });
+
+  horas.forEach(h => {
+    const label = `${String(h).padStart(2,'0')}:00`;
+    html += `<div style="font-size:10px;color:var(--text3);padding:8px 4px;text-align:right;border-top:1px solid var(--border);background:var(--bg3)">${label}</div>`;
+    dias.forEach(d => {
+      const key  = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const evs  = (eventosPorDia[key] || []).filter(ev => {
+        const hStr = (ev.HoraInicio || '').split(':')[0];
+        return parseInt(hStr) === h;
+      });
+      const isHoje = d.toDateString() === hoje.toDateString();
+      const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const clickFn = evs.length ? `mostrarEventosDia('${ds}')` : isAdmin() ? `_criarEventoNoDia('${ds}','${label}')` : '';
+      html += `<div onclick="${clickFn}" style="border-left:1px solid var(--border);border-top:1px solid var(--border);min-height:40px;padding:3px;cursor:${clickFn?'pointer':'default'};${isHoje?'background:rgba(239,68,68,.03)':''}">
+        ${evs.map(ev => { const cor = setorCor(ev.Tipo); return `<div class="cal-ev-chip" style="background:${cor.bg};color:${cor.fg}" title="${esc(ev.Titulo)}" onclick="event.stopPropagation();mostrarEventosDia('${ds}')">${esc(ev.Titulo)}</div>`; }).join('')}
+      </div>`;
+    });
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function _renderCalDay(container) {
+  const d    = new Date(_calDayTarget);
+  const hoje = new Date();
+  const semNomes = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const meses    = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const key      = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const horas    = Array.from({length:14}, (_, i) => 7 + i);
+
+  const evsDia   = (_calEventos || []).filter(ev => (ev.Data || '').substring(0,10) === key);
+  const evsPorHora = {};
+  evsDia.forEach(ev => {
+    const h = parseInt((ev.HoraInicio || '').split(':')[0]) || 8;
+    if (!evsPorHora[h]) evsPorHora[h] = [];
+    evsPorHora[h].push(ev);
+  });
+
+  const prevD = new Date(d); prevD.setDate(d.getDate()-1);
+  const nextD = new Date(d); nextD.setDate(d.getDate()+1);
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <button class="btn btn-outline btn-sm" onclick="_calDayTarget=new Date(${prevD.getTime()});renderCalendar()"><i class="fas fa-chevron-left"></i></button>
+      <div style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;${d.toDateString()===hoje.toDateString()?'color:var(--teal)':''}">${semNomes[d.getDay()]}</div>
+        <div style="font-size:13px;color:var(--text2)">${d.getDate()} de ${meses[d.getMonth()]} de ${d.getFullYear()}</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="_calDayTarget=new Date(${nextD.getTime()});renderCalendar()"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">`;
+
+  horas.forEach(h => {
+    const label = `${String(h).padStart(2,'0')}:00`;
+    const evs   = evsPorHora[h] || [];
+    const ds    = key;
+    const clickFn = evs.length ? `mostrarEventosDia('${ds}')` : isAdmin() ? `_criarEventoNoDia('${ds}','${label}')` : '';
+    html += `<div style="display:grid;grid-template-columns:56px 1fr;border-top:1px solid var(--border);min-height:52px">
+      <div style="font-size:11px;color:var(--text3);padding:10px 8px;text-align:right;background:var(--bg3)">${label}</div>
+      <div onclick="${clickFn}" style="padding:6px 10px;cursor:${clickFn?'pointer':'default'};${evs.length?'background:rgba(239,68,68,.04)':''}${!evs.length&&isAdmin()?' transition:background .15s;':''}">
+        ${evs.map(ev => { const cor = setorCor(ev.Tipo);
+          return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:${cor.bg};border:1px solid ${cor.bd};margin-bottom:4px;cursor:pointer" onclick="event.stopPropagation();mostrarEventosDia('${ds}')">
+            <div style="font-size:13px;font-weight:600;color:${cor.fg}">${esc(ev.Titulo)}</div>
+            ${ev.HoraInicio ? `<div style="font-size:11px;color:var(--text3);margin-left:auto">${ev.HoraInicio}${ev.HoraFim?'–'+ev.HoraFim:''}</div>` : ''}
+          </div>`; }).join('')}
+        ${!evs.length && isAdmin() ? `<div style="font-size:11px;color:var(--text3);opacity:0;transition:opacity .2s" class="add-ev-hint"><i class="fas fa-plus"></i> clique para criar</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Hover hint para admin
+  if (isAdmin()) {
+    container.querySelectorAll('[onclick*="_criarEventoNoDia"]').forEach(cell => {
+      const hint = cell.querySelector('.add-ev-hint');
+      if (hint) {
+        cell.addEventListener('mouseenter', () => hint.style.opacity = '1');
+        cell.addEventListener('mouseleave', () => hint.style.opacity = '0');
+      }
+    });
+  }
+}
+
+function _criarEventoNoDia(dateStr, hora) {
+  if (!requireAdmin('criar eventos')) return;
+  const modal = document.getElementById('modal-novo-evento');
+  if (!modal) { openModal('modal-novo-evento'); return; }
+  // Pré-preenche data e hora
+  const dataEl = modal.querySelector('input[type="date"]');
+  const horaEl = modal.querySelector('input[type="time"]');
+  if (dataEl) dataEl.value = dateStr;
+  if (horaEl && hora) horaEl.value = hora.replace(':00','') + ':00';
+  openModal('modal-novo-evento');
 }
 
 // ══════════════════════════════════════════════════════════════
