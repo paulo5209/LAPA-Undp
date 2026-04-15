@@ -170,3 +170,10 @@ window.utils = {
   validateField: _validateField,
   validateModal: _validateModal
 };
+
+// Alias para compatibilidade com módulos existentes
+window.setLoadingMsg = setLoadingMsg;
+window.setEmptyMsg = setEmptyMsg;
+window.esc = esc;
+window.setorCor = setorCor;
+window.statusBadge = statusBadge;

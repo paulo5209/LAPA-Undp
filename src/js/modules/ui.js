@@ -209,3 +209,13 @@ window.ui = {
   closeMobileSidebar,
   isLightMode: () => lightMode
 };
+
+// Alias para compatibilidade com módulos existentes
+window.showPage = showPage;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.showToast = showToast;
+window.animateCounter = animateCounter;
+window.customConfirm = customConfirm;
+window.toggleMobileSidebar = toggleMobileSidebar;
+window.closeMobileSidebar = closeMobileSidebar;

@@ -179,3 +179,10 @@ window.auth = {
   checkLock: _loginBloqueado,
   registerFailure: _registrarFalha
 };
+
+// Alias para compatibilidade com módulos existentes
+window.selectRole = selectRole;
+window.togglePassVisibility = togglePassVisibility;
+window.showLoginError = showLoginError;
+window.loginSuccess = loginSuccess;
+window.doLogout = doLogout;

@@ -66,3 +66,7 @@ window.api = {
   getCache: () => _apiCache,
   clearCache: () => { Object.keys(_apiCache).forEach(k => delete _apiCache[k]); }
 };
+
+// Alias para compatibilidade com módulos existentes
+window.fetchWithCache = fetchWithCache;
+window.postData = postData;
