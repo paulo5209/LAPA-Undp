@@ -1148,6 +1148,14 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; color: var(--coral); margin: 0 auto 18px;
 }
+.lapa-filter-bar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.lapa-filter-bar input, .lapa-filter-bar select { padding:8px 12px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius2); color:var(--text); font-size:13px; flex:1; min-width:180px; }
+.tesouraria-date-filter { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; font-size:13px; }
+.tesouraria-date-filter input[type="date"] { padding:6px 10px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius2); color:var(--text); }
+.ouvidoria-resp-modal textarea, .ouvidoria-resp-modal select { width:100%; min-height:80px; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius2); color:var(--text); padding:10px; font-family:'Plus Jakarta Sans',sans-serif; resize:vertical; margin-bottom:12px; }
+.nav-badge--warn  { background: var(--gold); color: #fff; }
+.nav-badge--alert { background: var(--coral); color: #fff; }
+.nav-badge--info  { background: var(--teal); color: #fff; }
 </style>
 </head>
 <body>
@@ -1323,6 +1331,10 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
           <div class="hero-divider"></div>
           <div class="hero-stat"><div class="value" id="cnt-eventos"><span class="skel-inline"></span></div><div class="label">Treinamentos no semestre</div></div>
           <div class="hero-divider"></div>
+          <div class="lapa-filter-bar">
+  <input type="text" id="filter-pesquisa-text" placeholder="Buscar por título, pesquisador ou CAAE..." oninput="filterPesquisa()">
+  <select id="filter-pesquisa-status" onchange="filterPesquisa()"><option value="">Todos os status</option><option value="Planejamento">Planejamento</option><option value="Aguardando CEP">Aguardando CEP</option><option value="Coleta de dados">Coleta de dados</option><option value="Análise">Análise</option><option value="Escrita">Escrita</option><option value="Publicado">Publicado</option></select>
+</div>
           <div class="hero-stat"><div class="value" id="cnt-projetos"><span class="skel-inline"></span></div><div class="label">Projetos em andamento</div></div>
           <div class="hero-divider"></div>
           <div class="hero-stat"><div class="value" id="cnt-anos"><span class="skel-inline"></span></div><div class="label">Anos de existência</div></div>
@@ -1536,6 +1548,14 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
       </div>
 
       <div class="divider"></div>
+      <div class="tesouraria-date-filter">
+  <span style="color:var(--text2)">Período:</span>
+  <input type="date" id="date-start"><span style="color:var(--text3)">até</span><input type="date" id="date-end">
+  <button class="btn btn-sm btn-outline" onclick="setDateRange('month')">Mês</button>
+  <button class="btn btn-sm btn-outline" onclick="setDateRange('semester')">Semestre</button>
+  <button class="btn btn-sm btn-outline" onclick="setDateRange('year')">Ano</button>
+  <button class="btn btn-sm btn-primary" onclick="applyDateFilter()">Filtrar</button>
+</div>
 
       <div class="grid grid-2-1">
         <div class="card">
@@ -1791,6 +1811,12 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
       </div>
       <div class="divider"></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:18px;align-items:center">
+        <div class="lapa-filter-bar">
+  <input type="text" id="filter-ensino-text" placeholder="Buscar por título ou responsável..." oninput="filterEnsino()">
+  <select id="filter-ensino-mod" onchange="filterEnsino()"><option value="">Todas modalidades</option><option value="Presencial">Presencial</option><option value="Online">Online</option><option value="Híbrido">Híbrido</option></select>
+  <select id="filter-ensino-status" onchange="filterEnsino()"><option value="">Todos os status</option><option value="Planejado">Planejado</option><option value="Em andamento">Em andamento</option><option value="Encerrado">Encerrado</option></select>
+  <input type="number" id="filter-ensino-minh" placeholder="Horas mín." style="max-width:100px" oninput="filterEnsino()">
+</div>
         <div style="font-weight:600">Cursos & Capacitações</div>
         <button class="btn btn-primary admin-only" onclick="openModal('modal-novo-curso')"><i class="fas fa-plus"></i> Novo curso</button>
       </div>
@@ -2724,6 +2750,8 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
 </div>
 
 <!-- ═══════════ JAVASCRIPT ═══════════ -->
+ <!-- MODAL: Responder Ouvidoria (ADMIN) -->
+<div class="modal-overlay" id="modal-ouvidoria-resp"><div class="modal ouvidoria-resp-modal" style="width:500px"><div class="modal-header"><div class="modal-title"><i class="fas fa-comment-dots" style="color:var(--teal);margin-right:8px"></i>Responder Manifestação</div><button class="modal-close" onclick="closeOuvidoriaModal()">✕</button></div><input type="hidden" id="ouv-resp-id"><div class="form-group"><label class="form-label">Resposta interna (admin)</label><textarea id="ouv-resp-admin" placeholder="Anotações ou encaminhamento interno..."></textarea></div><div class="form-group"><label class="form-label">Resposta ao membro (visível)</label><textarea id="ouv-resp-membro" placeholder="Mensagem que será exibida ao solicitante..."></textarea></div><div class="form-group"><label class="form-label">Novo Status</label><select id="ouv-resp-status"><option value="Em análise">Em análise</option><option value="Resolvido">Resolvido</option><option value="Arquivado">Arquivado</option></select></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeOuvidoriaModal()">Cancelar</button><button class="btn btn-primary" onclick="saveOuvidoriaResponse()"><i class="fas fa-save"></i> Salvar & Atualizar</button></div></div></div>
 <script>
 'use strict';
 // ═══════════════════════════════════════════════════════════════
@@ -7396,6 +7424,75 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => document.getElementById('login-senha')?.focus(), 300);
   }
 });
+function filterPesquisa() {
+  const t = (document.getElementById('filter-pesquisa-text')?.value || '').toLowerCase();
+  const s = document.getElementById('filter-pesquisa-status')?.value || '';
+  document.querySelectorAll('#pesquisa-grid .research-card').forEach(c => {
+    const mT = !t || c.textContent.toLowerCase().includes(t);
+    const mS = !s || (c.getAttribute('data-status') || c.querySelector('.badge')?.textContent || '') === s;
+    c.style.display = (mT && mS) ? '' : 'none';
+  });
+}
+function filterEnsino() {
+  const t = (document.getElementById('filter-ensino-text')?.value || '').toLowerCase();
+  const m = document.getElementById('filter-ensino-mod')?.value || '';
+  const s = document.getElementById('filter-ensino-status')?.value || '';
+  const h = parseInt(document.getElementById('filter-ensino-minh')?.value) || 0;
+  document.querySelectorAll('#ensino-cursos-grid .research-card').forEach(c => {
+    const mT = !t || c.textContent.toLowerCase().includes(t);
+    const mM = !m || (c.getAttribute('data-mod') || '') === m;
+    const mS = !s || (c.getAttribute('data-status') || c.querySelector('.badge')?.textContent || '') === s;
+    const mH = !h || parseInt(c.getAttribute('data-hours') || 0) >= h;
+    c.style.display = (mT && mM && mS && mH) ? '' : 'none';
+  });
+}
+function setDateRange(type) {
+  const n = new Date(); let s = new Date(), e = new Date();
+  if (type === 'month') { s = new Date(n.getFullYear(), n.getMonth(), 1); e = new Date(n.getFullYear(), n.getMonth()+1, 0); }
+  else if (type === 'semester') { const sm = n.getMonth() < 6 ? 0 : 6; s = new Date(n.getFullYear(), sm, 1); e = new Date(n.getFullYear(), sm+6, 0); }
+  else if (type === 'year') { s = new Date(n.getFullYear(), 0, 1); e = new Date(n.getFullYear(), 11, 31); }
+  document.getElementById('date-start').value = s.toISOString().split('T')[0];
+  document.getElementById('date-end').value = e.toISOString().split('T')[0];
+}
+function applyDateFilter() {
+  const s = document.getElementById('date-start').value, e = document.getElementById('date-end').value;
+  document.querySelectorAll('#finance-movimentacoes .finance-row').forEach(r => {
+    r.style.display = (s && e) ? (r.textContent.includes(s) || r.textContent.includes(e) ? '' : 'none') : '';
+  });
+}
+function handleCSVImport(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const rows = ev.target.result.split(/\r?\n/).filter(r => r.trim());
+    const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+    const members = rows.slice(1).map(r => {
+      const c = r.split(',').map(x => x.trim());
+      return { nome: c[headers.indexOf('nome')] || c[0], matricula: c[headers.indexOf('matrícula')] || c[headers.indexOf('matricula')] || c[1], periodo: c[headers.indexOf('período')] || c[headers.indexOf('periodo')] || c[2], setor: c[headers.indexOf('setor')] || c[3] };
+    }).filter(m => m.nome && m.matricula);
+    console.log('CSV lido:', members);
+    showToast(`${members.length} membro(s) pronto(s) para cadastro.`, 'success');
+  };
+  reader.readAsText(file); input.value = '';
+}
+let ouvCurrentId = null;
+function openOuvidoriaModal(id, tipo) {
+  if (!isAdmin()) return;
+  ouvCurrentId = id;
+  document.getElementById('ouv-resp-id').value = id;
+  document.querySelector('#modal-ouvidoria-resp .modal-title').innerHTML = `<i class="fas fa-comment-dots" style="color:var(--teal);margin-right:8px"></i>Responder: ${tipo}`;
+  openModal('modal-ouvidoria-resp');
+}
+function closeOuvidoriaModal() { closeModal('modal-ouvidoria-resp'); ouvCurrentId = null; }
+async function saveOuvidoriaResponse() {
+  if (!requireAdmin('responder ouvidoria')) return;
+  const btn = document.querySelector('#modal-ouvidoria-resp .btn-primary');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando…';
+  try {
+    await apiPost({ action: 'update', sheet: 'Ouvidoria', id: ouvCurrentId, row: { Status: document.getElementById('ouv-resp-status').value, RespostaAdmin: document.getElementById('ouv-resp-admin').value.trim(), RespostaMembro: document.getElementById('ouv-resp-membro').value.trim() }});
+    showToast('Manifestação atualizada!', 'success'); closeOuvidoriaModal(); loadOuvidoria();
+  } catch(e) { showToast('Erro: ' + e.message, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Salvar & Atualizar'; }
+}
 </script>
 </body>
 </html>
