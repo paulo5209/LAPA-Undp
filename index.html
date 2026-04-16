@@ -45,7 +45,68 @@ body {
   display: flex;
   overflow-x: hidden;
 }
+/* Container do item de navegação */
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  position: relative;
+  color: #4a5568;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-item:hover, .nav-item.active {
+  background: #edf2f7;
+  color: #2d3748;
+}
 
+/* Ícone e texto */
+.nav-item .icon {
+  width: 24px;
+  margin-right: 12px;
+  text-align: center;
+  font-size: 15px;
+}
+.nav-item > span:not(.nav-badge) {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Badge base */
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: auto; /* Garante alinhamento à direita */
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  background: #e2e8f0;
+  color: #4a5568;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+/* Variantes semânticas */
+.nav-badge--warn  { background: #f6ad55; color: #fff; }
+.nav-badge--alert { background: #e53e3e; color: #fff; }
+.nav-badge--info  { background: #4299e1; color: #fff; }
+
+/* Utilitário para JS: mostrar badge quando houver dados */
+.nav-badge.show {
+  display: inline-flex !important;
+  animation: badgePop 0.2s ease;
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
 /* ═══════════════════════════════════════════════════
    SIDEBAR
 ═══════════════════════════════════════════════════ */
@@ -1160,13 +1221,14 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
     </div>
     <div class="nav-item" onclick="showPage('agenda')">
       <i class="icon fas fa-calendar-alt"></i><span>Agenda & Eventos</span>
-      <span class="nav-badge" id="nav-badge-agenda" style="display:none">0</span>
+      <span class="nav-badge" id="badge-agenda" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('membros')">
       <i class="icon fas fa-users"></i><span>Membros</span>
     </div>
     <div class="nav-item" onclick="showPage('documentos')">
       <i class="icon fas fa-folder-open"></i><span>Documentos</span>
+      <span class="nav-badge" id="badge-documentos" style="display:none">0</span>
     </div>
 
     <div class="nav-section-label">Setores</div>
@@ -1175,25 +1237,29 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
     </div>
     <div class="nav-item" onclick="showPage('tesouraria')">
       <i class="icon fas fa-coins"></i><span>Tesouraria</span>
-      <span class="nav-badge warn" id="nav-badge-tesouraria" style="display:none">!</span>
+      <span class="nav-badge nav-badge--warn" id="badge-tesouraria" style="display:none">!</span>
     </div>
     <div class="nav-item" onclick="showPage('marketing')">
       <i class="icon fas fa-bullhorn"></i><span>Marketing</span>
+      <span class="nav-badge" id="badge-marketing" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('pesquisa')">
       <i class="icon fas fa-microscope"></i><span>Pesquisa</span>
+      <span class="nav-badge" id="badge-pesquisa" style="display:none">0</span>
     </div>
 
     <div class="nav-section-label">Operações</div>
     <div class="nav-item" onclick="showPage('extensao')">
       <i class="icon fas fa-hands-helping"></i><span>Extensão</span>
+      <span class="nav-badge" id="badge-extensao" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('ensino')">
       <i class="icon fas fa-graduation-cap"></i><span>Ensino</span>
+      <span class="nav-badge" id="badge-ensino" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('ouvidoria')">
       <i class="icon fas fa-comment-dots"></i><span>Ouvidoria</span>
-      <span class="nav-badge alert" id="nav-badge-ouvidoria" style="display:none">0</span>
+      <span class="nav-badge nav-badge--alert" id="badge-ouvidoria" style="display:none">0</span>
     </div>
     <div class="nav-item" onclick="showPage('relatorios')">
       <i class="icon fas fa-chart-bar"></i><span>Relatórios</span>
@@ -1210,6 +1276,7 @@ th.sort-desc .sort-icon { opacity: 1; color: var(--teal); }
     </div>
   </div>
 </aside>
+  
 
 <!-- ═══════════ MAIN ═══════════ -->
 <div class="main">
