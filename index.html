@@ -4608,16 +4608,30 @@ async function loadOuvidoria() {
           'Nenhuma solicitação em aberto.</div>';
       } else {
         listEl.innerHTML = abertas.map(o => {
-          const num  = String(o.ID || '').slice(-4) || '????';
-          const desc = o.Mensagem ? o.Mensagem.substring(0, 70) + (o.Mensagem.length > 70 ? '…' : '') : '—';
-          return `<div class="finance-row">
-            <div>
-              <div class="finance-desc">${esc(o.Tipo || 'Manifestação')}: ${esc(desc)}</div>
-              <div class="finance-cat">#${esc(num)} • Anônimo • ${formatDate(o.Data)} • ${esc(o.Tipo || '—')}</div>
-            </div>
-            <span class="badge ${statusBadge(o.Status)}">${esc(o.Status || '—')}</span>
-          </div>`;
-        }).join('');
+         listEl.innerHTML = abertas.map(o => {
+  const num  = String(o.ID || '').slice(-4) || '????';
+  const desc = o.Mensagem ? o.Mensagem.substring(0, 70) + (o.Mensagem.length > 70 ? '…' : '') : '—';
+  
+  // Botões visíveis apenas para admin
+  const adminBtns = isAdmin() ? `
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn btn-outline btn-sm" onclick="openOuvidoriaModal('${esc(o.ID)}','${esc(o.Tipo)}')" title="Responder / Alterar status">
+        <i class="fas fa-comment-dots"></i>
+      </button>
+      <button class="btn btn-outline btn-sm" style="color:var(--coral)" onclick="deleteOuvidoria('${esc(o.ID)}')" title="Excluir registro">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>` : '';
+
+  return `<div class="finance-row">
+    <div style="flex:1">
+      <div class="finance-desc">${esc(o.Tipo || 'Manifestação')}: ${esc(desc)}</div>
+      <div class="finance-cat">#${esc(num)} • Anônimo • ${formatDate(o.Data)} • ${esc(o.Status || 'Pendente')}</div>
+    </div>
+    <span class="badge ${statusBadge(o.Status)}">${esc(o.Status || '—')}</span>
+    ${adminBtns}
+  </div>`;
+}).join('');
       }
     }
   } catch(e) {
@@ -7492,6 +7506,23 @@ async function saveOuvidoriaResponse() {
     await apiPost({ action: 'update', sheet: 'Ouvidoria', id: ouvCurrentId, row: { Status: document.getElementById('ouv-resp-status').value, RespostaAdmin: document.getElementById('ouv-resp-admin').value.trim(), RespostaMembro: document.getElementById('ouv-resp-membro').value.trim() }});
     showToast('Manifestação atualizada!', 'success'); closeOuvidoriaModal(); loadOuvidoria();
   } catch(e) { showToast('Erro: ' + e.message, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Salvar & Atualizar'; }
+}
+async function deleteOuvidoria(id) {
+  if (!requireAdmin('excluir manifestações')) return;
+  customConfirm({
+    title: 'Excluir manifestação',
+    message: 'Deseja realmente excluir este registro? Esta ação não pode ser desfeita.',
+    confirmLabel: 'Excluir',
+    icon: 'fa-trash',
+    iconColor: 'var(--coral)',
+    onConfirm: async () => {
+      try {
+        await apiPost({ action: 'delete', sheet: 'Ouvidoria', id });
+        showToast('Manifestação excluída com sucesso.', 'success');
+        loadOuvidoria();
+      } catch(e) { showToast('Erro ao excluir: ' + e.message, 'error'); }
+    }
+  });
 }
 </script>
 </body>
