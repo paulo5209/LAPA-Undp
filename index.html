@@ -4608,7 +4608,6 @@ async function loadOuvidoria() {
           'Nenhuma solicitação em aberto.</div>';
       } else {
         listEl.innerHTML = abertas.map(o => {
-         listEl.innerHTML = abertas.map(o => {
   const num  = String(o.ID || '').slice(-4) || '????';
   const desc = o.Mensagem ? o.Mensagem.substring(0, 70) + (o.Mensagem.length > 70 ? '…' : '') : '—';
   
